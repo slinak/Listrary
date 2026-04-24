@@ -1,0 +1,24 @@
+@model List<ListManager.Models.List>
+
+@{
+    ViewData["Title"] = "Lists";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Your Lists</h1>
+</div>
+<table class="table">
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.ListName</td>
+            <td>@item.ListType</td>
+            <td>@item.CreatedDate</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.ListID">Details</a> | 
+                <a asp-action="Edit" asp-route-id="@item.ListID">Edit</a> | 
+                <a asp-action="Delete" asp-route-id="@item.ListID">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
