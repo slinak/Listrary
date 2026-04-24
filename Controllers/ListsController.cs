@@ -6,7 +6,7 @@ namespace ListManager.Controllers;
 
 public class ListsController : Controller
 {
-    public static List<ListManager.Models.List> Lists = new List<ListManager.Models.List>() { new List() { ListID = "1", ListName = "Grocery List", ListType = ListType.Grocery, CreatedDate = DateTime.Now, LastUpdatedDate = DateTime.Now } };
+    public static List<ListManager.Models.List> Lists = new List<ListManager.Models.List>();
     private readonly ILogger<ListsController> _logger;
 
     public ListsController(ILogger<ListsController> logger)
@@ -22,6 +22,29 @@ public class ListsController : Controller
     public IActionResult Create()
     {
         return View("Create");
+    }
+
+    public IActionResult Edit(int id)
+    {
+        var list = Lists.FirstOrDefault(l => l.ListID == id);
+        if (list == null)
+        {
+            return NotFound();
+        }
+        return View("Edit", list);
+    }
+
+    [HttpPost]
+    public IActionResult Edit(List newList)
+    {
+        var list = Lists.FirstOrDefault(l => l.ListID == newList.ListID);
+        if (list != null)
+        {
+            Lists.Remove(list);
+            Lists.Add(newList);
+        }
+            
+        return RedirectToAction("Index");
     }
 
     [HttpPost]
