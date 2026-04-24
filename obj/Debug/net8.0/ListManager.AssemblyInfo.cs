@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ListManager")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+18699a35e3831a294bd82b8355782ee02efb5637")]
 [assembly: System.Reflection.AssemblyProductAttribute("ListManager")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ListManager")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

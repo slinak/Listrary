@@ -28,3 +28,4 @@ C:\Users\merse\Documents\GitHub\ListManager\obj\Debug\net8.0\refint\ListManager.
 C:\Users\merse\Documents\GitHub\ListManager\obj\Debug\net8.0\ListManager.pdb
 C:\Users\merse\Documents\GitHub\ListManager\obj\Debug\net8.0\ListManager.genruntimeconfig.cache
 C:\Users\merse\Documents\GitHub\ListManager\obj\Debug\net8.0\ref\ListManager.dll
+C:\Users\merse\Documents\GitHub\ListManager\obj\Debug\net8.0\ListManager.sourcelink.json

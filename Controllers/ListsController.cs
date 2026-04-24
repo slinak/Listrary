@@ -6,7 +6,7 @@ namespace ListManager.Controllers;
 
 public class ListsController : Controller
 {
-    public static List<ListManager.Models.List> Lists = new List<ListManager.Models.List>();
+    public static List<ListManager.Models.List> Lists = new List<ListManager.Models.List>() { new List() { ListID = "1", ListName = "Grocery List", ListType = ListType.Grocery, CreatedDate = DateTime.Now, LastUpdatedDate = DateTime.Now } };
     private readonly ILogger<ListsController> _logger;
 
     public ListsController(ILogger<ListsController> logger)
