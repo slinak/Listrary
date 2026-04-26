@@ -7,6 +7,7 @@ namespace ListManager.Controllers;
 public class ListsController : Controller
 {
     public static List<ListManager.Models.List> Lists = new List<ListManager.Models.List>();
+    public static List<ListItem> ListItems = new List<ListItem>();
     private readonly ILogger<ListsController> _logger;
 
     public ListsController(ILogger<ListsController> logger)
