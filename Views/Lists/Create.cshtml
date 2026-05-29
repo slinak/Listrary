@@ -18,7 +18,7 @@
             @Html.LabelFor(model => model.ListName, "List Name", htmlAttributes: new { @class = "control-label col-sm" })
             <div class="col-md-10">
                 <small>Please enter the list name.</small>
-                @Html.EditorFor(model => model.ListName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextBoxFor(model => model.ListName, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.ListName, "", new { @class = "text-danger" })
             </div>
         </div>

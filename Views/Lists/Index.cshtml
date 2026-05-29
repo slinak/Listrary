@@ -1,4 +1,4 @@
-@model List<ListManager.Models.List>
+@model IEnumerable<ListManager.Models.List>
 
 @{
     ViewData["Title"] = "Lists";
@@ -8,14 +8,17 @@
     <h1 class="display-4">Your Lists</h1>
 </div>
 <table class="table">
-    @foreach (var item in Model)
-    {
+    <thead>
         <tr>
             <th>List Name</th>
             <th>List Type</th>
             <th>Created Date</th>
             <th>Actions</th>
         </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
         <tr>
             <td>@item.ListName</td>
             <td>@item.ListType</td>
@@ -26,4 +29,5 @@
             </td>
         </tr>
     }
+    </tbody>
 </table>

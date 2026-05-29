@@ -1,5 +1,6 @@
 /obj/
 /bin/
+# Ignore all debug symbol files
 *.pdb
 bin/Debug/net8.0/ListManager.dll
 bin/Debug/net8.0/ListManager.dll
@@ -13,3 +14,4 @@ obj/Debug/net8.0/ListManager.pdb
 obj/Debug/net8.0/ListManager.sourcelink.json
 obj/Debug/net8.0/ref/ListManager.dll
 obj/Debug/net8.0/refint/ListManager.dll
+bin/Debug/net8.0/ListManager.pdb

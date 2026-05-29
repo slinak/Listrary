@@ -7,11 +7,15 @@ namespace ListManager.Controllers;
 public class ListItemController : Controller
 {
     public static List<ListItem> ListItems = new List<ListItem>();
-    public IActionResult Create(ListItem item)
+
+    [HttpPost]
+    public IActionResult Create(int listID, ListItem item)
     {
+        item.ListID = listID;
         ListItems.Add(item);
-        return View();
+        return RedirectToAction("Edit", "Lists", new { id = listID });
     }
+
     public static List<ListItem> GetAllListItems()
     {
         return ListItems;
