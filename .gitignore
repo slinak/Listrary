@@ -1,5 +1,5 @@
 /obj/
-obj/Debug/
+obj/Debug/*
 bin/Debug/
 /bin/
 # Ignore all debug symbol files
