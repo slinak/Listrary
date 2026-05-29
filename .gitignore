@@ -1,4 +1,5 @@
 /obj/
+obj/Debug/
 /bin/
 # Ignore all debug symbol files
 *.pdb
