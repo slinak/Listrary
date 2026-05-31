@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj": {}
+    "c:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj": {}
   },
   "projects": {
-    "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj": {
+    "c:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
+        "projectUniqueName": "c:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
         "projectName": "ListManager",
-        "projectPath": "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
+        "projectPath": "c:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
         "packagesPath": "C:\\Users\\merse\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\obj\\",
+        "outputPath": "c:\\Users\\merse\\Documents\\GitHub\\ListManager\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
