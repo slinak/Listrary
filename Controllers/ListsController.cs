@@ -28,7 +28,8 @@ public class ListsController : Controller
 
     public IActionResult Create()
     {
-        return View(new ListManager.Models.List());
+        var list = new ListManager.Models.List { ListType = ListType.Grocery };
+        return View(list);
     }
 
     public IActionResult Edit(int id)
