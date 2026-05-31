@@ -1,28 +1,34 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ListManager.Data;
 using ListManager.Models;
 
 namespace ListManager.Controllers;
 
 public class ListsController : Controller
 {
-    private static int NextListID = 1;
-    public static List<ListManager.Models.List> Lists = new List<ListManager.Models.List>();
-    public static List<ListItem> ListItems = new List<ListItem>();
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<ListsController> _logger;
 
-    public ListsController(ILogger<ListsController> logger)
+    public ListsController(ApplicationDbContext context, ILogger<ListsController> logger)
     {
+        _context = context;
         _logger = logger;
     }
 
     public IActionResult Index()
     {
-        var listViewModels = Lists.Select(list => new ListViewItemModel
-        {
-            ListModel = list,
-            ItemCount = ListItemController.GetListItemsByListID(list.ListID).Count
-        }).ToList();
+        var listViewModels = _context.Lists
+            .Include(list => list.Items)
+            .OrderBy(list => list.CreatedDate)
+            .Select(list => new ListViewItemModel
+            {
+                ListModel = list,
+                ItemCount = list.Items.Count
+            })
+            .ToList();
+
         return View(listViewModels);
     }
 
@@ -34,7 +40,7 @@ public class ListsController : Controller
 
     public IActionResult Edit(int id)
     {
-        var list = Lists.FirstOrDefault(l => l.ListID == id);
+        var list = _context.Lists.Find(id);
         if (list == null)
         {
             return NotFound();
@@ -46,20 +52,29 @@ public class ListsController : Controller
     [HttpPost]
     public IActionResult Edit(List newList)
     {
-        var list = Lists.FirstOrDefault(l => l.ListID == newList.ListID);
+        if (!ModelState.IsValid)
+        {
+            return View(newList);
+        }
+
+        var list = _context.Lists.Find(newList.ListID);
         if (list != null)
         {
-            list.ListName = newList.ListName;
+            list.ListName = newList.ListName?.Trim();
             list.ListType = newList.ListType;
             list.LastUpdatedDate = DateTime.Now;
+            _context.SaveChanges();
         }
-            
+
         return RedirectToAction("Index");
     }
 
     public IActionResult Manage(int id)
     {
-        var list = Lists.FirstOrDefault(l => l.ListID == id);
+        var list = _context.Lists
+            .Include(l => l.Items)
+            .FirstOrDefault(l => l.ListID == id);
+
         if (list == null)
         {
             return NotFound();
@@ -68,7 +83,7 @@ public class ListsController : Controller
         var viewModel = new ListItemManagementViewModel
         {
             ListModel = list,
-            Items = ListItemController.GetListItemsByListID(id)
+            Items = list.Items.OrderBy(item => item.CreatedDate).ToList()
         };
 
         return View(viewModel);
@@ -77,16 +92,11 @@ public class ListsController : Controller
     [HttpPost]
     public IActionResult Delete(int id)
     {
-        var list = Lists.FirstOrDefault(l => l.ListID == id);
+        var list = _context.Lists.Find(id);
         if (list != null)
         {
-            Lists.Remove(list);
-            // Also remove all items associated with this list
-            var items = ListItemController.GetListItemsByListID(id);
-            foreach (var item in items)
-            {
-                ListItemController.DeleteListItemFromList(id, item.ListItemID);
-            }
+            _context.Lists.Remove(list);
+            _context.SaveChanges();
         }
 
         return RedirectToAction("Index");
@@ -95,11 +105,15 @@ public class ListsController : Controller
     [HttpPost]
     public IActionResult Create(List list)
     {
+        if (!ModelState.IsValid)
+        {
+            return View(list);
+        }
+
         var newList = new ListManager.Models.List
         {
-            ListID = NextListID++,
-            ListName = list?.ListName?.Trim() ?? string.Empty,
-            ListType = list?.ListType,
+            ListName = list.ListName?.Trim() ?? string.Empty,
+            ListType = list.ListType,
             CreatedDate = DateTime.Now,
             LastUpdatedDate = DateTime.Now
         };
@@ -113,7 +127,9 @@ public class ListsController : Controller
             }
         }
 
-        Lists.Add(newList);
+        _context.Lists.Add(newList);
+        _context.SaveChanges();
+
         return RedirectToAction("Index");
     }
 

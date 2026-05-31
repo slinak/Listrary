@@ -1,60 +1,40 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using ListManager.Data;
 using ListManager.Models;
 
 namespace ListManager.Controllers;
 
 public class ListItemController : Controller
 {
-    public static List<ListItem> ListItems = new List<ListItem>();
+    private readonly ApplicationDbContext _context;
+
+    public ListItemController(ApplicationDbContext context)
+    {
+        _context = context;
+    }
 
     [HttpPost]
     public IActionResult Create(int listID, ListItem item)
     {
+        if (!ModelState.IsValid)
+        {
+            return RedirectToAction("Manage", "Lists", new { id = listID });
+        }
+
         item.ListID = listID;
-        ListItems.Add(item);
+        item.CreatedDate = DateTime.Now;
+        item.LastUpdatedDate = DateTime.Now;
+        item.AddedDate = DateTime.Now;
+
+        _context.ListItems.Add(item);
+        _context.SaveChanges();
+
         return RedirectToAction("Manage", "Lists", new { id = listID });
-    }
-
-    public static List<ListItem> GetAllListItems()
-    {
-        return ListItems;
-    }
-    public static List<ListItem> GetListItemsByListID(int listID)
-    {
-        return ListItems.Where(li => li.ListID == listID).ToList();
-    }
-
-    public static void AddListItemToList(int listID, ListItem item)
-    {
-        item.ListID = listID;
-        ListItems.Add(item);
-    }
-
-    public static void DeleteListItemFromList(int listID, int listItemID)
-    {
-        var item = ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
-        if (item != null)
-        {
-            ListItems.Remove(item);
-        }
-    }
-
-    public static void UpdateListItem(int listID, int listItemID, ListItem updatedItem)
-    {
-        var item = ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
-        if (item != null)
-        {
-            item.ItemName = updatedItem.ItemName;
-            item.ItemDetails = updatedItem.ItemDetails;
-            item.IsCompleted = updatedItem.IsCompleted;
-            item.LastUpdatedDate = DateTime.Now;
-        }
     }
 
     public IActionResult Edit(int listID, int listItemID)
     {
-        var item = ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
+        var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item == null)
         {
             return NotFound();
@@ -67,13 +47,20 @@ public class ListItemController : Controller
     [HttpPost]
     public IActionResult Edit(int listID, ListItem updatedItem)
     {
-        var item = ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == updatedItem.ListItemID);
+        if (!ModelState.IsValid)
+        {
+            ViewBag.ListID = listID;
+            return View(updatedItem);
+        }
+
+        var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == updatedItem.ListItemID);
         if (item != null)
         {
             item.ItemName = updatedItem.ItemName;
             item.ItemDetails = updatedItem.ItemDetails;
             item.IsCompleted = updatedItem.IsCompleted;
             item.LastUpdatedDate = DateTime.Now;
+            _context.SaveChanges();
         }
 
         return RedirectToAction("Manage", "Lists", new { id = listID });
@@ -82,20 +69,28 @@ public class ListItemController : Controller
     [HttpPost]
     public IActionResult Delete(int listID, int listItemID)
     {
-        DeleteListItemFromList(listID, listItemID);
+        var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
+        if (item != null)
+        {
+            _context.ListItems.Remove(item);
+            _context.SaveChanges();
+        }
+
         return RedirectToAction("Manage", "Lists", new { id = listID });
     }
 
     [HttpPost]
     public IActionResult Toggle(int listID, int listItemID)
     {
-        var item = ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
+        var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item != null)
         {
             item.IsCompleted = !item.IsCompleted;
             item.LastUpdatedDate = DateTime.Now;
+            _context.SaveChanges();
         }
 
         return RedirectToAction("Manage", "Lists", new { id = listID });
     }
+
 }
