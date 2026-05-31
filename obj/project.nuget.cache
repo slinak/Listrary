@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7osxSniayyDXUhOG3AQj5jPal7Yg5OxeCp5GZKO9cwnJfHRrAUH6nvDQXMCHrc4FCfJeudUrAZmDoLmsQnqR6Q==",
+  "dgSpecHash": "jZYOHa0QgNlH/5Qi1CHKNTaZdouOvrKYWAt5Tz97iQYe6PY+WE8MpFyttktFyyRO57sOLSLgRGZQFwkolE6E2Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
+  "projectFilePath": "c:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\merse\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\merse\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",

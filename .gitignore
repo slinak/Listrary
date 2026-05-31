@@ -35,3 +35,5 @@ bin/Debug/net8.0/ListManager.dll
 bin/Debug/net8.0/ListManager.dll
 bin/Debug/net8.0/ListManager.exe
 ListManager.db
+ListManager.db-shm
+ListManager.db-wal
