@@ -18,7 +18,12 @@ public class ListsController : Controller
 
     public IActionResult Index()
     {
-        return View(Lists);
+        var listViewModels = Lists.Select(list => new ListViewItemModel
+        {
+            ListModel = list,
+            ItemCount = ListItemController.GetListItemsByListID(list.ListID).Count
+        }).ToList();
+        return View(listViewModels);
     }
 
     public IActionResult Create()
@@ -34,13 +39,7 @@ public class ListsController : Controller
             return NotFound();
         }
 
-        var viewModel = new ListItemManagementViewModel
-        {
-            ListModel = list,
-            Items = ListItemController.GetListItemsByListID(id)
-        };
-
-        return View("Edit", viewModel);
+        return View(list);
     }
 
     [HttpPost]
@@ -49,10 +48,46 @@ public class ListsController : Controller
         var list = Lists.FirstOrDefault(l => l.ListID == newList.ListID);
         if (list != null)
         {
-            Lists.Remove(list);
-            Lists.Add(newList);
+            list.ListName = newList.ListName;
+            list.ListType = newList.ListType;
+            list.LastUpdatedDate = DateTime.Now;
         }
             
+        return RedirectToAction("Index");
+    }
+
+    public IActionResult Manage(int id)
+    {
+        var list = Lists.FirstOrDefault(l => l.ListID == id);
+        if (list == null)
+        {
+            return NotFound();
+        }
+
+        var viewModel = new ListItemManagementViewModel
+        {
+            ListModel = list,
+            Items = ListItemController.GetListItemsByListID(id)
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public IActionResult Delete(int id)
+    {
+        var list = Lists.FirstOrDefault(l => l.ListID == id);
+        if (list != null)
+        {
+            Lists.Remove(list);
+            // Also remove all items associated with this list
+            var items = ListItemController.GetListItemsByListID(id);
+            foreach (var item in items)
+            {
+                ListItemController.DeleteListItemFromList(id, item.ListItemID);
+            }
+        }
+
         return RedirectToAction("Index");
     }
 

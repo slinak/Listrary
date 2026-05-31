@@ -1,4 +1,4 @@
-@model IEnumerable<ListManager.Models.List>
+@model IEnumerable<ListManager.Models.ListViewItemModel>
 
 @{
     ViewData["Title"] = "Lists";
@@ -12,6 +12,7 @@
         <tr>
             <th>List Name</th>
             <th>List Type</th>
+            <th>Items</th>
             <th>Created Date</th>
             <th>Actions</th>
         </tr>
@@ -20,12 +21,18 @@
     @foreach (var item in Model)
     {
         <tr>
-            <td>@item.ListName</td>
-            <td>@item.ListType</td>
-            <td>@item.CreatedDate</td>
+            <td>@item.ListModel!.ListName</td>
+            <td>@item.ListModel!.ListType</td>
+            <td>@item.ItemCount</td>
+            <td>@item.ListModel!.CreatedDate</td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ListID">Manage</a> | 
-                <a asp-action="Delete" asp-route-id="@item.ListID">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID">Edit</a> | 
+                <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID">Manage</a> |
+                @using (Html.BeginForm("Delete", "Lists", FormMethod.Post, new { @class = "d-inline" }))
+                {
+                    @Html.Hidden("id", item.ListModel!.ListID)
+                    <button type="submit" class="btn btn-link p-0" style="color: inherit; text-decoration: underline; border: none; background: none; cursor: pointer;">Delete</button>
+                }
             </td>
         </tr>
     }

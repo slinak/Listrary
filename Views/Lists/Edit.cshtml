@@ -1,4 +1,4 @@
-@model ListManager.Models.ListItemManagementViewModel
+@model ListManager.Models.List
 
 @{
     ViewData["Title"] = "Edit List";
@@ -10,27 +10,27 @@
         @using (Html.BeginForm("Edit", "Lists", FormMethod.Post, new { @class = "form-horizontal" }))
         {
             @Html.AntiForgeryToken()
-            @Html.HiddenFor(model => model.ListModel.ListID)
+            @Html.HiddenFor(model => model.ListID)
 
             <div class="form-horizontal">
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="form-group row">
-                    @Html.LabelFor(model => model.ListModel.ListName, "List Name", htmlAttributes: new { @class = "control-label col-sm" })
+                    @Html.LabelFor(model => model.ListName, "List Name", htmlAttributes: new { @class = "control-label col-sm" })
                     <div class="col-md-10">
                         <small>Please enter the list name.</small>
-                        @Html.EditorFor(model => model.ListModel.ListName, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.ListModel.ListName, "", new { @class = "text-danger" })
+                        @Html.EditorFor(model => model.ListName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ListName, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="form-group row">
-                    @Html.LabelFor(model => model.ListModel.ListType, "List Type", htmlAttributes: new { @class = "control-label col-sm" })
+                    @Html.LabelFor(model => model.ListType, "List Type", htmlAttributes: new { @class = "control-label col-sm" })
                     <div class="col-md-10">
                         <dl>
                         @foreach (var value in Enum.GetValues(typeof(ListType)))
                             if (value != null)
                             {
                                 <dd>
-                                    @Html.RadioButtonFor(model => model.ListModel.ListType, value, htmlAttributes : new { @class = "form-check-input", @id = value })
+                                    @Html.RadioButtonFor(model => model.ListType, value, htmlAttributes : new { @class = "form-check-input", @id = value })
                                     @Html.Label(value.ToString(), value.ToString(), htmlAttributes: new { @for = value })
                                 </dd>
                             }
@@ -40,75 +40,10 @@
                 <div class="form-group row">
                     <div class="col-md-offset-2 col-md-2">
                         <input type="submit" value="Save" class="btn btn-primary mb-2" />
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
                     </div>
                 </div>
             </div>
         }
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="col-md-8">
-        <h2>Manage Items</h2>
-        @if (Model.Items != null && Model.Items.Any())
-        {
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Details</th>
-                        <th>Completed</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Items)
-                    {
-                        <tr>
-                            <td>@item.ItemName</td>
-                            <td>@item.ItemDetails</td>
-                            <td>@(item.IsCompleted ? "Yes" : "No")</td>
-                            <td>
-                                @using (Html.BeginForm("Delete", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
-                                {
-                                    @Html.Hidden("listID", Model.ListModel.ListID)
-                                    @Html.Hidden("listItemID", item.ListItemID)
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <div class="alert alert-info">This list has no items yet. Add your first item below.</div>
-        }
-
-        <div class="card mt-4">
-            <div class="card-body">
-                <h4 class="card-title">Add a New Item</h4>
-                @using (Html.BeginForm("Create", "ListItem", FormMethod.Post))
-                {
-                    @Html.Hidden("listID", Model.ListModel.ListID)
-                    <div class="form-group">
-                        <label for="ItemName">Item Name</label>
-                        @Html.TextBox("ItemName", Model.NewItem.ItemName, new { @class = "form-control", placeholder = "Name of the item" })
-                    </div>
-                    <div class="form-group mt-2">
-                        <label for="ItemDetails">Details</label>
-                        @Html.TextArea("ItemDetails", Model.NewItem.ItemDetails, 3, 0, new { @class = "form-control", placeholder = "Optional details" })
-                    </div>
-                    <div class="form-check mt-2">
-                        @Html.CheckBox("IsCompleted", Model.NewItem.IsCompleted, new { @class = "form-check-input", @id = "IsCompleted" })
-                        <label class="form-check-label" for="IsCompleted">Completed</label>
-                    </div>
-                    <button type="submit" class="btn btn-success mt-3">Add Item</button>
-                }
-            </div>
-        </div>
     </div>
 </div>
