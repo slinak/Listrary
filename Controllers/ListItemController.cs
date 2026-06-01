@@ -27,14 +27,10 @@ public class ListItemController : Controller
     public IActionResult Create(int listID, ListItem item)
     {
         if (!UserOwnsList(listID))
-        {
             return NotFound();
-        }
 
         if (!ModelState.IsValid)
-        {
             return RedirectToAction("Manage", "Lists", new { id = listID });
-        }
 
         item.ListID = listID;
         item.CreatedDate = DateTime.Now;
@@ -50,15 +46,11 @@ public class ListItemController : Controller
     public IActionResult Edit(int listID, int listItemID)
     {
         if (!UserOwnsList(listID))
-        {
             return NotFound();
-        }
 
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item == null)
-        {
             return NotFound();
-        }
 
         ViewBag.ListID = listID;
         return View(item);
@@ -68,9 +60,7 @@ public class ListItemController : Controller
     public IActionResult Edit(int listID, ListItem updatedItem)
     {
         if (!UserOwnsList(listID))
-        {
             return NotFound();
-        }
 
         if (!ModelState.IsValid)
         {
@@ -95,9 +85,7 @@ public class ListItemController : Controller
     public IActionResult Delete(int listID, int listItemID)
     {
         if (!UserOwnsList(listID))
-        {
             return NotFound();
-        }
 
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item != null)
@@ -113,9 +101,7 @@ public class ListItemController : Controller
     public IActionResult Toggle(int listID, int listItemID)
     {
         if (!UserOwnsList(listID))
-        {
             return NotFound();
-        }
 
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item != null)
