@@ -80,8 +80,7 @@ public class ListsController : Controller
 
     public IActionResult Create()
     {
-        var list = new ListManager.Models.List { ListType = ListType.Grocery };
-        return View(list);
+        return View(new ListManager.Models.List { ListType = ListType.Grocery });
     }
 
     [HttpPost]
