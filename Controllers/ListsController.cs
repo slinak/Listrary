@@ -193,9 +193,7 @@ public class ListsController : Controller
     public IActionResult Share(int id, ListSharePermission permission)
     {
         if (!UserOwnsList(id))
-        {
             return NotFound();
-        }
 
         var share = new ListShare
         {
@@ -217,9 +215,7 @@ public class ListsController : Controller
             .FirstOrDefault(l => l.ListID == id && l.OwnerId == CurrentUserId);
 
         if (list == null)
-        {
             return NotFound();
-        }
 
         var viewModel = new ListItemManagementViewModel
         {
