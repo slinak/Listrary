@@ -1,0 +1,25 @@
+/* Global frontend styling separate from site.css */
+:root {
+  --app-primary-color: #258cfb;
+  --app-background-color: #f8f9fa;
+}
+
+body {
+  background-color: var(--app-background-color);
+}
+
+.tableHeadRow {
+  background-color: rgba(37, 140, 251, 0.08);
+  > th {
+    text-align:center;
+  }
+}
+
+.tableBody > tr > td {
+  text-align:center;
+}
+
+.navbar-brand,
+.nav-link {
+  color: var(--app-primary-color) !important;
+}

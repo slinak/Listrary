@@ -26,6 +26,12 @@ namespace ListManager.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("LastUpdatedDate")
                         .HasColumnType("TEXT");
 
@@ -55,6 +61,9 @@ namespace ListManager.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsCompleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ItemDetails")

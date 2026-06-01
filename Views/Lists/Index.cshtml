@@ -9,7 +9,7 @@
 </div>
 <table class="table">
     <thead>
-        <tr>
+        <tr class="tableHeadRow">
             <th>List Name</th>
             <th>List Type</th>
             <th>Items</th>
@@ -17,7 +17,7 @@
             <th>Actions</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="tableBody">
     @foreach (var item in Model)
     {
         <tr>
@@ -26,8 +26,8 @@
             <td>@item.ItemCount</td>
             <td>@item.ListModel!.CreatedDate</td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID">Edit</a> | 
-                <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID">Manage</a> |
+                <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID">View</a> |
+                <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID">Edit</a> |
                 @using (Html.BeginForm("Delete", "Lists", FormMethod.Post, new { @class = "d-inline" }))
                 {
                     @Html.Hidden("id", item.ListModel!.ListID)
