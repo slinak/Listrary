@@ -6,26 +6,25 @@
 
 <div class="row">
     <div class="col-md-10">
-        <h2>Manage Items: @Model.ListModel.ListName</h2>
+        <h2>Manage @Model.ListModel.ListName</h2>
 
         @if (Model.Items != null && Model.Items.Any())
         {
             <table class="table table-bordered table-striped">
                 <thead>
-                    <tr>
+                    <tr class="tableHeadRow">
                         <th>Item</th>
                         <th>Details</th>
-                        <th>Completed</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="tableBody">
                     @foreach (var item in Model.Items)
                     {
                         <tr>
                             <td>@item.ItemName</td>
                             <td>@item.ItemDetails</td>
-                            <td>@(item.IsCompleted ? "Yes" : "No")</td>
+                            
                             <td>
                                 @using (Html.BeginForm("Toggle", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
                                 {
@@ -83,10 +82,6 @@
                     <div class="form-group mt-2">
                         <label for="ItemDetails">Details</label>
                         @Html.TextArea("ItemDetails", Model.NewItem.ItemDetails, 3, 0, new { @class = "form-control", placeholder = "Optional details" })
-                    </div>
-                    <div class="form-check mt-2">
-                        @Html.CheckBox("IsCompleted", Model.NewItem.IsCompleted, new { @class = "form-check-input", @id = "IsCompleted" })
-                        <label class="form-check-label" for="IsCompleted">Completed</label>
                     </div>
                     <button type="submit" class="btn btn-success mt-3">Add Item</button>
                 }
