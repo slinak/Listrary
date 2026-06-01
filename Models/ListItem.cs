@@ -15,6 +15,7 @@ public class ListItem
     public string? ItemName { get; set; }
     public string? ItemDetails { get; set; }
     public bool IsCompleted { get; set; }
+    public bool IsDeleted { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.Now;
     public DateTime LastUpdatedDate { get; set; } = DateTime.Now;
     public DateTime AddedDate { get; set; } = DateTime.Now;
