@@ -30,9 +30,7 @@ public class ListsController : Controller
     private ListShare? FindShare(int listId, string? shareToken)
     {
         if (string.IsNullOrEmpty(shareToken))
-        {
             return _context.ListShares.FirstOrDefault(share => share.ListID == listId && share.RecipientId == CurrentUserId);
-        }
 
         var share = _context.ListShares.FirstOrDefault(share => share.ListID == listId && share.Token == shareToken);
         if (share != null && share.RecipientId == null)
@@ -47,9 +45,7 @@ public class ListsController : Controller
     private bool HasViewAccess(int listId, string? shareToken)
     {
         if (UserOwnsList(listId))
-        {
             return true;
-        }
 
         var share = FindShare(listId, shareToken);
         return share != null;
@@ -58,9 +54,7 @@ public class ListsController : Controller
     private bool HasEditAccess(int listId, string? shareToken)
     {
         if (UserOwnsList(listId))
-        {
             return true;
-        }
 
         var share = FindShare(listId, shareToken);
         return share?.Permission == ListSharePermission.Edit;
@@ -94,9 +88,7 @@ public class ListsController : Controller
     public IActionResult Create(List list)
     {
         if (!ModelState.IsValid)
-        {
             return View(list);
-        }
 
         var newList = new ListManager.Models.List
         {
@@ -111,9 +103,7 @@ public class ListsController : Controller
         {
             newList.ListName = Request.Form["ListName"].ToString()?.Trim();
             if (string.IsNullOrWhiteSpace(newList.ListName))
-            {
                 newList.ListName = Request.Form["list.ListName"].ToString()?.Trim();
-            }
         }
 
         _context.Lists.Add(newList);
@@ -125,15 +115,11 @@ public class ListsController : Controller
     public IActionResult Edit(int id)
     {
         if (!UserOwnsList(id))
-        {
             return NotFound();
-        }
 
         var list = _context.Lists.FirstOrDefault(l => l.ListID == id);
         if (list == null)
-        {
             return NotFound();
-        }
 
         return View(list);
     }
@@ -142,9 +128,7 @@ public class ListsController : Controller
     public IActionResult Edit(List newList)
     {
         if (!ModelState.IsValid)
-        {
             return View(newList);
-        }
 
         var list = _context.Lists.FirstOrDefault(l => l.ListID == newList.ListID && l.OwnerId == CurrentUserId);
         if (list != null)
@@ -166,14 +150,10 @@ public class ListsController : Controller
             .FirstOrDefault(l => l.ListID == id);
 
         if (list == null)
-        {
             return NotFound();
-        }
 
         if (!HasViewAccess(id, shareToken))
-        {
             return NotFound();
-        }
 
         var share = FindShare(id, shareToken);
         var viewModel = new ListItemManagementViewModel
