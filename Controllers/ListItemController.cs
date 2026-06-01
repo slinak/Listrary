@@ -23,14 +23,45 @@ public class ListItemController : Controller
         return _context.Lists.Any(l => l.ListID == listID && l.OwnerId == CurrentUserId);
     }
 
-    [HttpPost]
-    public IActionResult Create(int listID, ListItem item)
+    private ListShare? FindShare(int listID, string? shareToken)
     {
-        if (!UserOwnsList(listID))
+        if (!string.IsNullOrWhiteSpace(shareToken))
+        {
+            var share = _context.ListShares.FirstOrDefault(s => s.ListID == listID && s.Token == shareToken);
+            if (share != null)
+            {
+                if (share.RecipientId == null)
+                {
+                    share.RecipientId = CurrentUserId;
+                    _context.SaveChanges();
+                }
+
+                return share;
+            }
+        }
+
+        return _context.ListShares.FirstOrDefault(s => s.ListID == listID && s.RecipientId == CurrentUserId);
+    }
+
+    private bool HasEditAccess(int listID, string? shareToken)
+    {
+        if (UserOwnsList(listID))
+        {
+            return true;
+        }
+
+        var share = FindShare(listID, shareToken);
+        return share != null && share.Permission == ListSharePermission.Edit;
+    }
+
+    [HttpPost]
+    public IActionResult Create(int listID, ListItem item, string? shareToken)
+    {
+        if (!HasEditAccess(listID, shareToken))
             return NotFound();
 
         if (!ModelState.IsValid)
-            return RedirectToAction("Manage", "Lists", new { id = listID });
+            return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
 
         item.ListID = listID;
         item.CreatedDate = DateTime.Now;
@@ -40,7 +71,7 @@ public class ListItemController : Controller
         _context.ListItems.Add(item);
         _context.SaveChanges();
 
-        return RedirectToAction("Manage", "Lists", new { id = listID });
+        return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
     }
 
     public IActionResult Edit(int listID, int listItemID)
@@ -57,9 +88,9 @@ public class ListItemController : Controller
     }
 
     [HttpPost]
-    public IActionResult Edit(int listID, ListItem updatedItem)
+    public IActionResult Edit(int listID, ListItem updatedItem, string? shareToken)
     {
-        if (!UserOwnsList(listID))
+        if (!HasEditAccess(listID, shareToken))
             return NotFound();
 
         if (!ModelState.IsValid)
@@ -78,13 +109,13 @@ public class ListItemController : Controller
             _context.SaveChanges();
         }
 
-        return RedirectToAction("Manage", "Lists", new { id = listID });
+        return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
     }
 
     [HttpPost]
-    public IActionResult Delete(int listID, int listItemID)
+    public IActionResult Delete(int listID, int listItemID, string? shareToken)
     {
-        if (!UserOwnsList(listID))
+        if (!HasEditAccess(listID, shareToken))
             return NotFound();
 
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
@@ -94,13 +125,13 @@ public class ListItemController : Controller
             _context.SaveChanges();
         }
 
-        return RedirectToAction("Manage", "Lists", new { id = listID });
+        return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
     }
 
     [HttpPost]
-    public IActionResult Toggle(int listID, int listItemID)
+    public IActionResult Toggle(int listID, int listItemID, string? shareToken)
     {
-        if (!UserOwnsList(listID))
+        if (!HasEditAccess(listID, shareToken))
             return NotFound();
 
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
@@ -111,7 +142,6 @@ public class ListItemController : Controller
             _context.SaveChanges();
         }
 
-        return RedirectToAction("Manage", "Lists", new { id = listID });
+        return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
     }
-
 }

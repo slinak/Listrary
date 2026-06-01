@@ -90,6 +90,42 @@ namespace ListManager.Migrations
                     b.ToTable("ListItems");
                 });
 
+            modelBuilder.Entity("ListManager.Models.ListShare", b =>
+                {
+                    b.Property<int>("ListShareId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ListID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Permission")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RecipientId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ListShareId");
+
+                    b.HasIndex("ListID");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("ListShares");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -297,6 +333,17 @@ namespace ListManager.Migrations
                     b.Navigation("List");
                 });
 
+            modelBuilder.Entity("ListManager.Models.ListShare", b =>
+                {
+                    b.HasOne("ListManager.Models.List", "List")
+                        .WithMany("Shares")
+                        .HasForeignKey("ListID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("List");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -351,6 +398,8 @@ namespace ListManager.Migrations
             modelBuilder.Entity("ListManager.Models.List", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("Shares");
                 });
 #pragma warning restore 612, 618
         }

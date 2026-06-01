@@ -19,6 +19,7 @@ public class List
     public bool IsCompleted { get; set; } = false;
 
     public ICollection<ListItem> Items { get; set; } = new System.Collections.Generic.List<ListItem>();
+    public ICollection<ListShare> Shares { get; set; } = new System.Collections.Generic.List<ListShare>();
 }
 
 public enum ListType

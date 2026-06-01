@@ -1,4 +1,5 @@
 @model ListManager.Models.ListItemManagementViewModel
+@using System.Security.Claims
 
 @{
     ViewData["Title"] = "Manage Items";
@@ -26,16 +27,24 @@
                             <td>@item.ItemDetails</td>
                             
                             <td>
-                                @using (Html.BeginForm("Toggle", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
+                                @if (Model.CanEdit)
                                 {
-                                    @Html.Hidden("listID", Model.ListModel.ListID)
-                                    @Html.Hidden("listItemID", item.ListItemID)
-                                    <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-warning")">@(item.IsCompleted ? "✓ Completed" : "Mark Complete")</button>
+                                    @using (Html.BeginForm("Toggle", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
+                                    {
+                                        @Html.Hidden("listID", Model.ListModel.ListID)
+                                        @Html.Hidden("listItemID", item.ListItemID)
+                                        @Html.Hidden("shareToken", Model.ShareToken)
+                                        <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-warning")">@(item.IsCompleted ? "✓ Completed" : "Mark Complete")</button>
+                                    }
+                                    <button type="button" class="btn btn-sm btn-danger delete-list-item-btn" style="margin-left: 0.5rem;"
+                                            data-list-id="@Model.ListModel.ListID"
+                                            data-list-item-id="@item.ListItemID"
+                                            data-list-item-name="@item.ItemName">Delete</button>
                                 }
-                                <button type="button" class="btn btn-sm btn-danger delete-list-item-btn" style="margin-left: 0.5rem;"
-                                        data-list-id="@Model.ListModel.ListID"
-                                        data-list-item-id="@item.ListItemID"
-                                        data-list-item-name="@item.ItemName">Delete</button>
+                                else
+                                {
+                                    <span class="text-muted">View only</span>
+                                }
                             </td>
                         </tr>
                     }
@@ -54,6 +63,7 @@
                                 <p>Are you sure you want to delete the item <strong id="deleteListItemName"></strong>?</p>
                                 @Html.Hidden("listID", Model.ListModel.ListID, new { id = "deleteListItemListId" })
                                 @Html.Hidden("listItemID", "", new { id = "deleteListItemId" })
+                                @Html.Hidden("shareToken", Model.ShareToken)
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -68,26 +78,79 @@
         {
             <div class="alert alert-info">This list has no items yet. Add your first item below.</div>
         }
-
         <div class="card mt-4">
             <div class="card-body">
                 <h4 class="card-title">Add an Item</h4>
-                @using (Html.BeginForm("Create", "ListItem", FormMethod.Post))
+                @if (Model.CanEdit)
                 {
-                    @Html.Hidden("listID", Model.ListModel.ListID)
-                    <div class="form-group">
-                        <label for="ItemName">Item Name</label>
-                        @Html.TextBox("ItemName", Model.NewItem.ItemName, new { @class = "form-control", placeholder = "Name" })
-                    </div>
-                    <div class="form-group mt-2">
-                        <label for="ItemDetails">Details</label>
-                        @Html.TextArea("ItemDetails", Model.NewItem.ItemDetails, 3, 0, new { @class = "form-control", placeholder = "Optional details, quantity, brand, etc" })
-                    </div>
-                    <button type="submit" class="btn btn-success mt-3">Add Item</button>
+                    @using (Html.BeginForm("Create", "ListItem", FormMethod.Post))
+                    {
+                        @Html.Hidden("listID", Model.ListModel.ListID)
+                        @Html.Hidden("shareToken", Model.ShareToken)
+                        <div class="form-group">
+                            <label for="ItemName">Item Name</label>
+                            @Html.TextBox("ItemName", Model.NewItem.ItemName, new { @class = "form-control", placeholder = "Name", autofocus = "autofocus" })
+                        </div>
+                        <div class="form-group mt-2">
+                            <label for="ItemDetails">Details</label>
+                            @Html.TextArea("ItemDetails", Model.NewItem.ItemDetails, 3, 0, new { @class = "form-control", placeholder = "Optional details, quantity, brand, etc" })
+                        </div>
+                        <button type="submit" class="btn btn-success mt-3">Add Item</button>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-secondary">This list is shared as view-only. Item changes are disabled.</div>
                 }
             </div>
         </div>
-
+        <hr />
+        @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.ListModel.OwnerId)
+        {
+            <div class="card md-4">
+                <div class="card-body">
+                    <h5 class="card-title">Share this list</h5>
+                    <form asp-action="Share" asp-controller="Lists" method="post" class="row gy-2 gx-2 align-items-end">
+                        @Html.Hidden("id", Model.ListModel.ListID)
+                        <div class="col-md-6">
+                            <label class="form-label" for="permission">Permission</label>
+                            <select class="form-select" id="permission" name="permission">
+                                <option value="View">View only</option>
+                                <option value="Edit">Edit</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary mt-1">Generate share link</button>
+                        </div>
+                    </form>
+                    @if (!string.IsNullOrEmpty(Model.GeneratedShareLink))
+                    {
+                        <div class="alert alert-success mt-3" role="alert">
+                            Share link created. Send this URL to another user:
+                            <div><a href="@Model.GeneratedShareLink" target="_blank">@Model.GeneratedShareLink</a></div>
+                        </div>
+                    }
+                    @if (Model.ActiveShares != null && Model.ActiveShares.Any())
+                    {
+                        <div class="mt-3">
+                            <h6>Active share links</h6>
+                            <ul class="list-group">
+                                @foreach (var share in Model.ActiveShares)
+                                {
+                                    <li class="list-group-item">
+                                        <strong>@share.Permission</strong> link: <code>@Url.Action("Manage", "Lists", new { id = share.ListID, shareToken = share.Token }, Context.Request.Scheme)</code>
+                                        @if (!string.IsNullOrEmpty(share.RecipientId))
+                                        {
+                                            <div><small>Accepted by: @share.RecipientId</small></div>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
         <hr />
         <a asp-action="Index" class="btn btn-secondary">Back to Lists</a>
     </div>

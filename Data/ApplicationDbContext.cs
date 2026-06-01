@@ -14,6 +14,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<List> Lists => Set<List>();
     public DbSet<ListItem> ListItems => Set<ListItem>();
+    public DbSet<ListShare> ListShares => Set<ListShare>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,6 +23,16 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .WithOne(item => item.List!)
             .HasForeignKey(item => item.ListID)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<List>()
+            .HasMany(list => list.Shares)
+            .WithOne(share => share.List!)
+            .HasForeignKey(share => share.ListID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ListShare>()
+            .HasIndex(share => share.Token)
+            .IsUnique();
 
         base.OnModelCreating(modelBuilder);
     }

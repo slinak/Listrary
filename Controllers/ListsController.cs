@@ -22,12 +22,57 @@ public class ListsController : Controller
 
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
+    private bool UserOwnsList(int listId)
+    {
+        return _context.Lists.Any(list => list.ListID == listId && list.OwnerId == CurrentUserId);
+    }
+
+    private ListShare? FindShare(int listId, string? shareToken)
+    {
+        if (string.IsNullOrEmpty(shareToken))
+        {
+            return _context.ListShares.FirstOrDefault(share => share.ListID == listId && share.RecipientId == CurrentUserId);
+        }
+
+        var share = _context.ListShares.FirstOrDefault(share => share.ListID == listId && share.Token == shareToken);
+        if (share != null && share.RecipientId == null)
+        {
+            share.RecipientId = CurrentUserId;
+            _context.SaveChanges();
+        }
+
+        return share?.RecipientId == CurrentUserId ? share : null;
+    }
+
+    private bool HasViewAccess(int listId, string? shareToken)
+    {
+        if (UserOwnsList(listId))
+        {
+            return true;
+        }
+
+        var share = FindShare(listId, shareToken);
+        return share != null;
+    }
+
+    private bool HasEditAccess(int listId, string? shareToken)
+    {
+        if (UserOwnsList(listId))
+        {
+            return true;
+        }
+
+        var share = FindShare(listId, shareToken);
+        return share?.Permission == ListSharePermission.Edit;
+    }
+
     public IActionResult Index()
     {
         var userId = CurrentUserId;
         var listViewModels = _context.Lists
             .Include(list => list.Items)
-            .Where(list => list.OwnerId == userId)
+            .Include(list => list.Shares)
+            .Where(list => list.OwnerId == userId || list.Shares.Any(share => share.RecipientId == userId))
             .OrderBy(list => list.CreatedDate)
             .Select(list => new ListViewItemModel
             {
@@ -79,7 +124,12 @@ public class ListsController : Controller
 
     public IActionResult Edit(int id)
     {
-        var list = _context.Lists.FirstOrDefault(l => l.ListID == id && l.OwnerId == CurrentUserId);
+        if (!UserOwnsList(id))
+        {
+            return NotFound();
+        }
+
+        var list = _context.Lists.FirstOrDefault(l => l.ListID == id);
         if (list == null)
         {
             return NotFound();
@@ -108,10 +158,62 @@ public class ListsController : Controller
         return RedirectToAction("Index");
     }
 
-    public IActionResult Manage(int id)
+    public IActionResult Manage(int id, string? shareToken)
     {
         var list = _context.Lists
             .Include(l => l.Items)
+            .Include(l => l.Shares)
+            .FirstOrDefault(l => l.ListID == id);
+
+        if (list == null)
+        {
+            return NotFound();
+        }
+
+        if (!HasViewAccess(id, shareToken))
+        {
+            return NotFound();
+        }
+
+        var share = FindShare(id, shareToken);
+        var viewModel = new ListItemManagementViewModel
+        {
+            ListModel = list,
+            Items = list.Items.OrderBy(item => item.CreatedDate).ToList(),
+            CanEdit = HasEditAccess(id, shareToken),
+            ShareToken = share?.Token,
+            ActiveShares = list.Shares.ToList(),
+            GeneratedShareLink = null
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public IActionResult Share(int id, ListSharePermission permission)
+    {
+        if (!UserOwnsList(id))
+        {
+            return NotFound();
+        }
+
+        var share = new ListShare
+        {
+            ListID = id,
+            OwnerId = CurrentUserId,
+            Permission = permission,
+            Token = Guid.NewGuid().ToString("N"),
+            CreatedDate = DateTime.Now
+        };
+
+        _context.ListShares.Add(share);
+        _context.SaveChanges();
+
+        var shareLink = Url.Action("Manage", "Lists", new { id = id, shareToken = share.Token }, Request.Scheme);
+
+        var list = _context.Lists
+            .Include(l => l.Items)
+            .Include(l => l.Shares)
             .FirstOrDefault(l => l.ListID == id && l.OwnerId == CurrentUserId);
 
         if (list == null)
@@ -122,10 +224,14 @@ public class ListsController : Controller
         var viewModel = new ListItemManagementViewModel
         {
             ListModel = list,
-            Items = list.Items.OrderBy(item => item.CreatedDate).ToList()
+            Items = list.Items.OrderBy(item => item.CreatedDate).ToList(),
+            CanEdit = true,
+            ShareToken = share.Token,
+            ActiveShares = list.Shares.ToList(),
+            GeneratedShareLink = shareLink
         };
 
-        return View(viewModel);
+        return View("Manage", viewModel);
     }
 
     [HttpPost]
