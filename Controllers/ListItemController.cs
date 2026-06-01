@@ -1,9 +1,12 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ListManager.Data;
 using ListManager.Models;
 
 namespace ListManager.Controllers;
 
+[Authorize]
 public class ListItemController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -13,9 +16,21 @@ public class ListItemController : Controller
         _context = context;
     }
 
+    private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+    private bool UserOwnsList(int listID)
+    {
+        return _context.Lists.Any(l => l.ListID == listID && l.OwnerId == CurrentUserId);
+    }
+
     [HttpPost]
     public IActionResult Create(int listID, ListItem item)
     {
+        if (!UserOwnsList(listID))
+        {
+            return NotFound();
+        }
+
         if (!ModelState.IsValid)
         {
             return RedirectToAction("Manage", "Lists", new { id = listID });
@@ -34,6 +49,11 @@ public class ListItemController : Controller
 
     public IActionResult Edit(int listID, int listItemID)
     {
+        if (!UserOwnsList(listID))
+        {
+            return NotFound();
+        }
+
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item == null)
         {
@@ -47,6 +67,11 @@ public class ListItemController : Controller
     [HttpPost]
     public IActionResult Edit(int listID, ListItem updatedItem)
     {
+        if (!UserOwnsList(listID))
+        {
+            return NotFound();
+        }
+
         if (!ModelState.IsValid)
         {
             ViewBag.ListID = listID;
@@ -69,6 +94,11 @@ public class ListItemController : Controller
     [HttpPost]
     public IActionResult Delete(int listID, int listItemID)
     {
+        if (!UserOwnsList(listID))
+        {
+            return NotFound();
+        }
+
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item != null)
         {
@@ -82,6 +112,11 @@ public class ListItemController : Controller
     [HttpPost]
     public IActionResult Toggle(int listID, int listItemID)
     {
+        if (!UserOwnsList(listID))
+        {
+            return NotFound();
+        }
+
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item != null)
         {

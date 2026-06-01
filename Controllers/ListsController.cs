@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ListManager.Data;
@@ -6,6 +8,7 @@ using ListManager.Models;
 
 namespace ListManager.Controllers;
 
+[Authorize]
 public class ListsController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -17,10 +20,14 @@ public class ListsController : Controller
         _logger = logger;
     }
 
+    private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
     public IActionResult Index()
     {
+        var userId = CurrentUserId;
         var listViewModels = _context.Lists
             .Include(list => list.Items)
+            .Where(list => list.OwnerId == userId)
             .OrderBy(list => list.CreatedDate)
             .Select(list => new ListViewItemModel
             {
@@ -38,9 +45,41 @@ public class ListsController : Controller
         return View(list);
     }
 
+    [HttpPost]
+    public IActionResult Create(List list)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(list);
+        }
+
+        var newList = new ListManager.Models.List
+        {
+            ListName = list.ListName?.Trim() ?? string.Empty,
+            OwnerId = CurrentUserId,
+            ListType = list.ListType,
+            CreatedDate = DateTime.Now,
+            LastUpdatedDate = DateTime.Now
+        };
+
+        if (string.IsNullOrWhiteSpace(newList.ListName))
+        {
+            newList.ListName = Request.Form["ListName"].ToString()?.Trim();
+            if (string.IsNullOrWhiteSpace(newList.ListName))
+            {
+                newList.ListName = Request.Form["list.ListName"].ToString()?.Trim();
+            }
+        }
+
+        _context.Lists.Add(newList);
+        _context.SaveChanges();
+
+        return RedirectToAction("Index");
+    }
+
     public IActionResult Edit(int id)
     {
-        var list = _context.Lists.Find(id);
+        var list = _context.Lists.FirstOrDefault(l => l.ListID == id && l.OwnerId == CurrentUserId);
         if (list == null)
         {
             return NotFound();
@@ -57,7 +96,7 @@ public class ListsController : Controller
             return View(newList);
         }
 
-        var list = _context.Lists.Find(newList.ListID);
+        var list = _context.Lists.FirstOrDefault(l => l.ListID == newList.ListID && l.OwnerId == CurrentUserId);
         if (list != null)
         {
             list.ListName = newList.ListName?.Trim();
@@ -73,7 +112,7 @@ public class ListsController : Controller
     {
         var list = _context.Lists
             .Include(l => l.Items)
-            .FirstOrDefault(l => l.ListID == id);
+            .FirstOrDefault(l => l.ListID == id && l.OwnerId == CurrentUserId);
 
         if (list == null)
         {
@@ -92,43 +131,12 @@ public class ListsController : Controller
     [HttpPost]
     public IActionResult Delete(int id)
     {
-        var list = _context.Lists.Find(id);
+        var list = _context.Lists.FirstOrDefault(l => l.ListID == id && l.OwnerId == CurrentUserId);
         if (list != null)
         {
             _context.Lists.Remove(list);
             _context.SaveChanges();
         }
-
-        return RedirectToAction("Index");
-    }
-
-    [HttpPost]
-    public IActionResult Create(List list)
-    {
-        if (!ModelState.IsValid)
-        {
-            return View(list);
-        }
-
-        var newList = new ListManager.Models.List
-        {
-            ListName = list.ListName?.Trim() ?? string.Empty,
-            ListType = list.ListType,
-            CreatedDate = DateTime.Now,
-            LastUpdatedDate = DateTime.Now
-        };
-
-        if (string.IsNullOrWhiteSpace(newList.ListName))
-        {
-            newList.ListName = Request.Form["ListName"].ToString()?.Trim();
-            if (string.IsNullOrWhiteSpace(newList.ListName))
-            {
-                newList.ListName = Request.Form["list.ListName"].ToString()?.Trim();
-            }
-        }
-
-        _context.Lists.Add(newList);
-        _context.SaveChanges();
 
         return RedirectToAction("Index");
     }
