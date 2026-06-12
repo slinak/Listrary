@@ -1,0 +1,33 @@
+@model IEnumerable<ListManager.Models.Circle>
+
+@{
+    ViewData["Title"] = "Your Circles";
+}
+
+<h2>Your Circles</h2>
+
+<p>
+    <a asp-action="Create">Create new circle</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Owner</th>
+            <th>Members</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var c in Model)
+    {
+        <tr>
+            <td>@c.Name</td>
+            <td>@c.OwnerId</td>
+            <td>@(c.Members?.Count ?? 0)</td>
+            <td><a asp-action="Manage" asp-route-id="@c.CircleId">Manage</a></td>
+        </tr>
+    }
+    </tbody>
+</table>

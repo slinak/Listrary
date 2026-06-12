@@ -46,6 +46,14 @@ public class ListsController : Controller
     {
         if (UserOwnsList(listId))
             return true;
+        // Check circle membership: if the list belongs to a circle and the current user is a member, allow view
+        var listForCircle = _context.Lists.FirstOrDefault(l => l.ListID == listId);
+        if (listForCircle != null && listForCircle.CircleId != null)
+        {
+            var isMember = _context.CircleMembers.Any(cm => cm.CircleId == listForCircle.CircleId && cm.UserId == CurrentUserId);
+            if (isMember)
+                return true;
+        }
 
         var share = FindShare(listId, shareToken);
         return share != null;
@@ -66,7 +74,11 @@ public class ListsController : Controller
         var listViewModels = _context.Lists
             .Include(list => list.Items)
             .Include(list => list.Shares)
-            .Where(list => list.OwnerId == userId || list.Shares.Any(share => share.RecipientId == userId))
+            .Include(list => list.Circle)
+                .ThenInclude(c => c.Members)
+            .Where(list => list.OwnerId == userId
+                || list.Shares.Any(share => share.RecipientId == userId)
+                || (list.Circle != null && list.Circle.Members.Any(m => m.UserId == userId)))
             .OrderBy(list => list.CreatedDate)
             .Select(list => new ListViewItemModel
             {

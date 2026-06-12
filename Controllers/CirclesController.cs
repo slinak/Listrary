@@ -1,0 +1,192 @@
+using System.Diagnostics;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ListManager.Data;
+using ListManager.Models;
+
+namespace ListManager.Controllers;
+
+[Authorize]
+public class CirclesController : Controller
+{
+    private readonly ApplicationDbContext _context;
+    private readonly ILogger<CirclesController> _logger;
+
+    public CirclesController(ApplicationDbContext context, ILogger<CirclesController> logger)
+    {
+        _context = context;
+        _logger = logger;
+    }
+
+    private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+    public IActionResult Index()
+    {
+        var userId = CurrentUserId;
+        var circles = _context.Circles
+            .Include(c => c.Members)
+            .Where(c => c.OwnerId == userId || c.Members.Any(m => m.UserId == userId))
+            .OrderBy(c => c.Name)
+            .ToList();
+
+        return View(circles);
+    }
+
+    public IActionResult Create()
+    {
+        return View(new Circle());
+    }
+
+    [HttpPost]
+    public IActionResult Create(Circle model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        model.OwnerId = CurrentUserId;
+        model.CreatedDate = DateTime.Now;
+
+        _context.Circles.Add(model);
+        _context.SaveChanges();
+
+        // Add owner as member
+        var ownerMember = new CircleMember { CircleId = model.CircleId, UserId = CurrentUserId, JoinedDate = DateTime.Now };
+        _context.CircleMembers.Add(ownerMember);
+        _context.SaveChanges();
+
+        return RedirectToAction("Manage", new { id = model.CircleId });
+    }
+
+    public IActionResult Manage(int id)
+    {
+        var circle = _context.Circles
+            .Include(c => c.Members)
+            .Include(c => c.Invitations)
+            .FirstOrDefault(c => c.CircleId == id);
+
+        if (circle == null)
+            return NotFound();
+
+        var isMember = circle.OwnerId == CurrentUserId || circle.Members.Any(m => m.UserId == CurrentUserId);
+        if (!isMember)
+            return Forbid();
+
+        return View(circle);
+    }
+
+    [HttpPost]
+    public IActionResult Invite(int circleId, string? recipientEmail, string? recipientId)
+    {
+        var circle = _context.Circles.Include(c => c.Members).FirstOrDefault(c => c.CircleId == circleId);
+        if (circle == null)
+            return NotFound();
+
+        var isMember = circle.OwnerId == CurrentUserId || circle.Members.Any(m => m.UserId == CurrentUserId);
+        if (!isMember)
+            return Forbid();
+
+        var invite = new CircleInvitation
+        {
+            CircleId = circleId,
+            InviterId = CurrentUserId,
+            RecipientEmail = string.IsNullOrWhiteSpace(recipientEmail) ? null : recipientEmail?.Trim(),
+            RecipientId = string.IsNullOrWhiteSpace(recipientId) ? null : recipientId?.Trim(),
+            Token = Guid.NewGuid().ToString("N"),
+            CreatedDate = DateTime.Now
+        };
+
+        _context.CircleInvitations.Add(invite);
+        _context.SaveChanges();
+
+        return RedirectToAction("Manage", new { id = circleId });
+    }
+
+    [HttpPost]
+    public IActionResult RemoveMember(int circleId, string userId)
+    {
+        var circle = _context.Circles.Include(c => c.Members).FirstOrDefault(c => c.CircleId == circleId);
+        if (circle == null)
+            return NotFound();
+
+        var isOwner = circle.OwnerId == CurrentUserId;
+        if (!isOwner)
+            return Forbid();
+
+        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleId == circleId && m.UserId == userId);
+        if (member != null)
+        {
+            _context.CircleMembers.Remove(member);
+            _context.SaveChanges();
+        }
+
+        return RedirectToAction("Manage", new { id = circleId });
+    }
+
+    [HttpPost]
+    public IActionResult Leave(int circleId)
+    {
+        var userId = CurrentUserId;
+        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleId == circleId && m.UserId == userId);
+        if (member != null)
+        {
+            _context.CircleMembers.Remove(member);
+            _context.SaveChanges();
+        }
+
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public IActionResult RemoveInvitation(int invitationId)
+    {
+        var invite = _context.CircleInvitations.Include(i => i.Circle).FirstOrDefault(i => i.CircleInvitationId == invitationId);
+        if (invite == null)
+            return NotFound();
+
+        var isOwnerOrInviter = invite.Circle?.OwnerId == CurrentUserId || invite.InviterId == CurrentUserId;
+        if (!isOwnerOrInviter)
+            return Forbid();
+
+        _context.CircleInvitations.Remove(invite);
+        _context.SaveChanges();
+
+        return RedirectToAction("Manage", new { id = invite.CircleId });
+    }
+
+    [AllowAnonymous]
+    public IActionResult Accept(string token)
+    {
+        if (string.IsNullOrEmpty(token))
+            return NotFound();
+
+        var invite = _context.CircleInvitations.Include(i => i.Circle).FirstOrDefault(i => i.Token == token);
+        if (invite == null)
+            return NotFound();
+
+        if (!User.Identity?.IsAuthenticated ?? false)
+        {
+            // Redirect to login and then back to this action
+            return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Accept", "Circles", new { token = token }) });
+        }
+
+        var userId = CurrentUserId;
+
+        if (invite.RecipientId == null)
+            invite.RecipientId = userId;
+
+        invite.Accepted = true;
+
+        // Add member if not exists
+        var exists = _context.CircleMembers.Any(m => m.CircleId == invite.CircleId && m.UserId == userId);
+        if (!exists)
+        {
+            _context.CircleMembers.Add(new CircleMember { CircleId = invite.CircleId, UserId = userId, JoinedDate = DateTime.Now });
+        }
+
+        _context.SaveChanges();
+
+        return RedirectToAction("Manage", new { id = invite.CircleId });
+    }
+}

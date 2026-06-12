@@ -16,4 +16,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <!-- Exclude test files directory from main project to avoid duplicate compilation -->
+  <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
+  </ItemGroup>
+
 </Project>

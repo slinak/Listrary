@@ -1,0 +1,42 @@
+@model ListManager.Models.Circle
+
+@{
+    ViewData["Title"] = "Create Circle";
+}
+
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">Create Circle</h2>
+
+        <form asp-action="Create" method="post" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <div class="text-danger"><span asp-validation-for="Name"></span></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a asp-action="Index" class="btn btn-link">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        // Bootstrap native validation styling
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+}
