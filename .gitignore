@@ -38,3 +38,4 @@ ListManager.db
 ListManager.db-shm
 ListManager.db-wal
 .instructions.md
+obj/ListManager.csproj.nuget.dgspec.json
