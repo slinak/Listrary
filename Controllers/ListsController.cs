@@ -90,6 +90,40 @@ public class ListsController : Controller
         return View(listViewModels);
     }
 
+    // Show all lists that belong to a specific circle (only available to circle owner or members)
+    public IActionResult Circle(int id)
+    {
+        var circle = _context.Circles
+            .Include(c => c.Members)
+            .FirstOrDefault(c => c.CircleID == id);
+
+        if (circle == null)
+            return NotFound();
+
+        var userId = CurrentUserId;
+        var isMemberOrOwner = circle.OwnerID == userId || circle.Members.Any(m => m.UserID == userId);
+        if (!isMemberOrOwner)
+            return NotFound();
+
+        var listViewModels = _context.Lists
+            .Include(l => l.Items)
+            .Include(l => l.Shares)
+            .Include(l => l.Circle)
+            .Where(l => l.CircleID == id)
+            .OrderBy(l => l.CreatedDate)
+            .Select(l => new ListViewItemModel
+            {
+                ListModel = l,
+                ItemCount = l.Items.Count
+            })
+            .ToList();
+
+        ViewData["CircleName"] = circle.Name;
+        ViewData["CircleId"] = id;
+
+        return View("Circle", listViewModels);
+    }
+
     public IActionResult Create()
     {
         return View(new ListManager.Models.List { ListType = ListType.Grocery });
