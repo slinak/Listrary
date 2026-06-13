@@ -65,7 +65,7 @@ public class CircleTests
         invite.RecipientID = userId;
         invite.Accepted = true;
         ctx.CircleInvitations.Update(invite);
-        ctx.CircleMembers.Add(new CircleMember { CircleId = circle.CircleID, UserID = userId });
+        ctx.CircleMembers.Add(new CircleMember { CircleID = circle.CircleID, UserID = userId });
         ctx.SaveChanges();
 
         var memberExists = ctx.CircleMembers.Any(m => m.CircleID == circle.CircleID && m.UserID == userId);

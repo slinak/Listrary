@@ -21,17 +21,90 @@ public class CirclesController : Controller
     }
 
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+    private string? CurrentUserEmail => User.FindFirstValue(ClaimTypes.Email);
 
     public IActionResult Index()
     {
         var userId = CurrentUserId;
+        var userEmail = CurrentUserEmail?.Trim();
+
         var circles = _context.Circles
             .Include(c => c.Members)
             .Where(c => c.OwnerID == userId || c.Members.Any(m => m.UserID == userId))
             .OrderBy(c => c.Name)
             .ToList();
 
-        return View(circles);
+        var pendingInvites = _context.CircleInvitations
+            .Include(i => i.Circle)
+            .Where(i => !i.Accepted &&
+                (i.RecipientID == userId ||
+                 (i.RecipientID == null && userEmail != null && i.RecipientEmail != null && i.RecipientEmail.Equals(userEmail))))
+            .OrderBy(i => i.CreatedDate)
+            .ToList();
+
+        var viewModel = new CirclesIndexViewModel
+        {
+            Circles = circles,
+            PendingInvitations = pendingInvites
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public IActionResult AcceptInvite(int invitationId)
+    {
+        var invite = _context.CircleInvitations
+            .Include(i => i.Circle)
+            .FirstOrDefault(i => i.CircleInvitationID == invitationId && !i.Accepted);
+
+        if (invite == null)
+            return NotFound();
+
+        var userId = CurrentUserId;
+        var userEmail = CurrentUserEmail?.Trim();
+        var isRecipient = invite.RecipientID == userId ||
+            (invite.RecipientID == null && userEmail != null && invite.RecipientEmail != null && invite.RecipientEmail.Equals(userEmail, StringComparison.OrdinalIgnoreCase));
+
+        if (!isRecipient)
+            return Forbid();
+
+        if (invite.RecipientID == null)
+            invite.RecipientID = userId;
+
+        invite.Accepted = true;
+
+        var exists = _context.CircleMembers.Any(m => m.CircleID == invite.CircleID && m.UserID == userId);
+        if (!exists)
+        {
+            _context.CircleMembers.Add(new CircleMember { CircleID = invite.CircleID, UserID = userId, JoinedDate = DateTime.Now });
+        }
+
+        _context.SaveChanges();
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public IActionResult RejectInvite(int invitationId)
+    {
+        var invite = _context.CircleInvitations
+            .Include(i => i.Circle)
+            .FirstOrDefault(i => i.CircleInvitationID == invitationId && !i.Accepted);
+
+        if (invite == null)
+            return NotFound();
+
+        var userId = CurrentUserId;
+        var userEmail = CurrentUserEmail?.Trim();
+        var isRecipient = invite.RecipientID == userId ||
+            (invite.RecipientID == null && userEmail != null && invite.RecipientEmail != null && invite.RecipientEmail.Equals(userEmail, StringComparison.OrdinalIgnoreCase));
+
+        if (!isRecipient)
+            return Forbid();
+
+        _context.CircleInvitations.Remove(invite);
+        _context.SaveChanges();
+        return RedirectToAction("Index");
     }
 
     public IActionResult Create()

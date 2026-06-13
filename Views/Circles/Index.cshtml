@@ -1,4 +1,4 @@
-@model IEnumerable<ListManager.Models.Circle>
+@model ListManager.Models.CirclesIndexViewModel
 
 @{
     ViewData["Title"] = "Your Circles";
@@ -9,8 +9,44 @@
     <a class="btn btn-primary" asp-action="Create">Create Circle</a>
 </div>
 
+@if (Model.PendingInvitations.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>Pending Invitations</strong>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                @foreach (var invite in Model.PendingInvitations)
+                {
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="mb-1">@invite.Circle?.Name</h5>
+                                <p class="mb-1">Invited by: @invite.InviterID</p>
+                                <p class="mb-1 text-muted">@invite.RecipientEmail ?? invite.RecipientID</p>
+                                <small>Invited on @invite.CreatedDate.ToString("g")</small>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <form asp-action="AcceptInvite" method="post" class="me-1">
+                                    <input type="hidden" name="invitationId" value="@invite.CircleInvitationID" />
+                                    <button type="submit" class="btn btn-success">Accept</button>
+                                </form>
+                                <form asp-action="RejectInvite" method="post">
+                                    <input type="hidden" name="invitationId" value="@invite.CircleInvitationID" />
+                                    <button type="submit" class="btn btn-outline-danger">Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
 <div class="row g-3">
-    @foreach (var c in Model)
+    @foreach (var c in Model.Circles)
     {
         <div class="col-sm-6 col-md-4">
             <div class="card h-100 shadow-sm">
