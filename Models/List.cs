@@ -11,8 +11,8 @@ public class List
     [Required]
     [StringLength(100)]
     public string? ListName { get; set; }
-    public string? OwnerId { get; set; }
-    public int? CircleId { get; set; }
+    public string? OwnerID { get; set; }
+    public int? CircleID { get; set; }
     public Circle? Circle { get; set; }
     public ListType? ListType { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.Now;

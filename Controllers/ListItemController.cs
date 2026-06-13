@@ -20,7 +20,7 @@ public class ListItemController : Controller
 
     private bool UserOwnsList(int listID)
     {
-        return _context.Lists.Any(l => l.ListID == listID && l.OwnerId == CurrentUserId);
+        return _context.Lists.Any(l => l.ListID == listID && l.OwnerID == CurrentUserId);
     }
 
     private ListShare? FindShare(int listID, string? shareToken)
@@ -30,9 +30,9 @@ public class ListItemController : Controller
             var share = _context.ListShares.FirstOrDefault(s => s.ListID == listID && s.Token == shareToken);
             if (share != null)
             {
-                if (share.RecipientId == null)
+                if (share.RecipientID == null)
                 {
-                    share.RecipientId = CurrentUserId;
+                    share.RecipientID = CurrentUserId;
                     _context.SaveChanges();
                 }
 
@@ -40,7 +40,7 @@ public class ListItemController : Controller
             }
         }
 
-        return _context.ListShares.FirstOrDefault(s => s.ListID == listID && s.RecipientId == CurrentUserId);
+        return _context.ListShares.FirstOrDefault(s => s.ListID == listID && s.RecipientID == CurrentUserId);
     }
 
     private bool HasEditAccess(int listID, string? shareToken)

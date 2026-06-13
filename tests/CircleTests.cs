@@ -24,14 +24,14 @@ public class CircleTests
         var ownerId = "owner-1";
         var memberId = "member-1";
 
-        var circle = new Circle { Name = "Test", OwnerId = ownerId };
+        var circle = new Circle { Name = "Test", OwnerID = ownerId };
         ctx.Circles.Add(circle);
         ctx.SaveChanges();
 
-        ctx.CircleMembers.Add(new CircleMember { CircleId = circle.CircleId, UserId = memberId });
+        ctx.CircleMembers.Add(new CircleMember { CircleID = circle.CircleID, UserID = memberId });
         ctx.SaveChanges();
 
-        var list = new List { ListName = "SharedList", OwnerId = ownerId, CircleId = circle.CircleId };
+        var list = new List { ListName = "SharedList", OwnerID = ownerId, CircleID = circle.CircleID };
         ctx.Lists.Add(list);
         ctx.SaveChanges();
 
@@ -39,7 +39,7 @@ public class CircleTests
         var visible = ctx.Lists
             .Include(l => l.Circle)
             .ThenInclude(c => c.Members)
-            .Where(l => l.OwnerId == memberId || (l.Circle != null && l.Circle.Members.Any(m => m.UserId == memberId)))
+            .Where(l => l.OwnerID == memberId || (l.Circle != null && l.Circle.Members.Any(m => m.UserID == memberId)))
             .ToList();
 
         Assert.Contains(visible, l => l.ListID == list.ListID);
@@ -53,22 +53,22 @@ public class CircleTests
         var ownerId = "owner-2";
         var userId = "user-2";
 
-        var circle = new Circle { Name = "Invited", OwnerId = ownerId };
+        var circle = new Circle { Name = "Invited", OwnerID = ownerId };
         ctx.Circles.Add(circle);
         ctx.SaveChanges();
 
-        var invite = new CircleInvitation { CircleId = circle.CircleId, InviterId = ownerId, Token = "tok-123" };
+        var invite = new CircleInvitation { CircleID = circle.CircleID, InviterID = ownerId, Token = "tok-123" };
         ctx.CircleInvitations.Add(invite);
         ctx.SaveChanges();
 
         // Simulate accept
-        invite.RecipientId = userId;
+        invite.RecipientID = userId;
         invite.Accepted = true;
         ctx.CircleInvitations.Update(invite);
-        ctx.CircleMembers.Add(new CircleMember { CircleId = circle.CircleId, UserId = userId });
+        ctx.CircleMembers.Add(new CircleMember { CircleId = circle.CircleID, UserID = userId });
         ctx.SaveChanges();
 
-        var memberExists = ctx.CircleMembers.Any(m => m.CircleId == circle.CircleId && m.UserId == userId);
+        var memberExists = ctx.CircleMembers.Any(m => m.CircleID == circle.CircleID && m.UserID == userId);
         Assert.True(memberExists);
     }
 }

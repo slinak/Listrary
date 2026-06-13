@@ -27,7 +27,7 @@ public class CirclesController : Controller
         var userId = CurrentUserId;
         var circles = _context.Circles
             .Include(c => c.Members)
-            .Where(c => c.OwnerId == userId || c.Members.Any(m => m.UserId == userId))
+            .Where(c => c.OwnerID == userId || c.Members.Any(m => m.UserID == userId))
             .OrderBy(c => c.Name)
             .ToList();
 
@@ -45,18 +45,18 @@ public class CirclesController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        model.OwnerId = CurrentUserId;
+        model.OwnerID = CurrentUserId;
         model.CreatedDate = DateTime.Now;
 
         _context.Circles.Add(model);
         _context.SaveChanges();
 
         // Add owner as member
-        var ownerMember = new CircleMember { CircleId = model.CircleId, UserId = CurrentUserId, JoinedDate = DateTime.Now };
+        var ownerMember = new CircleMember { CircleID = model.CircleID, UserID = CurrentUserId, JoinedDate = DateTime.Now };
         _context.CircleMembers.Add(ownerMember);
         _context.SaveChanges();
 
-        return RedirectToAction("Manage", new { id = model.CircleId });
+        return RedirectToAction("Manage", new { id = model.CircleID });
     }
 
     public IActionResult Manage(int id)
@@ -64,12 +64,12 @@ public class CirclesController : Controller
         var circle = _context.Circles
             .Include(c => c.Members)
             .Include(c => c.Invitations)
-            .FirstOrDefault(c => c.CircleId == id);
+            .FirstOrDefault(c => c.CircleID == id);
 
         if (circle == null)
             return NotFound();
 
-        var isMember = circle.OwnerId == CurrentUserId || circle.Members.Any(m => m.UserId == CurrentUserId);
+        var isMember = circle.OwnerID == CurrentUserId || circle.Members.Any(m => m.UserID == CurrentUserId);
         if (!isMember)
             return Forbid();
 
@@ -79,20 +79,20 @@ public class CirclesController : Controller
     [HttpPost]
     public IActionResult Invite(int circleId, string? recipientEmail, string? recipientId)
     {
-        var circle = _context.Circles.Include(c => c.Members).FirstOrDefault(c => c.CircleId == circleId);
+        var circle = _context.Circles.Include(c => c.Members).FirstOrDefault(c => c.CircleID == circleId);
         if (circle == null)
             return NotFound();
 
-        var isMember = circle.OwnerId == CurrentUserId || circle.Members.Any(m => m.UserId == CurrentUserId);
+        var isMember = circle.OwnerID == CurrentUserId || circle.Members.Any(m => m.UserID == CurrentUserId);
         if (!isMember)
             return Forbid();
 
         var invite = new CircleInvitation
         {
-            CircleId = circleId,
-            InviterId = CurrentUserId,
+            CircleID = circleId,
+            InviterID = CurrentUserId,
             RecipientEmail = string.IsNullOrWhiteSpace(recipientEmail) ? null : recipientEmail?.Trim(),
-            RecipientId = string.IsNullOrWhiteSpace(recipientId) ? null : recipientId?.Trim(),
+            RecipientID = string.IsNullOrWhiteSpace(recipientId) ? null : recipientId?.Trim(),
             Token = Guid.NewGuid().ToString("N"),
             CreatedDate = DateTime.Now
         };
@@ -106,15 +106,15 @@ public class CirclesController : Controller
     [HttpPost]
     public IActionResult RemoveMember(int circleId, string userId)
     {
-        var circle = _context.Circles.Include(c => c.Members).FirstOrDefault(c => c.CircleId == circleId);
+        var circle = _context.Circles.Include(c => c.Members).FirstOrDefault(c => c.CircleID == circleId);
         if (circle == null)
             return NotFound();
 
-        var isOwner = circle.OwnerId == CurrentUserId;
+        var isOwner = circle.OwnerID == CurrentUserId;
         if (!isOwner)
             return Forbid();
 
-        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleId == circleId && m.UserId == userId);
+        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleId == circleId && m.UserID == userId);
         if (member != null)
         {
             _context.CircleMembers.Remove(member);
@@ -128,7 +128,7 @@ public class CirclesController : Controller
     public IActionResult Leave(int circleId)
     {
         var userId = CurrentUserId;
-        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleId == circleId && m.UserId == userId);
+        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleId == circleId && m.UserID == userId);
         if (member != null)
         {
             _context.CircleMembers.Remove(member);
@@ -141,11 +141,11 @@ public class CirclesController : Controller
     [HttpPost]
     public IActionResult RemoveInvitation(int invitationId)
     {
-        var invite = _context.CircleInvitations.Include(i => i.Circle).FirstOrDefault(i => i.CircleInvitationId == invitationId);
+        var invite = _context.CircleInvitations.Include(i => i.Circle).FirstOrDefault(i => i.CircleInvitationID == invitationId);
         if (invite == null)
             return NotFound();
 
-        var isOwnerOrInviter = invite.Circle?.OwnerId == CurrentUserId || invite.InviterId == CurrentUserId;
+        var isOwnerOrInviter = invite.Circle?.OwnerID == CurrentUserId || invite.InviterID == CurrentUserId;
         if (!isOwnerOrInviter)
             return Forbid();
 
@@ -173,16 +173,16 @@ public class CirclesController : Controller
 
         var userId = CurrentUserId;
 
-        if (invite.RecipientId == null)
-            invite.RecipientId = userId;
+        if (invite.RecipientID == null)
+            invite.RecipientID = userId;
 
         invite.Accepted = true;
 
         // Add member if not exists
-        var exists = _context.CircleMembers.Any(m => m.CircleId == invite.CircleId && m.UserId == userId);
+        var exists = _context.CircleMembers.Any(m => m.CircleID == invite.CircleID && m.UserID == userId);
         if (!exists)
         {
-            _context.CircleMembers.Add(new CircleMember { CircleId = invite.CircleId, UserId = userId, JoinedDate = DateTime.Now });
+            _context.CircleMembers.Add(new CircleMember { CircleID = invite.CircleID, UserID = userId, JoinedDate = DateTime.Now });
         }
 
         _context.SaveChanges();

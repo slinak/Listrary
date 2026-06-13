@@ -36,7 +36,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.Entity<List>()
             .HasOne(list => list.Circle)
             .WithMany()
-            .HasForeignKey(list => list.CircleId)
+            .HasForeignKey(list => list.CircleID)
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<ListShare>()
@@ -46,17 +46,17 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.Entity<Circle>()
             .HasMany(c => c.Members)
             .WithOne(m => m.Circle)
-            .HasForeignKey(m => m.CircleId)
+            .HasForeignKey(m => m.CircleID)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Circle>()
             .HasMany(c => c.Invitations)
             .WithOne(i => i.Circle)
-            .HasForeignKey(i => i.CircleId)
+            .HasForeignKey(i => i.CircleID)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CircleMember>()
-            .HasIndex(m => new { m.CircleId, m.UserId })
+            .HasIndex(m => new { m.CircleID, m.UserID })
             .IsUnique();
 
         modelBuilder.Entity<CircleInvitation>()
