@@ -114,7 +114,7 @@ public class CirclesController : Controller
         if (!isOwner)
             return Forbid();
 
-        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleId == circleId && m.UserID == userId);
+        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleID == circleId && m.UserID == userId);
         if (member != null)
         {
             _context.CircleMembers.Remove(member);
@@ -128,7 +128,7 @@ public class CirclesController : Controller
     public IActionResult Leave(int circleId)
     {
         var userId = CurrentUserId;
-        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleId == circleId && m.UserID == userId);
+        var member = _context.CircleMembers.FirstOrDefault(m => m.CircleID == circleId && m.UserID == userId);
         if (member != null)
         {
             _context.CircleMembers.Remove(member);
@@ -152,7 +152,7 @@ public class CirclesController : Controller
         _context.CircleInvitations.Remove(invite);
         _context.SaveChanges();
 
-        return RedirectToAction("Manage", new { id = invite.CircleId });
+        return RedirectToAction("Manage", new { id = invite.CircleID });
     }
 
     [AllowAnonymous]
@@ -187,6 +187,6 @@ public class CirclesController : Controller
 
         _context.SaveChanges();
 
-        return RedirectToAction("Manage", new { id = invite.CircleId });
+        return RedirectToAction("Manage", new { id = invite.CircleID });
     }
 }

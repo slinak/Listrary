@@ -9,7 +9,7 @@
         <div class="d-flex justify-content-between align-items-start">
             <div>
                 <h2 class="card-title">Manage: @Model.Name</h2>
-                <p class="mb-1"><span class="badge bg-info text-dark">Owner:</span> @Model.OwnerId</p>
+                <p class="mb-1"><span class="badge bg-info text-dark">Owner:</span> @Model.OwnerID</p>
             </div>
             <div class="text-end">
                 <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Circles</a>
@@ -29,21 +29,21 @@
             @foreach (var m in Model.Members)
             {
                 <tr>
-                    <td>@m.UserId</td>
+                    <td>@m.UserID</td>
                     <td>@m.JoinedDate.ToShortDateString()</td>
                     <td>
-                        @if (Model.OwnerId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                        @if (Model.OwnerID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
                         {
                             <form asp-action="RemoveMember" method="post" class="d-inline">
-                                <input type="hidden" name="circleId" value="@Model.CircleId" />
-                                <input type="hidden" name="userId" value="@m.UserId" />
+                                <input type="hidden" name="circleId" value="@Model.CircleID" />
+                                <input type="hidden" name="UserID" value="@m.UserID" />
                                 <button class="btn btn-sm btn-outline-danger">Remove</button>
                             </form>
                         }
-                        @if (m.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value && Model.OwnerId != m.UserId)
+                        @if (m.UserID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value && Model.OwnerID != m.UserID)
                         {
                             <form asp-action="Leave" method="post" class="d-inline">
-                                <input type="hidden" name="circleId" value="@Model.CircleId" />
+                                <input type="hidden" name="CircleID" value="@Model.CircleID" />
                                 <button class="btn btn-sm btn-outline-secondary">Leave</button>
                             </form>
                         }
@@ -62,23 +62,23 @@
             @foreach (var i in Model.Invitations)
             {
                 <tr>
-                    <td>@(i.RecipientEmail ?? i.RecipientId ?? "(unspecified)")</td>
+                    <td>@(i.RecipientEmail ?? i.RecipientID ?? "(unspecified)")</td>
                     <td>@(i.Accepted ? "Accepted" : "Pending")</td>
                     <td>
                         @if (!i.Accepted)
                         {
                             <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Accept", "Circles", new { token = i.Token })">Accept Link</a>
-                            @if (Model.OwnerId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value || i.InviterId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                            @if (Model.OwnerID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value || i.InviterID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
                             {
                                 <form asp-action="RemoveInvitation" method="post" class="d-inline">
-                                    <input type="hidden" name="invitationId" value="@i.CircleInvitationId" />
+                                    <input type="hidden" name="invitationId" value="@i.CircleInvitationID" />
                                     <button class="btn btn-sm btn-outline-danger">Cancel</button>
                                 </form>
                             }
                         }
                         else
                         {
-                            <span>Accepted by: @i.RecipientId</span>
+                            <span>Accepted by: @i.RecipientID</span>
                         }
                     </td>
                 </tr>
@@ -88,13 +88,13 @@
 
         <h4 class="mt-4">Invite</h4>
         <form asp-action="Invite" method="post" id="inviteForm" class="row g-2 align-items-end">
-            <input type="hidden" name="circleId" value="@Model.CircleId" />
+            <input type="hidden" name="CircleID" value="@Model.CircleID" />
             <div class="col-md-6">
                 <label class="form-label">Recipient Email</label>
                 <input name="recipientEmail" class="form-control" type="email" placeholder="name@example.com" />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Recipient UserId (optional)</label>
+                <label class="form-label">Recipient UserID (optional)</label>
                 <input name="recipientId" class="form-control" />
             </div>
             <div class="col-md-2">
@@ -107,7 +107,7 @@
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
     <script>
-        // Simple client-side validation: require either email or userId
+        // Simple client-side validation: require either email or UserID
         document.getElementById('inviteForm').addEventListener('submit', function (e) {
             var email = document.querySelector('[name="recipientEmail"]').value.trim();
             var uid = document.querySelector('[name="recipientId"]').value.trim();
