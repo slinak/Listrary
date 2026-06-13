@@ -37,3 +37,4 @@ Thumbs.db
 # End of file
 obj/project.nuget.cache
 obj/ListManager.csproj.nuget.dgspec.json
+.vscode/settings.json
