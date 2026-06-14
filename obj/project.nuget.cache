@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rIboH3BBaL0D2keaBStYY5srmqQTYS6n7ocismtPw7b6eCUIYlDATGJPLT278AG+B6ssIbuCtrjsep16W/98sw==",
+  "dgSpecHash": "rfOQ5v35MZ9Pj4fl3a7XoLLOB8A4T6WBxYK2kGf5DS3S44myNHYcYqVoHFHxf+dRLeQ49xWP7n34EleJPJfZaA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
+  "projectFilePath": "c:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\merse\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\merse\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\8.0.0\\microsoft.aspnetcore.cryptography.internal.8.0.0.nupkg.sha512",

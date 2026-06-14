@@ -1,40 +1,40 @@
-/obj/
-obj/Debug/*
-bin/Debug/
+## Build outputs
 /bin/
-# Ignore all debug symbol files
-*.pdb
-bin/Debug/net8.0/ListManager.dll
-bin/Debug/net8.0/ListManager.dll
-bin/Debug/net8.0/ListManager.exe
-bin/Debug/net8.0/ListManager.pdb
-obj/Debug/net8.0/apphost.exe
-obj/Debug/net8.0/ListManager.AssemblyInfo.cs
-obj/Debug/net8.0/ListManager.AssemblyInfoInputs.cache
-obj/Debug/net8.0/ListManager.dll
-obj/Debug/net8.0/ListManager.pdb
-obj/Debug/net8.0/ListManager.sourcelink.json
-obj/Debug/net8.0/ref/ListManager.dll
-obj/Debug/net8.0/refint/ListManager.dll
-bin/Debug/net8.0/ListManager.pdb
-bin/Debug/net8.0/ListManager.dll
-bin/Debug/net8.0/ListManager.exe
-bin/Debug/net8.0/ListManager.pdb
-obj/Debug/net8.0/apphost.exe
-obj/Debug/net8.0/ListManager.AssemblyInfo.cs
-obj/Debug/net8.0/ListManager.AssemblyInfoInputs.cache
-obj/Debug/net8.0/ListManager.dll
-obj/Debug/net8.0/ListManager.pdb
-obj/Debug/net8.0/ListManager.sourcelink.json
-obj/Debug/net8.0/ref/ListManager.dll
-obj/Debug/net8.0/refint/ListManager.dll
-bin/Debug/net8.0/ListManager.dll
-bin/Debug/net8.0/ListManager.exe
-bin/Debug/net8.0/ListManager.pdb
-bin/Debug/net8.0/ListManager.dll
-bin/Debug/net8.0/ListManager.dll
-bin/Debug/net8.0/ListManager.exe
+/obj/
+
+## Ignore build outputs in nested projects
+**/bin/
+**/obj/
+
+## Visual Studio / editor
+.vs/
+.vscode/
+
+## Rider / JetBrains
+.idea/
+
+## NuGet / packages
+*.nupkg
+packages/
+
+## Runtime files
 ListManager.db
 ListManager.db-shm
 ListManager.db-wal
-.instructions.md
+
+## Test artifacts
+/tests/bin/
+/tests/obj/
+
+## OS and editor metadata
+.DS_Store
+Thumbs.db
+*.log
+
+## Misc
+*.pdb
+
+# End of file
+obj/project.nuget.cache
+obj/ListManager.csproj.nuget.dgspec.json
+.vscode/settings.json

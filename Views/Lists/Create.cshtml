@@ -38,6 +38,13 @@
             </div>
         </div>
         <div class="form-group row">
+            @Html.LabelFor(model => model.CircleID, "Circle", htmlAttributes: new { @class = "control-label col-sm" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.CircleID, ViewBag.CircleOptions as SelectList, "None", new { @class = "form-control" })
+                <span class="form-text text-muted">Add this list to one of your circles.</span>
+            </div>
+        </div>
+        <div class="form-group row">
             <div class="col-md-offset-2 col-md-2">
                 <input type="submit" value="Create" class="btn btn-primary mb-2" />
             </div>

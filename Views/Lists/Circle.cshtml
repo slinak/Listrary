@@ -1,0 +1,41 @@
+@model IEnumerable<ListManager.Models.ListViewItemModel>
+
+@{
+    ViewData["Title"] = "Lists in Circle";
+    var circleName = ViewData["CircleName"] as string ?? "Circle";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Lists in "@circleName"</h2>
+    <a class="btn btn-secondary" asp-controller="Circles" asp-action="Index">Back to Circles</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>List Name</th>
+            <th>List Type</th>
+            <th>Items</th>
+            <th>Created Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.ListModel!.ListName</td>
+            <td>@item.ListModel!.ListType</td>
+            <td>@item.ItemCount</td>
+            <td>@item.ListModel!.CreatedDate</td>
+            <td>
+                <a asp-action="Manage" asp-controller="Lists" asp-route-id="@item.ListModel!.ListID">View</a>
+                @if (item.ListModel!.OwnerID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                {
+                    <text> | <a asp-action="Edit" asp-controller="Lists" asp-route-id="@item.ListModel!.ListID">Edit</a></text>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

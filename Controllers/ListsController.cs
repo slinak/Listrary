@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ListManager.Data;
 using ListManager.Models;
@@ -22,30 +23,49 @@ public class ListsController : Controller
 
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
+    private SelectList GetCircleSelectList()
+    {
+        var circles = _context.Circles
+            .Include(c => c.Members)
+            .Where(c => c.OwnerID == CurrentUserId || c.Members.Any(m => m.UserID == CurrentUserId))
+            .OrderBy(c => c.Name)
+            .ToList();
+
+        return new SelectList(circles, nameof(Models.Circle.CircleID), nameof(Models.Circle.Name));
+    }
+
     private bool UserOwnsList(int listId)
     {
-        return _context.Lists.Any(list => list.ListID == listId && list.OwnerId == CurrentUserId);
+        return _context.Lists.Any(list => list.ListID == listId && list.OwnerID == CurrentUserId);
     }
 
     private ListShare? FindShare(int listId, string? shareToken)
     {
         if (string.IsNullOrEmpty(shareToken))
-            return _context.ListShares.FirstOrDefault(share => share.ListID == listId && share.RecipientId == CurrentUserId);
+            return _context.ListShares.FirstOrDefault(share => share.ListID == listId && share.RecipientID == CurrentUserId);
 
         var share = _context.ListShares.FirstOrDefault(share => share.ListID == listId && share.Token == shareToken);
-        if (share != null && share.RecipientId == null)
+        if (share != null && share.RecipientID == null)
         {
-            share.RecipientId = CurrentUserId;
+            share.RecipientID = CurrentUserId;
             _context.SaveChanges();
         }
 
-        return share?.RecipientId == CurrentUserId ? share : null;
+        return share?.RecipientID == CurrentUserId ? share : null;
     }
 
     private bool HasViewAccess(int listId, string? shareToken)
     {
         if (UserOwnsList(listId))
             return true;
+        // Check circle membership: if the list belongs to a circle and the current user is a member, allow view
+        var listForCircle = _context.Lists.FirstOrDefault(l => l.ListID == listId);
+        if (listForCircle != null && listForCircle.CircleID != null)
+        {
+            var isMember = _context.CircleMembers.Any(cm => cm.CircleID == listForCircle.CircleID && cm.UserID == CurrentUserId);
+            if (isMember)
+                return true;
+        }
 
         var share = FindShare(listId, shareToken);
         return share != null;
@@ -63,10 +83,37 @@ public class ListsController : Controller
     public IActionResult Index()
     {
         var userId = CurrentUserId;
-        var listViewModels = _context.Lists
+
+        var circles = _context.Circles
+            .Include(c => c.Members)
+            .Where(c => c.OwnerID == userId || c.Members.Any(m => m.UserID == userId))
+            .OrderBy(c => c.Name)
+            .ToList();
+
+        var circleGroups = circles.Select(circle => new CircleListsViewModel
+        {
+            Circle = circle,
+            Lists = _context.Lists
+                .Include(list => list.Items)
+                .Include(list => list.Shares)
+                .Include(list => list.Circle)
+                .Where(list => list.CircleID == circle.CircleID)
+                .OrderBy(list => list.CreatedDate)
+                .Select(list => new ListViewItemModel
+                {
+                    ListModel = list,
+                    ItemCount = list.Items.Count
+                })
+                .ToList()
+        }).ToList();
+
+        var circleListIds = circleGroups.SelectMany(group => group.Lists.Select(item => item.ListModel!.ListID)).ToHashSet();
+
+        var otherLists = _context.Lists
             .Include(list => list.Items)
             .Include(list => list.Shares)
-            .Where(list => list.OwnerId == userId || list.Shares.Any(share => share.RecipientId == userId))
+            .Where(list => !list.CircleID.HasValue
+                && (list.OwnerID == userId || list.Shares.Any(share => share.RecipientID == userId)))
             .OrderBy(list => list.CreatedDate)
             .Select(list => new ListViewItemModel
             {
@@ -75,11 +122,52 @@ public class ListsController : Controller
             })
             .ToList();
 
-        return View(listViewModels);
+        var viewModel = new ListsIndexViewModel
+        {
+            CircleGroups = circleGroups,
+            OtherLists = otherLists
+        };
+
+        return View(viewModel);
+    }
+
+    // Show all lists that belong to a specific circle (only available to circle owner or members)
+    public IActionResult Circle(int id)
+    {
+        var circle = _context.Circles
+            .Include(c => c.Members)
+            .FirstOrDefault(c => c.CircleID == id);
+
+        if (circle == null)
+            return NotFound();
+
+        var userId = CurrentUserId;
+        var isMemberOrOwner = circle.OwnerID == userId || circle.Members.Any(m => m.UserID == userId);
+        if (!isMemberOrOwner)
+            return NotFound();
+
+        var listViewModels = _context.Lists
+            .Include(l => l.Items)
+            .Include(l => l.Shares)
+            .Include(l => l.Circle)
+            .Where(l => l.CircleID == id)
+            .OrderBy(l => l.CreatedDate)
+            .Select(l => new ListViewItemModel
+            {
+                ListModel = l,
+                ItemCount = l.Items.Count
+            })
+            .ToList();
+
+        ViewData["CircleName"] = circle.Name;
+        ViewData["CircleId"] = id;
+
+        return View("Circle", listViewModels);
     }
 
     public IActionResult Create()
     {
+        ViewBag.CircleOptions = GetCircleSelectList();
         return View(new ListManager.Models.List { ListType = ListType.Grocery });
     }
 
@@ -87,12 +175,16 @@ public class ListsController : Controller
     public IActionResult Create(List list)
     {
         if (!ModelState.IsValid)
+        {
+            ViewBag.CircleOptions = GetCircleSelectList();
             return View(list);
+        }
 
         var newList = new ListManager.Models.List
         {
             ListName = list.ListName?.Trim() ?? string.Empty,
-            OwnerId = CurrentUserId,
+            OwnerID = CurrentUserId,
+            CircleID = list.CircleID,
             ListType = list.ListType,
             CreatedDate = DateTime.Now,
             LastUpdatedDate = DateTime.Now
@@ -120,6 +212,7 @@ public class ListsController : Controller
         if (list == null)
             return NotFound();
 
+        ViewBag.CircleOptions = GetCircleSelectList();
         return View(list);
     }
 
@@ -127,12 +220,16 @@ public class ListsController : Controller
     public IActionResult Edit(List newList)
     {
         if (!ModelState.IsValid)
+        {
+            ViewBag.CircleOptions = GetCircleSelectList();
             return View(newList);
+        }
 
-        var list = _context.Lists.FirstOrDefault(l => l.ListID == newList.ListID && l.OwnerId == CurrentUserId);
+        var list = _context.Lists.FirstOrDefault(l => l.ListID == newList.ListID && l.OwnerID == CurrentUserId);
         if (list != null)
         {
             list.ListName = newList.ListName?.Trim();
+            list.CircleID = newList.CircleID;
             list.ListType = newList.ListType;
             list.LastUpdatedDate = DateTime.Now;
             _context.SaveChanges();
@@ -177,7 +274,7 @@ public class ListsController : Controller
         var share = new ListShare
         {
             ListID = id,
-            OwnerId = CurrentUserId,
+            OwnerID = CurrentUserId,
             Permission = permission,
             Token = Guid.NewGuid().ToString("N"),
             CreatedDate = DateTime.Now
@@ -191,7 +288,7 @@ public class ListsController : Controller
         var list = _context.Lists
             .Include(l => l.Items)
             .Include(l => l.Shares)
-            .FirstOrDefault(l => l.ListID == id && l.OwnerId == CurrentUserId);
+            .FirstOrDefault(l => l.ListID == id && l.OwnerID == CurrentUserId);
 
         if (list == null)
             return NotFound();
@@ -212,7 +309,7 @@ public class ListsController : Controller
     [HttpPost]
     public IActionResult Delete(int id)
     {
-        var list = _context.Lists.FirstOrDefault(l => l.ListID == id && l.OwnerId == CurrentUserId);
+        var list = _context.Lists.FirstOrDefault(l => l.ListID == id && l.OwnerID == CurrentUserId);
         if (list != null)
         {
             _context.Lists.Remove(list);

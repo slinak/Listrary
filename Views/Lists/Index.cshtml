@@ -1,4 +1,4 @@
-@model IEnumerable<ListManager.Models.ListViewItemModel>
+@model ListManager.Models.ListsIndexViewModel
 
 @{
     ViewData["Title"] = "Lists";
@@ -7,35 +7,97 @@
 <div class="text-center">
     <h1 class="display-4">Lists</h1>
 </div>
-<table class="table">
-    <thead>
-        <tr class="tableHeadRow">
-            <th>List Name</th>
-            <th>List Type</th>
-            <th>Items</th>
-            <th>Created Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody class="tableBody">
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.ListModel!.ListName</td>
-            <td>@item.ListModel!.ListType</td>
-            <td>@item.ItemCount</td>
-            <td>@item.ListModel!.CreatedDate</td>
-            <td>
-                <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID">View</a> |
-                <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID">Edit</a> |
-                <button type="button" class="btn btn-link p-0 delete-list-btn" style="color: inherit; text-decoration: underline; border: none; background: none; cursor: pointer;"
-                        data-list-id="@item.ListModel!.ListID"
-                        data-list-name="@item.ListModel!.ListName">Delete</button>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+
+@foreach (var group in Model.CircleGroups)
+{
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Circle: @group.Circle.Name</strong>
+                <span class="badge bg-secondary ms-2">@group.Lists.Count() list@(group.Lists.Count() == 1 ? "" : "s")</span>
+            </div>
+            <a asp-action="Circle" asp-route-id="@group.Circle.CircleID" class="btn btn-sm btn-outline-primary">View Circle</a>
+        </div>
+        <div class="card-body">
+            @if (!group.Lists.Any())
+            {
+                <p class="text-muted mb-0">No lists in this circle yet.</p>
+            }
+            else
+            {
+                <table class="table mb-0">
+                    <thead>
+                        <tr class="tableHeadRow">
+                            <th>List Name</th>
+                            <th>List Type</th>
+                            <th>Items</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in group.Lists)
+                        {
+                            <tr>
+                                <td>@item.ListModel!.ListName</td>
+                                <td>@item.ListModel!.ListType</td>
+                                <td>@item.ItemCount</td>
+                                <td>@item.ListModel!.CreatedDate</td>
+                                <td>
+                                    <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID">View</a> |
+                                    <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID">Edit</a> |
+                                    <button type="button" class="btn btn-link p-0 delete-list-btn" style="color: inherit; text-decoration: underline; border: none; background: none; cursor: pointer;"
+                                            data-list-id="@item.ListModel!.ListID"
+                                            data-list-name="@item.ListModel!.ListName">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+}
+
+@if (Model.OtherLists.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>Your Lists</strong>
+        </div>
+        <div class="card-body">
+            <table class="table mb-0">
+                <thead>
+                    <tr class="tableHeadRow">
+                        <th>List Name</th>
+                        <th>List Type</th>
+                        <th>Items</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OtherLists)
+                    {
+                        <tr>
+                            <td>@item.ListModel!.ListName</td>
+                            <td>@item.ListModel!.ListType</td>
+                            <td>@item.ItemCount</td>
+                            <td>@item.ListModel!.CreatedDate</td>
+                            <td>
+                                <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID">View</a> |
+                                <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID">Edit</a> |
+                                <button type="button" class="btn btn-link p-0 delete-list-btn" style="color: inherit; text-decoration: underline; border: none; background: none; cursor: pointer;"
+                                        data-list-id="@item.ListModel!.ListID"
+                                        data-list-name="@item.ListModel!.ListName">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
 
 <div class="modal fade" id="deleteListModal" tabindex="-1" aria-labelledby="deleteListModalLabel" aria-hidden="true">
     <div class="modal-dialog">

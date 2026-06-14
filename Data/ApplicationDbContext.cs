@@ -15,6 +15,9 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<List> Lists => Set<List>();
     public DbSet<ListItem> ListItems => Set<ListItem>();
     public DbSet<ListShare> ListShares => Set<ListShare>();
+    public DbSet<Circle> Circles => Set<Circle>();
+    public DbSet<CircleMember> CircleMembers => Set<CircleMember>();
+    public DbSet<CircleInvitation> CircleInvitations => Set<CircleInvitation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,8 +33,34 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .HasForeignKey(share => share.ListID)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<List>()
+            .HasOne(list => list.Circle)
+            .WithMany()
+            .HasForeignKey(list => list.CircleID)
+            .OnDelete(DeleteBehavior.SetNull);
+
         modelBuilder.Entity<ListShare>()
             .HasIndex(share => share.Token)
+            .IsUnique();
+
+        modelBuilder.Entity<Circle>()
+            .HasMany(c => c.Members)
+            .WithOne(m => m.Circle)
+            .HasForeignKey(m => m.CircleID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Circle>()
+            .HasMany(c => c.Invitations)
+            .WithOne(i => i.Circle)
+            .HasForeignKey(i => i.CircleID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CircleMember>()
+            .HasIndex(m => new { m.CircleID, m.UserID })
+            .IsUnique();
+
+        modelBuilder.Entity<CircleInvitation>()
+            .HasIndex(i => i.Token)
             .IsUnique();
 
         base.OnModelCreating(modelBuilder);

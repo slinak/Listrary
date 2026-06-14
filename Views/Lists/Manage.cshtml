@@ -105,7 +105,7 @@
             </div>
         </div>
         <hr />
-        @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.ListModel.OwnerId)
+        @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.ListModel.OwnerID)
         {
             <div class="card md-4">
                 <div class="card-body">
@@ -139,9 +139,9 @@
                                 {
                                     <li class="list-group-item">
                                         <strong>@share.Permission</strong> link: <code>@Url.Action("Manage", "Lists", new { id = share.ListID, shareToken = share.Token }, Context.Request.Scheme)</code>
-                                        @if (!string.IsNullOrEmpty(share.RecipientId))
+                                        @if (!string.IsNullOrEmpty(share.RecipientID))
                                         {
-                                            <div><small>Accepted by: @share.RecipientId</small></div>
+                                            <div><small>Accepted by: @share.RecipientID</small></div>
                                         }
                                     </li>
                                 }
