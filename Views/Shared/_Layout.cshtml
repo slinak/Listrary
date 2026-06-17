@@ -27,9 +27,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Lists" asp-action="Index">View Lists</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Lists" asp-action="Create">Create a List</a>
-                        </li>
+                        <!-- Create link moved to Lists page header -->
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">
