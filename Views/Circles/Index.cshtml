@@ -9,6 +9,13 @@
     <a class="btn btn-primary" asp-action="Create">Create Circle</a>
 </div>
 
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["StatusMessage"]
+    </div>
+}
+
 @if (Model.PendingInvitations.Any())
 {
     <div class="card mb-4">

@@ -238,8 +238,11 @@ public class CirclesController : Controller
         if (circle.OwnerID != CurrentUserId)
             return Forbid();
 
+        var name = circle.Name;
         _context.Circles.Remove(circle);
         _context.SaveChanges();
+
+        TempData["StatusMessage"] = $"Circle '{name}' deleted.";
 
         return RedirectToAction("Index");
     }
