@@ -23,6 +23,7 @@ public class ListItemController : Controller
         return _context.Lists.Any(l => l.ListID == listID && l.OwnerID == CurrentUserId);
     }
 
+    [HttpGet]
     private ListShare? FindShare(int listID, string? shareToken)
     {
         if (!string.IsNullOrWhiteSpace(shareToken))

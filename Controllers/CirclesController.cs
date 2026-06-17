@@ -23,6 +23,7 @@ public class CirclesController : Controller
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
     private string? CurrentUserEmail => User.FindFirstValue(ClaimTypes.Email);
 
+    [HttpGet]
     public IActionResult Index()
     {
         var userId = CurrentUserId;
@@ -107,6 +108,7 @@ public class CirclesController : Controller
         return RedirectToAction("Index");
     }
 
+    [HttpGet]
     public IActionResult Create()
     {
         return View(new Circle());
@@ -132,6 +134,7 @@ public class CirclesController : Controller
         return RedirectToAction("Manage", new { id = model.CircleID });
     }
 
+    [HttpPost]
     public IActionResult Manage(int id)
     {
         var circle = _context.Circles
@@ -264,10 +267,7 @@ public class CirclesController : Controller
             return NotFound();
 
         if (!User.Identity?.IsAuthenticated ?? false)
-        {
-            // Redirect to login and then back to this action
             return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Accept", "Circles", new { token = token }) });
-        }
 
         var userId = CurrentUserId;
 
@@ -279,9 +279,7 @@ public class CirclesController : Controller
         // Add member if not exists
         var exists = _context.CircleMembers.Any(m => m.CircleID == invite.CircleID && m.UserID == userId);
         if (!exists)
-        {
             _context.CircleMembers.Add(new CircleMember { CircleID = invite.CircleID, UserID = userId, JoinedDate = DateTime.Now });
-        }
 
         _context.SaveChanges();
 

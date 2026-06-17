@@ -80,6 +80,7 @@ public class ListsController : Controller
         return share?.Permission == ListSharePermission.Edit;
     }
 
+    [HttpGet]
     public IActionResult Index()
     {
         var userId = CurrentUserId;
@@ -132,6 +133,7 @@ public class ListsController : Controller
     }
 
     // Show all lists that belong to a specific circle (only available to circle owner or members)
+    [HttpGet]
     public IActionResult Circle(int id)
     {
         var circle = _context.Circles
@@ -165,6 +167,7 @@ public class ListsController : Controller
         return View("Circle", listViewModels);
     }
 
+    [HttpGet]
     public IActionResult Create()
     {
         ViewBag.CircleOptions = GetCircleSelectList();
@@ -203,6 +206,7 @@ public class ListsController : Controller
         return RedirectToAction("Index");
     }
 
+    [HttpGet]
     public IActionResult Edit(int id)
     {
         if (!UserOwnsList(id))
@@ -238,6 +242,7 @@ public class ListsController : Controller
         return RedirectToAction("Index");
     }
 
+    [HttpGet]
     public IActionResult Manage(int id, string? shareToken)
     {
         var list = _context.Lists
@@ -319,6 +324,7 @@ public class ListsController : Controller
         return RedirectToAction("Index");
     }
 
+    [HttpGet]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
