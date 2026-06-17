@@ -173,6 +173,8 @@ public class CirclesController : Controller
         _context.CircleInvitations.Add(invite);
         _context.SaveChanges();
 
+        TempData["StatusMessage"] = $"Invitation sent to {(invite.RecipientEmail ?? invite.RecipientID ?? "recipient")}.";
+
         return RedirectToAction("Manage", new { id = circleId });
     }
 
@@ -192,6 +194,7 @@ public class CirclesController : Controller
         {
             _context.CircleMembers.Remove(member);
             _context.SaveChanges();
+            TempData["StatusMessage"] = $"Removed member {userId}.";
         }
 
         return RedirectToAction("Manage", new { id = circleId });
@@ -222,8 +225,11 @@ public class CirclesController : Controller
         if (!isOwnerOrInviter)
             return Forbid();
 
+        var recip = invite.RecipientEmail ?? invite.RecipientID ?? "(unspecified)";
         _context.CircleInvitations.Remove(invite);
         _context.SaveChanges();
+
+        TempData["StatusMessage"] = $"Invitation canceled for {recip}.";
 
         return RedirectToAction("Manage", new { id = invite.CircleID });
     }
