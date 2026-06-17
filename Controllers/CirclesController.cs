@@ -134,7 +134,7 @@ public class CirclesController : Controller
         return RedirectToAction("Manage", new { id = model.CircleID });
     }
 
-    [HttpPost]
+    [HttpGet]
     public IActionResult Manage(int id)
     {
         var circle = _context.Circles
