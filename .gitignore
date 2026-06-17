@@ -38,3 +38,4 @@ Thumbs.db
 obj/project.nuget.cache
 obj/ListManager.csproj.nuget.dgspec.json
 .vscode/settings.json
+publish/
