@@ -228,6 +228,22 @@ public class CirclesController : Controller
         return RedirectToAction("Manage", new { id = invite.CircleID });
     }
 
+    [HttpPost]
+    public IActionResult Delete(int circleId)
+    {
+        var circle = _context.Circles.FirstOrDefault(c => c.CircleID == circleId);
+        if (circle == null)
+            return NotFound();
+
+        if (circle.OwnerID != CurrentUserId)
+            return Forbid();
+
+        _context.Circles.Remove(circle);
+        _context.SaveChanges();
+
+        return RedirectToAction("Index");
+    }
+
     [AllowAnonymous]
     public IActionResult Accept(string token)
     {

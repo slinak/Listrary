@@ -13,6 +13,13 @@
             </div>
             <div class="text-end">
                 <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Circles</a>
+                @if (Model.OwnerID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                {
+                    <form asp-action="Delete" method="post" class="d-inline ms-2" onsubmit="return confirm('Delete this circle? This will remove members and invitations, and unset circle on associated lists.');">
+                        <input type="hidden" name="circleId" value="@Model.CircleID" />
+                        <button class="btn btn-sm btn-danger">Delete Circle</button>
+                    </form>
+                }
             </div>
         </div>
 
