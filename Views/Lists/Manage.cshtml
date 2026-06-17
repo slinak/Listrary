@@ -6,12 +6,32 @@
 }
 
 <div class="row">
-    <div class="col-md-10">
-        <h2>Manage @Model.ListModel.ListName</h2>
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h2 class="mb-0">@Model.ListModel.ListName</h2>
+            </div>
+            <div class="text-end">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Lists</a>
+                @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.ListModel.OwnerID)
+                {
+                    <button type="button" class="btn btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#shareListModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share me-2" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M13.5 1a1.5 1.5 0 1 0-1.415 2.096L6.9 6.12a1.5 1.5 0 0 0 0 3.76l5.185 3.024A1.5 1.5 0 1 0 13.5 15a1.5 1.5 0 0 0-1.415-2.096L7.9 9.88a.5.5 0 0 1 0-.76l4.185-2.44A1.5 1.5 0 0 0 13.5 1z"/>
+                        </svg>
+                        Share List
+                    </button>
+                }
+            </div>
+        </div>
 
         @if (Model.Items != null && Model.Items.Any())
         {
             <table class="table table-bordered table-striped">
+                <colgroup>
+                    <col style="width: 40%" />
+                    <col style="width: 40%" />
+                    <col style="width: 20%" />
+                </colgroup>
                 <thead>
                     <tr class="tableHeadRow">
                         <th>Item</th>
@@ -104,56 +124,63 @@
                 }
             </div>
         </div>
-        <hr />
-        @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.ListModel.OwnerID)
-        {
-            <div class="card md-4">
-                <div class="card-body">
-                    <h5 class="card-title">Share this list</h5>
-                    <form asp-action="Share" asp-controller="Lists" method="post" class="row gy-2 gx-2 align-items-end">
-                        @Html.Hidden("id", Model.ListModel.ListID)
-                        <div class="col-md-6">
-                            <label class="form-label" for="permission">Permission</label>
-                            <select class="form-select" id="permission" name="permission">
-                                <option value="View">View only</option>
-                                <option value="Edit">Edit</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-primary mt-1">Generate link</button>
-                        </div>
-                    </form>
-                    @if (!string.IsNullOrEmpty(Model.GeneratedShareLink))
-                    {
-                        <div class="alert alert-success mt-3" role="alert">
-                            Share link created. Send this URL to another user:
-                            <div><a href="@Model.GeneratedShareLink" target="_blank">@Model.GeneratedShareLink</a></div>
-                        </div>
-                    }
-                    @if (Model.ActiveShares != null && Model.ActiveShares.Any())
-                    {
-                        <div class="mt-3">
-                            <h6>Active share links</h6>
-                            <ul class="list-group">
-                                @foreach (var share in Model.ActiveShares)
-                                {
-                                    <li class="list-group-item">
-                                        <strong>@share.Permission</strong> link: <code>@Url.Action("Manage", "Lists", new { id = share.ListID, shareToken = share.Token }, Context.Request.Scheme)</code>
-                                        @if (!string.IsNullOrEmpty(share.RecipientID))
-                                        {
-                                            <div><small>Accepted by: @share.RecipientID</small></div>
-                                        }
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    }
+
+        <!-- Share List Modal (contains the same share form formerly inline) -->
+        <div class="modal fade" id="shareListModal" tabindex="-1" aria-labelledby="shareListModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="shareListModalLabel">Share this list</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-action="Share" asp-controller="Lists" method="post" class="row gy-2 gx-2 align-items-end">
+                            @Html.Hidden("id", Model.ListModel.ListID)
+                            <div class="col-md-6">
+                                <label class="form-label" for="permission">Permission</label>
+                                <select class="form-select" id="permission" name="permission">
+                                    <option value="View">View only</option>
+                                    <option value="Edit">Edit</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary mt-1">Generate link</button>
+                            </div>
+                        </form>
+
+                        @if (!string.IsNullOrEmpty(Model.GeneratedShareLink))
+                        {
+                            <div class="alert alert-success mt-3" role="alert">
+                                Share link created. Send this URL to another user:
+                                <div><a href="@Model.GeneratedShareLink" target="_blank">@Model.GeneratedShareLink</a></div>
+                            </div>
+                        }
+
+                        @if (Model.ActiveShares != null && Model.ActiveShares.Any())
+                        {
+                            <div class="mt-3">
+                                <h6>Active share links</h6>
+                                <ul class="list-group">
+                                    @foreach (var share in Model.ActiveShares)
+                                    {
+                                        <li class="list-group-item">
+                                            <strong>@share.Permission</strong> link: <code>@Url.Action("Manage", "Lists", new { id = share.ListID, shareToken = share.Token }, Context.Request.Scheme)</code>
+                                            @if (!string.IsNullOrEmpty(share.RecipientID))
+                                            {
+                                                <div><small>Accepted by: @share.RecipientID</small></div>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
-        }
-        <hr />
-        <a asp-action="Index" class="btn btn-secondary">Back to Lists</a>
-    </div>
+        </div>
 </div>
 
 @section Scripts {
@@ -172,6 +199,16 @@
                     deleteModal.show();
                 });
             });
+
+            // Auto-open share modal if a link was just generated or there are active shares
+            var shouldOpenShareModal = @((!string.IsNullOrEmpty(Model.GeneratedShareLink) || (Model.ActiveShares != null && Model.ActiveShares.Any())) ? "true" : "false");
+            if (shouldOpenShareModal === "true") {
+                var shareModalEl = document.getElementById('shareListModal');
+                if (shareModalEl) {
+                    var shareModal = new bootstrap.Modal(shareModalEl);
+                    shareModal.show();
+                }
+            }
         });
     </script>
 }
