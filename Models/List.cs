@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace ListManager.Models;
 
@@ -10,13 +11,21 @@ public class List
 
     [Required]
     [StringLength(100)]
+    [Description("Name")]
     public string? ListName { get; set; }
     public string? OwnerID { get; set; }
     public int? CircleID { get; set; }
     public Circle? Circle { get; set; }
+
+    [Description("Type")]
     public ListType? ListType { get; set; }
+
+    [Description("Created Date")]
     public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+    [Description("Last Updated Date")]
     public DateTime LastUpdatedDate { get; set; } = DateTime.Now;
+
     public bool IsDeleted { get; set; } = false;
     public bool IsCompleted { get; set; } = false;
 
@@ -27,7 +36,10 @@ public class List
 public enum ListType
 {
     Grocery,
+    [Description("To Do")]
     ToDo,
+    [Description("Wish List")]
     WishList,
+    [Description("Other")]
     Other
 }

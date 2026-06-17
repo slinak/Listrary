@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,6 +13,7 @@ public class ListItem
 
     [Required]
     [StringLength(150)]
+    [Description("Name")]
     public string? ItemName { get; set; }
     public string? ItemDetails { get; set; }
     public bool IsCompleted { get; set; }
