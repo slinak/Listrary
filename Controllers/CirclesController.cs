@@ -63,11 +63,8 @@ public class CirclesController : Controller
             return NotFound();
 
         var userId = CurrentUserId;
-        var userEmail = CurrentUserEmail?.Trim();
-        var isRecipient = invite.RecipientID == userId ||
-            (invite.RecipientID == null && userEmail != null && invite.RecipientEmail != null && invite.RecipientEmail.Equals(userEmail, StringComparison.OrdinalIgnoreCase));
 
-        if (!isRecipient)
+        if (!CirclesHelper.isCorrectRecipient(invite, userId, CurrentUserEmail?.Trim()))
             return Forbid();
 
         if (invite.RecipientID == null)
@@ -78,7 +75,14 @@ public class CirclesController : Controller
         var exists = _context.CircleMembers.Any(m => m.CircleID == invite.CircleID && m.UserID == userId);
         if (!exists)
         {
-            _context.CircleMembers.Add(new CircleMember { CircleID = invite.CircleID, UserID = userId, JoinedDate = DateTime.Now });
+            _context.CircleMembers.Add(
+                new CircleMember
+                { 
+                    CircleID = invite.CircleID, 
+                    UserID = userId, 
+                    JoinedDate = DateTime.Now
+                }
+            );
         }
 
         _context.SaveChanges();
@@ -95,19 +99,13 @@ public class CirclesController : Controller
         if (invite == null)
             return NotFound();
 
-        if (!isCorrectRecipient(invite, CurrentUserId, CurrentUserEmail?.Trim()))
+        if (!CirclesHelper.isCorrectRecipient(invite, CurrentUserId, CurrentUserEmail?.Trim()))
             return Forbid();
 
         _context.CircleInvitations.Remove(invite);
         _context.SaveChanges();
         return RedirectToAction("Index");
     }
-
-    Func<CircleInvitation, string, string?, bool> isCorrectRecipient = (invite, userId, userEmail) =>
-    {
-        return invite.RecipientID == userId ||
-            (invite.RecipientID == null && userEmail != null && invite.RecipientEmail != null && invite.RecipientEmail.Equals(userEmail, StringComparison.OrdinalIgnoreCase));
-    };
 
     [HttpGet]
     public IActionResult Create()
@@ -128,8 +126,15 @@ public class CirclesController : Controller
         _context.SaveChanges();
 
         // Add owner as member
-        var ownerMember = new CircleMember { CircleID = model.CircleID, UserID = CurrentUserId, JoinedDate = DateTime.Now };
-        _context.CircleMembers.Add(ownerMember);
+    
+        _context.CircleMembers.Add(
+            new CircleMember
+            { 
+                CircleID = model.CircleID, 
+                UserID = CurrentUserId, 
+                JoinedDate = DateTime.Now
+            }
+        );
         _context.SaveChanges();
 
         return RedirectToAction("Manage", new { id = model.CircleID });
@@ -146,13 +151,11 @@ public class CirclesController : Controller
         if (circle == null)
             return NotFound();
 
-        if (!isCircleMember(circle, CurrentUserId))
+        if (!CirclesHelper.isCircleMember(circle, CurrentUserId))
             return Forbid();
 
         return View(circle);
     }
-
-    Func<Circle, string, bool> isCircleMember = (circle, userId) => circle.OwnerID == userId || circle.Members.Any(m => m.UserID == userId);
 
     [HttpPost]
     public IActionResult Invite(int circleId, string? recipientEmail, string? recipientId)
@@ -161,8 +164,7 @@ public class CirclesController : Controller
         if (circle == null)
             return NotFound();
 
-        var isMember = isCircleMember(circle, CurrentUserId);
-        if (!isMember)
+        if (!CirclesHelper.isCircleMember(circle, CurrentUserId))
             return Forbid();
 
         var invite = new CircleInvitation
@@ -190,10 +192,13 @@ public class CirclesController : Controller
         if (circle == null)
             return NotFound();
 
-        if (!isCircleOwner(circle, CurrentUserId))
+        if (!CirclesHelper.isCircleOwner(circle, CurrentUserId))
             return Forbid();
 
         var member = _context.CircleMembers.FirstOrDefault(m => m.CircleID == circleId && m.UserID == userId);
+        if (member == null)
+            return NotFound();
+
         if (member != null)
         {
             _context.CircleMembers.Remove(member);
@@ -203,8 +208,6 @@ public class CirclesController : Controller
 
         return RedirectToAction("Manage", new { id = circleId });
     }
-
-    Func<Circle, string, bool> isCircleOwner = (circle, userId) => circle.OwnerID == userId;
 
     [HttpPost]
     public IActionResult Leave(int circleId)
