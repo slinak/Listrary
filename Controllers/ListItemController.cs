@@ -122,6 +122,7 @@ public class ListItemController : Controller
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item != null)
         {
+            item.IsDeleted = true;
             _context.ListItems.Remove(item);
             _context.SaveChanges();
         }

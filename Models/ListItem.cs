@@ -8,7 +8,7 @@ public class ListItem
 {
     [Key]
     public int ListItemID { get; set; }
-    public int ListID { get; set; }
+    public int? ListID { get; set; }
     public List? List { get; set; }
 
     [Required]

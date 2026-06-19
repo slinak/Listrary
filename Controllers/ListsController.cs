@@ -171,7 +171,7 @@ public class ListsController : Controller
     public IActionResult Create()
     {
         ViewBag.CircleOptions = GetCircleSelectList();
-        return View(new ListManager.Models.List { ListType = ListType.Grocery });
+        return View(new ListManager.Models.List { ListType = ListType.Shopping });
     }
 
     [HttpPost]

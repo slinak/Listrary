@@ -35,7 +35,8 @@ public class List
 
 public enum ListType
 {
-    Grocery,
+    [Description("Shopping")]
+    Shopping,
     [Description("To Do")]
     ToDo,
     [Description("Wish List")]
