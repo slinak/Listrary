@@ -141,9 +141,42 @@ public class ListItemController : Controller
         {
             item.IsCompleted = !item.IsCompleted;
             item.LastUpdatedDate = DateTime.Now;
+
+            // If marking as complete, move to bottom
+            if (item.IsCompleted)
+            {
+                var maxSortOrder = _context.ListItems
+                    .Where(li => li.ListID == listID && !li.IsDeleted)
+                    .Max(li => (int?)li.SortOrder) ?? 0;
+                item.SortOrder = maxSortOrder + 1;
+            }
+
             _context.SaveChanges();
         }
 
         return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
+    }
+
+    [HttpGet]
+    public IActionResult GetItemNameSuggestions(int listID, string? query, string? shareToken)
+    {
+        if (!HasEditAccess(listID, shareToken))
+            return Unauthorized();
+
+        if (string.IsNullOrWhiteSpace(query) || query.Length < 1)
+            return Json(new List<string>());
+
+        var suggestions = _context.ListItems
+            .Where(li => li.ListID == listID 
+                && !li.IsDeleted 
+                && li.ItemName != null
+                && li.ItemName.ToLower().Contains(query.ToLower()))
+            .Select(li => li.ItemName)
+            .Distinct()
+            .OrderBy(name => name)
+            .Take(10)
+            .ToList();
+
+        return Json(suggestions);
     }
 }

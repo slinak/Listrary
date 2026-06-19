@@ -19,7 +19,7 @@ namespace ListManager.Migrations
 
             modelBuilder.Entity("ListManager.Models.Circle", b =>
                 {
-                    b.Property<int>("CircleId")
+                    b.Property<int>("CircleID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -31,47 +31,47 @@ namespace ListManager.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OwnerId")
+                    b.Property<string>("OwnerID")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("CircleId");
+                    b.HasKey("CircleID");
 
                     b.ToTable("Circles");
                 });
 
             modelBuilder.Entity("ListManager.Models.CircleInvitation", b =>
                 {
-                    b.Property<int>("CircleInvitationId")
+                    b.Property<int>("CircleInvitationID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("Accepted")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CircleId")
+                    b.Property<int>("CircleID")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("InviterId")
+                    b.Property<string>("InviterID")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RecipientEmail")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RecipientId")
+                    b.Property<string>("RecipientID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("CircleInvitationId");
+                    b.HasKey("CircleInvitationID");
 
-                    b.HasIndex("CircleId");
+                    b.HasIndex("CircleID");
 
                     b.HasIndex("Token")
                         .IsUnique();
@@ -81,23 +81,23 @@ namespace ListManager.Migrations
 
             modelBuilder.Entity("ListManager.Models.CircleMember", b =>
                 {
-                    b.Property<int>("CircleMemberId")
+                    b.Property<int>("CircleMemberID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CircleId")
+                    b.Property<int>("CircleID")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("JoinedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("UserID")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("CircleMemberId");
+                    b.HasKey("CircleMemberID");
 
-                    b.HasIndex("CircleId", "UserId")
+                    b.HasIndex("CircleID", "UserID")
                         .IsUnique();
 
                     b.ToTable("CircleMembers");
@@ -109,7 +109,7 @@ namespace ListManager.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CircleId")
+                    b.Property<int?>("CircleID")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedDate")
@@ -132,12 +132,12 @@ namespace ListManager.Migrations
                     b.Property<int?>("ListType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("OwnerId")
+                    b.Property<string>("OwnerID")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ListID");
 
-                    b.HasIndex("CircleId");
+                    b.HasIndex("CircleID");
 
                     b.ToTable("Lists");
                 });
@@ -171,7 +171,10 @@ namespace ListManager.Migrations
                     b.Property<DateTime>("LastUpdatedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ListID")
+                    b.Property<int?>("ListID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SortOrder")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ListItemID");
@@ -183,7 +186,7 @@ namespace ListManager.Migrations
 
             modelBuilder.Entity("ListManager.Models.ListShare", b =>
                 {
-                    b.Property<int>("ListShareId")
+                    b.Property<int>("ListShareID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -193,21 +196,21 @@ namespace ListManager.Migrations
                     b.Property<int>("ListID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("OwnerId")
+                    b.Property<string>("OwnerID")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Permission")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("RecipientId")
+                    b.Property<string>("RecipientID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("ListShareId");
+                    b.HasKey("ListShareID");
 
                     b.HasIndex("ListID");
 
@@ -417,7 +420,7 @@ namespace ListManager.Migrations
                 {
                     b.HasOne("ListManager.Models.Circle", "Circle")
                         .WithMany("Invitations")
-                        .HasForeignKey("CircleId")
+                        .HasForeignKey("CircleID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -428,7 +431,7 @@ namespace ListManager.Migrations
                 {
                     b.HasOne("ListManager.Models.Circle", "Circle")
                         .WithMany("Members")
-                        .HasForeignKey("CircleId")
+                        .HasForeignKey("CircleID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -439,7 +442,7 @@ namespace ListManager.Migrations
                 {
                     b.HasOne("ListManager.Models.Circle", "Circle")
                         .WithMany()
-                        .HasForeignKey("CircleId")
+                        .HasForeignKey("CircleID")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Circle");
@@ -450,8 +453,7 @@ namespace ListManager.Migrations
                     b.HasOne("ListManager.Models.List", "List")
                         .WithMany("Items")
                         .HasForeignKey("ListID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("List");
                 });

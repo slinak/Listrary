@@ -109,7 +109,8 @@
                         @Html.Hidden("shareToken", Model.ShareToken)
                         <div class="form-group">
                             <label for="ItemName">Item Name</label>
-                            @Html.TextBox("ItemName", Model.NewItem.ItemName, new { @class = "form-control", placeholder = "Name", autofocus = "autofocus" })
+                            @Html.TextBox("ItemName", Model.NewItem.ItemName, new { @class = "form-control", placeholder = "Name", autofocus = "autofocus", @list = "itemSuggestions" })
+                            <datalist id="itemSuggestions"></datalist>
                         </div>
                         <div class="form-group mt-2">
                             <label for="ItemDetails">Details</label>
@@ -208,6 +209,44 @@
                     var shareModal = new bootstrap.Modal(shareModalEl);
                     shareModal.show();
                 }
+            }
+
+            // Item name autocomplete
+            var itemNameInput = document.querySelector('input[name="ItemName"]');
+            var datalist = document.getElementById('itemSuggestions');
+            var debounceTimer;
+            var listID = @Model.ListModel.ListID;
+            var shareToken = '@Model.ShareToken';
+
+            if (itemNameInput && datalist) {
+                itemNameInput.addEventListener('input', function () {
+                    clearTimeout(debounceTimer);
+                    var query = this.value.trim();
+
+                    if (query.length === 0) {
+                        datalist.innerHTML = '';
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(function () {
+                        var url = '/ListItem/GetItemNameSuggestions?listID=' + listID + '&query=' + encodeURIComponent(query);
+                        if (shareToken) {
+                            url += '&shareToken=' + encodeURIComponent(shareToken);
+                        }
+
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(suggestions => {
+                                datalist.innerHTML = '';
+                                suggestions.forEach(function (suggestion) {
+                                    var option = document.createElement('option');
+                                    option.value = suggestion;
+                                    datalist.appendChild(option);
+                                });
+                            })
+                            .catch(error => console.error('Error fetching suggestions:', error));
+                    }, 300);
+                });
             }
         });
     </script>

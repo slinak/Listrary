@@ -260,7 +260,7 @@ public class ListsController : Controller
         var viewModel = new ListItemManagementViewModel
         {
             ListModel = list,
-            Items = list.Items.OrderBy(item => item.CreatedDate).ToList(),
+            Items = list.Items.OrderBy(item => item.IsCompleted).ThenBy(item => item.SortOrder).ToList(),
             CanEdit = HasEditAccess(id, shareToken),
             ShareToken = share?.Token,
             ActiveShares = list.Shares.ToList(),
@@ -301,7 +301,7 @@ public class ListsController : Controller
         var viewModel = new ListItemManagementViewModel
         {
             ListModel = list,
-            Items = list.Items.OrderBy(item => item.CreatedDate).ToList(),
+            Items = list.Items.OrderBy(item => item.IsCompleted).ThenBy(item => item.SortOrder).ToList(),
             CanEdit = true,
             ShareToken = share.Token,
             ActiveShares = list.Shares.ToList(),
