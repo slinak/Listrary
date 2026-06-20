@@ -70,6 +70,26 @@ body {
   color: #198754;
 }
 
+/* ── Identity / Account pages ── */
+.manage-nav .nav-link {
+  border-radius: 0;
+  color: #212529;
+  padding: 0.65rem 1.25rem;
+  border-left: 3px solid transparent;
+}
+
+.manage-nav .nav-link:hover {
+  background: rgba(37, 140, 251, 0.07);
+  color: var(--app-primary-color);
+}
+
+.manage-nav .nav-link.active {
+  border-left-color: var(--app-primary-color);
+  color: var(--app-primary-color);
+  font-weight: 600;
+  background: rgba(37, 140, 251, 0.07);
+}
+
 .mobile-group-jump {
   position: sticky;
   top: 0.5rem;
