@@ -23,3 +23,63 @@ body {
 .nav-link {
   color: var(--app-primary-color) !important;
 }
+
+.list-mobile-card {
+  border: 1px solid rgba(37, 140, 251, 0.2);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.list-action-group .btn {
+  min-width: 4.5rem;
+}
+
+@media (max-width: 767.98px) {
+  .list-mobile-card .btn {
+    flex: 1 1 auto;
+  }
+}
+
+.location-group-row td {
+  background: rgba(37, 140, 251, 0.1);
+  border-top: 2px solid rgba(37, 140, 251, 0.2);
+  font-weight: 600;
+}
+
+.completed-group-row td {
+  background: rgba(25, 135, 84, 0.12);
+  border-top-color: rgba(25, 135, 84, 0.25);
+}
+
+.location-group-label {
+  display: inline-block;
+  letter-spacing: 0.01em;
+}
+
+.location-group-mobile {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #0d6efd;
+  margin: 0.35rem 0 0.5rem;
+  scroll-margin-top: 5.5rem;
+}
+
+.completed-group-mobile {
+  color: #198754;
+}
+
+.mobile-group-jump {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 5;
+  background: var(--app-background-color);
+  padding-bottom: 0.35rem;
+}
+
+@media (max-width: 767.98px) {
+  .mobile-group-jump .btn {
+    white-space: nowrap;
+  }
+}

@@ -3,6 +3,45 @@
 
 @{
     ViewData["Title"] = "Manage Items";
+
+    string ToAnchorSlug(string value)
+    {
+        var builder = new System.Text.StringBuilder();
+
+        foreach (var character in value)
+        {
+            if (char.IsLetterOrDigit(character))
+            {
+                builder.Append(char.ToLowerInvariant(character));
+            }
+            else if (builder.Length == 0 || builder[builder.Length - 1] != '-')
+            {
+                builder.Append('-');
+            }
+        }
+
+        return builder.ToString().Trim('-');
+    }
+
+    string GetStoreLocationGroupKey(string? storeLocation)
+    {
+        return string.IsNullOrWhiteSpace(storeLocation)
+            ? "__no_location__"
+            : storeLocation.Trim().ToLowerInvariant();
+    }
+
+    string GetStoreLocationGroupLabel(string? storeLocation)
+    {
+        return string.IsNullOrWhiteSpace(storeLocation)
+            ? "No store location"
+            : storeLocation.Trim();
+    }
+
+    string GetStoreLocationSectionId(string? storeLocation)
+    {
+        var slug = ToAnchorSlug(GetStoreLocationGroupLabel(storeLocation));
+        return string.IsNullOrWhiteSpace(slug) ? "group-no-store-location" : $"group-{slug}";
+    }
 }
 
 <div class="row">
@@ -27,61 +66,207 @@
         @if (Model.Items != null && Model.Items.Any())
         {
             var showStoreLocation = Model.Items.Any(i => !string.IsNullOrWhiteSpace(i.StoreLocation));
-            <table class="table table-bordered table-striped">
-                <colgroup>
-                    <col style="width: 35%" />
-                    <col style="width: 35%" />
-                    @if (showStoreLocation)
+            var mobileSectionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var mobileSections = new List<(string Id, string Label, bool IsCompleted)>();
+
+            foreach (var item in Model.Items)
+            {
+                if (item.IsCompleted)
+                {
+                    const string completedSectionId = "group-completed";
+                    if (mobileSectionIds.Add(completedSectionId))
                     {
-                        <col style="width: 15%" />
+                        mobileSections.Add((completedSectionId, "Completed Items", true));
                     }
-                    <col style="width: 30%" />
-                </colgroup>
-                <thead>
-                    <tr class="tableHeadRow">
-                        <th>Item</th>
-                        <th>Details</th>
+
+                    continue;
+                }
+
+                var sectionId = GetStoreLocationSectionId(item.StoreLocation);
+                if (mobileSectionIds.Add(sectionId))
+                {
+                    mobileSections.Add((sectionId, GetStoreLocationGroupLabel(item.StoreLocation), false));
+                }
+            }
+
+            <div class="d-none d-md-block">
+                <table class="table table-bordered table-striped align-middle">
+                    <colgroup>
+                        <col style="width: 25%" />
+                        <col style="width: 25%" />
                         @if (showStoreLocation)
                         {
-                            <th>Store Location</th>
+                            <col style="width: 20%" />
                         }
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="tableBody">
-                    @foreach (var item in Model.Items)
-                    {
-                        <tr>
-                            <td>@item.ItemName</td>
-                            <td>@item.ItemDetails</td>
+                        <col style="width: 15%" />
+                        <col style="width: 30%" />
+                    </colgroup>
+                    <thead>
+                        <tr class="tableHeadRow">
+                            <th>Item</th>
+                            <th>Details</th>
                             @if (showStoreLocation)
                             {
-                                <td>@item.StoreLocation</td>
+                                <th>Store Location</th>
                             }
-                            <td>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tableBody">
+                        @{
+                            var previousIncompleteGroupKey = string.Empty;
+                            var completedHeaderShown = false;
+                        }
+                        @foreach (var item in Model.Items)
+                        {
+                            if (!item.IsCompleted)
+                            {
+                                var currentGroupKey = GetStoreLocationGroupKey(item.StoreLocation);
+                                if (currentGroupKey != previousIncompleteGroupKey)
+                                {
+                                    previousIncompleteGroupKey = currentGroupKey;
+                                    <tr class="location-group-row">
+                                        <td colspan="@(showStoreLocation ? 5 : 4)">
+                                            <span class="location-group-label">@GetStoreLocationGroupLabel(item.StoreLocation)</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else if (!completedHeaderShown)
+                            {
+                                completedHeaderShown = true;
+                                <tr class="location-group-row completed-group-row">
+                                    <td colspan="@(showStoreLocation ? 5 : 4)">
+                                        <span class="location-group-label">Completed Items</span>
+                                    </td>
+                                </tr>
+                            }
+
+                            <tr>
+                                <td class="fw-semibold">@item.ItemName</td>
+                                <td>@item.ItemDetails</td>
+                                @if (showStoreLocation)
+                                {
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(item.StoreLocation))
+                                        {
+                                            <span class="badge rounded-pill bg-light text-dark border">@item.StoreLocation</span>
+                                        }
+                                    </td>
+                                }
+                                <td>
+                                    <span class="badge rounded-pill @(item.IsCompleted ? "text-bg-success" : "text-bg-warning")">
+                                        @(item.IsCompleted ? "Completed" : "Active")
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (Model.CanEdit)
+                                    {
+                                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                            @using (Html.BeginForm("Toggle", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
+                                            {
+                                                @Html.Hidden("listID", Model.ListModel.ListID)
+                                                @Html.Hidden("listItemID", item.ListItemID)
+                                                @Html.Hidden("shareToken", Model.ShareToken)
+                                                <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-outline-success" : "btn-outline-warning")">@(item.IsCompleted ? "Completed" : "Complete")</button>
+                                            }
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-list-item-btn"
+                                                    data-list-id="@Model.ListModel.ListID"
+                                                    data-list-item-id="@item.ListItemID"
+                                                    data-list-item-name="@item.ItemName">Delete</button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">View only</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-md-none">
+                @if (mobileSections.Any())
+                {
+                    <div class="mobile-group-jump mb-3">
+                        <div class="small text-muted mb-1">Jump to section</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var navSection in mobileSections)
+                            {
+                                <a href="#@navSection.Id" class="btn btn-sm @(navSection.IsCompleted ? "btn-outline-success" : "btn-outline-primary") rounded-pill">@navSection.Label</a>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @{
+                    var previousIncompleteGroupKeyMobile = string.Empty;
+                    var completedHeaderShownMobile = false;
+                }
+                @foreach (var item in Model.Items)
+                {
+                    if (!item.IsCompleted)
+                    {
+                        var currentGroupKeyMobile = GetStoreLocationGroupKey(item.StoreLocation);
+                        if (currentGroupKeyMobile != previousIncompleteGroupKeyMobile)
+                        {
+                            previousIncompleteGroupKeyMobile = currentGroupKeyMobile;
+                            <div class="location-group-mobile" id="@GetStoreLocationSectionId(item.StoreLocation)">@GetStoreLocationGroupLabel(item.StoreLocation)</div>
+                        }
+                    }
+                    else if (!completedHeaderShownMobile)
+                    {
+                        completedHeaderShownMobile = true;
+                        <div class="location-group-mobile completed-group-mobile" id="group-completed">Completed Items</div>
+                    }
+
+                    <div class="card list-mobile-card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                <h6 class="mb-0 fw-semibold">@item.ItemName</h6>
+                                <span class="badge rounded-pill @(item.IsCompleted ? "text-bg-success" : "text-bg-warning")">
+                                    @(item.IsCompleted ? "Completed" : "Active")
+                                </span>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(item.ItemDetails))
+                            {
+                                <p class="mb-2 text-muted">@item.ItemDetails</p>
+                            }
+                            @if (showStoreLocation && !string.IsNullOrWhiteSpace(item.StoreLocation))
+                            {
+                                <div class="mb-3">
+                                    <span class="badge rounded-pill bg-light text-dark border">@item.StoreLocation</span>
+                                </div>
+                            }
+                            <div>
                                 @if (Model.CanEdit)
                                 {
-                                    @using (Html.BeginForm("Toggle", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
-                                    {
-                                        @Html.Hidden("listID", Model.ListModel.ListID)
-                                        @Html.Hidden("listItemID", item.ListItemID)
-                                        @Html.Hidden("shareToken", Model.ShareToken)
-                                        <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-warning")">@(item.IsCompleted ? "✓ Completed" : "Complete")</button>
-                                    }
-                                    <button type="button" class="btn btn-sm btn-danger delete-list-item-btn" style="margin-left: 0.5rem;"
-                                            data-list-id="@Model.ListModel.ListID"
-                                            data-list-item-id="@item.ListItemID"
-                                            data-list-item-name="@item.ItemName">Delete</button>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @using (Html.BeginForm("Toggle", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
+                                        {
+                                            @Html.Hidden("listID", Model.ListModel.ListID)
+                                            @Html.Hidden("listItemID", item.ListItemID)
+                                            @Html.Hidden("shareToken", Model.ShareToken)
+                                            <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-outline-success" : "btn-outline-warning")">@(item.IsCompleted ? "Completed" : "Complete")</button>
+                                        }
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-list-item-btn"
+                                                data-list-id="@Model.ListModel.ListID"
+                                                data-list-item-id="@item.ListItemID"
+                                                data-list-item-name="@item.ItemName">Delete</button>
+                                    </div>
                                 }
                                 else
                                 {
                                     <span class="text-muted">View only</span>
                                 }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
 
             <div class="modal fade" id="deleteListItemModal" tabindex="-1" aria-labelledby="deleteListItemModalLabel" aria-hidden="true">
                 <div class="modal-dialog">

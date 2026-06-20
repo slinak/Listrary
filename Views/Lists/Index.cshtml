@@ -14,6 +14,19 @@
     </a>
 </div>
 
+@{
+    string GetListTypeBadgeClass(ListManager.Models.ListType? listType)
+    {
+        return listType switch
+        {
+            ListManager.Models.ListType.Shopping => "bg-info-subtle text-info-emphasis",
+            ListManager.Models.ListType.ToDo => "bg-warning-subtle text-warning-emphasis",
+            ListManager.Models.ListType.WishList => "bg-success-subtle text-success-emphasis",
+            _ => "bg-secondary-subtle text-secondary-emphasis"
+        };
+    }
+}
+
 @foreach (var group in Model.CircleGroups)
 {
     <div class="card mb-4">
@@ -31,7 +44,87 @@
             }
             else
             {
-                <table class="table mb-0 text-center">
+                <div class="d-none d-md-block">
+                    <table class="table mb-0 text-center align-middle">
+                        <colgroup>
+                            <col style="width:20%" />
+                            <col style="width:20%" />
+                            <col style="width:20%" />
+                            <col style="width:20%" />
+                            <col style="width:20%" />
+                        </colgroup>
+                        <thead>
+                            <tr class="tableHeadRow">
+                                <th>List Name</th>
+                                <th>List Type</th>
+                                <th>Items</th>
+                                <th>Created Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in group.Lists)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@item.ListModel!.ListName</td>
+                                    <td>
+                                        <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
+                                    </td>
+                                    <td><span class="badge rounded-pill text-bg-primary">@item.ItemCount</span></td>
+                                    <td>@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm list-action-group" role="group" aria-label="List actions">
+                                            <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-primary">View</a>
+                                            <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-secondary">Edit</a>
+                                            <button type="button" class="btn btn-outline-danger delete-list-btn"
+                                                    data-list-id="@item.ListModel!.ListID"
+                                                    data-list-name="@item.ListModel!.ListName">Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-md-none">
+                    @foreach (var item in group.Lists)
+                    {
+                        <div class="card list-mobile-card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                    <h6 class="mb-0 fw-semibold">@item.ListModel!.ListName</h6>
+                                    <span class="badge rounded-pill text-bg-primary">@item.ItemCount item@(item.ItemCount == 1 ? "" : "s")</span>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
+                                    <span class="badge rounded-pill bg-light text-dark border">@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</span>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-primary">View</a>
+                                    <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-list-btn"
+                                            data-list-id="@item.ListModel!.ListID"
+                                            data-list-name="@item.ListModel!.ListName">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@if (Model.OtherLists.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>Your Lists</strong>
+        </div>
+        <div class="card-body">
+            <div class="d-none d-md-block">
+                <table class="table mb-0 text-center align-middle">
                     <colgroup>
                         <col style="width:20%" />
                         <col style="width:20%" />
@@ -49,72 +142,54 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in group.Lists)
+                        @foreach (var item in Model.OtherLists)
                         {
                             <tr>
-                                <td>@item.ListModel!.ListName</td>
-                                <td>@item.ListModel!.ListType</td>
-                                <td>@item.ItemCount</td>
-                                <td>@item.ListModel!.CreatedDate</td>
+                                <td class="fw-semibold">@item.ListModel!.ListName</td>
                                 <td>
-                                    <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID">View</a> |
-                                    <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID">Edit</a> |
-                                    <button type="button" class="btn btn-link p-0 delete-list-btn" style="color: inherit; text-decoration: underline; border: none; background: none; cursor: pointer;"
-                                            data-list-id="@item.ListModel!.ListID"
-                                            data-list-name="@item.ListModel!.ListName">Delete</button>
+                                    <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
+                                </td>
+                                <td><span class="badge rounded-pill text-bg-primary">@item.ItemCount</span></td>
+                                <td>@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm list-action-group" role="group" aria-label="List actions">
+                                        <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-primary">View</a>
+                                        <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-secondary">Edit</a>
+                                        <button type="button" class="btn btn-outline-danger delete-list-btn"
+                                                data-list-id="@item.ListModel!.ListID"
+                                                data-list-name="@item.ListModel!.ListName">Delete</button>
+                                    </div>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
-            }
-        </div>
-    </div>
-}
+            </div>
 
-@if (Model.OtherLists.Any())
-{
-    <div class="card mb-4">
-        <div class="card-header">
-            <strong>Your Lists</strong>
-        </div>
-        <div class="card-body">
-            <table class="table mb-0 text-center">
-                <colgroup>
-                    <col style="width:20%" />
-                    <col style="width:20%" />
-                    <col style="width:20%" />
-                    <col style="width:20%" />
-                    <col style="width:20%" />
-                </colgroup>
-                <thead>
-                    <tr class="tableHeadRow">
-                        <th>List Name</th>
-                        <th>List Type</th>
-                        <th>Items</th>
-                        <th>Created Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.OtherLists)
-                    {
-                        <tr>
-                            <td>@item.ListModel!.ListName</td>
-                            <td>@item.ListModel!.ListType</td>
-                            <td>@item.ItemCount</td>
-                            <td>@item.ListModel!.CreatedDate</td>
-                            <td>
-                                <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID">View</a> |
-                                <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID">Edit</a> |
-                                <button type="button" class="btn btn-link p-0 delete-list-btn" style="color: inherit; text-decoration: underline; border: none; background: none; cursor: pointer;"
+            <div class="d-md-none">
+                @foreach (var item in Model.OtherLists)
+                {
+                    <div class="card list-mobile-card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                <h6 class="mb-0 fw-semibold">@item.ListModel!.ListName</h6>
+                                <span class="badge rounded-pill text-bg-primary">@item.ItemCount item@(item.ItemCount == 1 ? "" : "s")</span>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
+                                <span class="badge rounded-pill bg-light text-dark border">@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</span>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-primary">View</a>
+                                <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-list-btn"
                                         data-list-id="@item.ListModel!.ListID"
                                         data-list-name="@item.ListModel!.ListName">Delete</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 }
