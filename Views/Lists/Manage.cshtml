@@ -26,16 +26,25 @@
 
         @if (Model.Items != null && Model.Items.Any())
         {
+            var showStoreLocation = Model.Items.Any(i => !string.IsNullOrWhiteSpace(i.StoreLocation));
             <table class="table table-bordered table-striped">
                 <colgroup>
-                    <col style="width: 40%" />
-                    <col style="width: 40%" />
-                    <col style="width: 20%" />
+                    <col style="width: 35%" />
+                    <col style="width: 35%" />
+                    @if (showStoreLocation)
+                    {
+                        <col style="width: 15%" />
+                    }
+                    <col style="width: 30%" />
                 </colgroup>
                 <thead>
                     <tr class="tableHeadRow">
                         <th>Item</th>
                         <th>Details</th>
+                        @if (showStoreLocation)
+                        {
+                            <th>Store Location</th>
+                        }
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -45,7 +54,10 @@
                         <tr>
                             <td>@item.ItemName</td>
                             <td>@item.ItemDetails</td>
-                            
+                            @if (showStoreLocation)
+                            {
+                                <td>@item.StoreLocation</td>
+                            }
                             <td>
                                 @if (Model.CanEdit)
                                 {
@@ -54,7 +66,7 @@
                                         @Html.Hidden("listID", Model.ListModel.ListID)
                                         @Html.Hidden("listItemID", item.ListItemID)
                                         @Html.Hidden("shareToken", Model.ShareToken)
-                                        <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-warning")">@(item.IsCompleted ? "✓ Completed" : "Mark Complete")</button>
+                                        <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-warning")">@(item.IsCompleted ? "✓ Completed" : "Complete")</button>
                                     }
                                     <button type="button" class="btn btn-sm btn-danger delete-list-item-btn" style="margin-left: 0.5rem;"
                                             data-list-id="@Model.ListModel.ListID"
@@ -115,6 +127,11 @@
                         <div class="form-group mt-2">
                             <label for="ItemDetails">Details</label>
                             @Html.TextArea("ItemDetails", Model.NewItem.ItemDetails, 3, 0, new { @class = "form-control", placeholder = "Optional details, quantity, brand, etc" })
+                        </div>
+                        <div class="form-group mt-2">
+                            <label for="StoreLocation">Store Location</label>
+                            @Html.TextBox("StoreLocation", Model.NewItem.StoreLocation, new { @class = "form-control", placeholder = "Aisle 5, Produce, Frozen", @list = "storeLocationSuggestions" })
+                            <datalist id="storeLocationSuggestions"></datalist>
                         </div>
                         <button type="submit" class="btn btn-success mt-3">Add Item</button>
                     }
@@ -213,39 +230,107 @@
 
             // Item name autocomplete
             var itemNameInput = document.querySelector('input[name="ItemName"]');
-            var datalist = document.getElementById('itemSuggestions');
-            var debounceTimer;
+            var itemNameDatalist = document.getElementById('itemSuggestions');
+            var storeLocationInput = document.querySelector('input[name="StoreLocation"]');
+            var storeLocationDatalist = document.getElementById('storeLocationSuggestions');
+            var itemNameDebounceTimer;
+            var storeLocationDebounceTimer;
             var listID = @Model.ListModel.ListID;
             var shareToken = '@Model.ShareToken';
 
-            if (itemNameInput && datalist) {
+            function buildSuggestionsUrl(basePath, parameters) {
+                var url = basePath + '?listID=' + listID;
+
+                Object.keys(parameters).forEach(function (key) {
+                    var value = parameters[key];
+                    if (value) {
+                        url += '&' + key + '=' + encodeURIComponent(value);
+                    }
+                });
+
+                if (shareToken) {
+                    url += '&shareToken=' + encodeURIComponent(shareToken);
+                }
+
+                return url;
+            }
+
+            function renderDatalist(targetDatalist, suggestions) {
+                targetDatalist.innerHTML = '';
+                suggestions.forEach(function (suggestion) {
+                    var option = document.createElement('option');
+                    option.value = suggestion;
+                    targetDatalist.appendChild(option);
+                });
+            }
+
+            if (itemNameInput && itemNameDatalist) {
                 itemNameInput.addEventListener('input', function () {
-                    clearTimeout(debounceTimer);
+                    clearTimeout(itemNameDebounceTimer);
                     var query = this.value.trim();
 
                     if (query.length === 0) {
-                        datalist.innerHTML = '';
+                        itemNameDatalist.innerHTML = '';
+                        if (storeLocationDatalist) {
+                            storeLocationDatalist.innerHTML = '';
+                        }
                         return;
                     }
 
-                    debounceTimer = setTimeout(function () {
-                        var url = '/ListItem/GetItemNameSuggestions?listID=' + listID + '&query=' + encodeURIComponent(query);
-                        if (shareToken) {
-                            url += '&shareToken=' + encodeURIComponent(shareToken);
-                        }
+                    itemNameDebounceTimer = setTimeout(function () {
+                        var url = buildSuggestionsUrl('/ListItem/GetItemNameSuggestions', { query: query });
 
                         fetch(url)
                             .then(response => response.json())
                             .then(suggestions => {
-                                datalist.innerHTML = '';
-                                suggestions.forEach(function (suggestion) {
-                                    var option = document.createElement('option');
-                                    option.value = suggestion;
-                                    datalist.appendChild(option);
-                                });
+                                renderDatalist(itemNameDatalist, suggestions);
                             })
-                            .catch(error => console.error('Error fetching suggestions:', error));
+                            .catch(error => console.error('Error fetching item name suggestions:', error));
                     }, 300);
+                });
+            }
+
+            if (itemNameInput && storeLocationInput && storeLocationDatalist) {
+                function fetchStoreLocationSuggestions() {
+                    var itemName = itemNameInput.value.trim();
+                    var query = storeLocationInput.value.trim();
+
+                    if (itemName.length === 0) {
+                        storeLocationDatalist.innerHTML = '';
+                        return;
+                    }
+
+                    var url = buildSuggestionsUrl('/ListItem/GetStoreLocationSuggestions', {
+                        itemName: itemName,
+                        query: query
+                    });
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(suggestions => {
+                            renderDatalist(storeLocationDatalist, suggestions);
+                        })
+                        .catch(error => console.error('Error fetching store location suggestions:', error));
+                }
+
+                itemNameInput.addEventListener('change', function () {
+                    clearTimeout(storeLocationDebounceTimer);
+                    storeLocationDebounceTimer = setTimeout(fetchStoreLocationSuggestions, 150);
+                });
+
+                itemNameInput.addEventListener('blur', function () {
+                    clearTimeout(storeLocationDebounceTimer);
+                    storeLocationDebounceTimer = setTimeout(fetchStoreLocationSuggestions, 150);
+                });
+
+                storeLocationInput.addEventListener('focus', function () {
+                    clearTimeout(storeLocationDebounceTimer);
+                    storeLocationDebounceTimer = setTimeout(fetchStoreLocationSuggestions, 150);
+                });
+
+                storeLocationInput.addEventListener('input', function () {
+                    clearTimeout(storeLocationDebounceTimer);
+                    storeLocationDebounceTimer = setTimeout(fetchStoreLocationSuggestions, 250);
                 });
             }
         });

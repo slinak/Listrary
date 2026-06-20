@@ -177,6 +177,10 @@ namespace ListManager.Migrations
                     b.Property<int>("SortOrder")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("StoreLocation")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.HasKey("ListItemID");
 
                     b.HasIndex("ListID");

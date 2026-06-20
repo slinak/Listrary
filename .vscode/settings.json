@@ -4,6 +4,8 @@
         "dotnet ef": true,
         "dotnet test": true,
         "git check-ignore": true,
-        "git add": true
+        "git add": true,
+        "ForEach-Object": true,
+        "more": true
     }
 }

@@ -80,6 +80,16 @@ public class ListsController : Controller
         return share?.Permission == ListSharePermission.Edit;
     }
 
+    private static List<ListItem> GetManageViewOrderedItems(IEnumerable<ListItem> items)
+    {
+        return items
+            .OrderBy(item => item.IsCompleted)
+            .ThenBy(item => item.IsCompleted ? 0 : (string.IsNullOrWhiteSpace(item.StoreLocation) ? 1 : 0))
+            .ThenBy(item => item.IsCompleted ? string.Empty : item.StoreLocation?.Trim(), StringComparer.OrdinalIgnoreCase)
+            .ThenBy(item => item.SortOrder)
+            .ToList();
+    }
+
     [HttpGet]
     public IActionResult Index()
     {
@@ -260,7 +270,7 @@ public class ListsController : Controller
         var viewModel = new ListItemManagementViewModel
         {
             ListModel = list,
-            Items = list.Items.OrderBy(item => item.IsCompleted).ThenBy(item => item.SortOrder).ToList(),
+            Items = GetManageViewOrderedItems(list.Items),
             CanEdit = HasEditAccess(id, shareToken),
             ShareToken = share?.Token,
             ActiveShares = list.Shares.ToList(),
@@ -301,7 +311,7 @@ public class ListsController : Controller
         var viewModel = new ListItemManagementViewModel
         {
             ListModel = list,
-            Items = list.Items.OrderBy(item => item.IsCompleted).ThenBy(item => item.SortOrder).ToList(),
+            Items = GetManageViewOrderedItems(list.Items),
             CanEdit = true,
             ShareToken = share.Token,
             ActiveShares = list.Shares.ToList(),

@@ -16,6 +16,9 @@ public class ListItem
     [Description("Name")]
     public string? ItemName { get; set; }
     public string? ItemDetails { get; set; }
+    [StringLength(100)]
+    [Description("Store Location")]
+    public string? StoreLocation { get; set; }
     public bool IsCompleted { get; set; }
     public bool IsDeleted { get; set; }
     public int SortOrder { get; set; } = 0;

@@ -105,6 +105,7 @@ public class ListItemController : Controller
         {
             item.ItemName = updatedItem.ItemName;
             item.ItemDetails = updatedItem.ItemDetails;
+            item.StoreLocation = updatedItem.StoreLocation;
             item.IsCompleted = updatedItem.IsCompleted;
             item.LastUpdatedDate = DateTime.Now;
             _context.SaveChanges();
@@ -167,13 +168,47 @@ public class ListItemController : Controller
             return Json(new List<string>());
 
         var suggestions = _context.ListItems
-            .Where(li => li.ListID == listID 
-                && !li.IsDeleted 
+            .Where(li => li.ListID == listID
+                && !li.IsDeleted
                 && li.ItemName != null
                 && li.ItemName.ToLower().Contains(query.ToLower()))
             .Select(li => li.ItemName)
             .Distinct()
             .OrderBy(name => name)
+            .Take(10)
+            .ToList();
+
+        return Json(suggestions);
+    }
+
+    [HttpGet]
+    public IActionResult GetStoreLocationSuggestions(int listID, string? itemName, string? query, string? shareToken)
+    {
+        if (!HasEditAccess(listID, shareToken))
+            return Unauthorized();
+
+        if (string.IsNullOrWhiteSpace(itemName))
+            return Json(new List<string>());
+
+        var normalizedItemName = itemName.Trim().ToLower();
+        var normalizedQuery = query?.Trim().ToLower() ?? string.Empty;
+
+        var suggestionsQuery = _context.ListItems
+            .Where(li => li.ListID == listID
+                && !li.IsDeleted
+                && li.ItemName != null
+                && li.StoreLocation != null
+                && li.ItemName.ToLower().Contains(normalizedItemName));
+
+        if (!string.IsNullOrWhiteSpace(normalizedQuery))
+        {
+            suggestionsQuery = suggestionsQuery.Where(li => li.StoreLocation!.ToLower().Contains(normalizedQuery));
+        }
+
+        var suggestions = suggestionsQuery
+            .Select(li => li.StoreLocation!)
+            .Distinct()
+            .OrderBy(location => location)
             .Take(10)
             .ToList();
 
