@@ -47,9 +47,7 @@ public class ListItemController : Controller
     private bool HasEditAccess(int listID, string? shareToken)
     {
         if (UserOwnsList(listID))
-        {
             return true;
-        }
 
         var share = FindShare(listID, shareToken);
         return share != null && share.Permission == ListSharePermission.Edit;
@@ -201,9 +199,7 @@ public class ListItemController : Controller
                 && li.ItemName.ToLower().Contains(normalizedItemName));
 
         if (!string.IsNullOrWhiteSpace(normalizedQuery))
-        {
             suggestionsQuery = suggestionsQuery.Where(li => li.StoreLocation!.ToLower().Contains(normalizedQuery));
-        }
 
         var suggestions = suggestionsQuery
             .Select(li => li.StoreLocation!)
