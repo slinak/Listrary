@@ -103,6 +103,39 @@ namespace ListManager.Migrations
                     b.ToTable("CircleMembers");
                 });
 
+            modelBuilder.Entity("ListManager.Models.ItemLocationPreference", b =>
+                {
+                    b.Property<int>("ItemLocationPreferenceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ItemNameNormalized")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastUsedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ListID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("StoreLocationOptionID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UsageCount")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ItemLocationPreferenceID");
+
+                    b.HasIndex("StoreLocationOptionID");
+
+                    b.HasIndex("ListID", "ItemNameNormalized")
+                        .IsUnique();
+
+                    b.ToTable("ItemLocationPreferences");
+                });
+
             modelBuilder.Entity("ListManager.Models.List", b =>
                 {
                     b.Property<int>("ListID")
@@ -134,6 +167,9 @@ namespace ListManager.Migrations
 
                     b.Property<string>("OwnerID")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("StrictStoreLocations")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ListID");
 
@@ -181,9 +217,14 @@ namespace ListManager.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("StoreLocationOptionID")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("ListItemID");
 
                     b.HasIndex("ListID");
+
+                    b.HasIndex("StoreLocationOptionID");
 
                     b.ToTable("ListItems");
                 });
@@ -222,6 +263,39 @@ namespace ListManager.Migrations
                         .IsUnique();
 
                     b.ToTable("ListShares");
+                });
+
+            modelBuilder.Entity("ListManager.Models.StoreLocationOption", b =>
+                {
+                    b.Property<int>("StoreLocationOptionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastUsedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ListID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("StoreLocationOptionID");
+
+                    b.HasIndex("ListID", "NormalizedName")
+                        .IsUnique();
+
+                    b.ToTable("StoreLocationOptions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -442,6 +516,25 @@ namespace ListManager.Migrations
                     b.Navigation("Circle");
                 });
 
+            modelBuilder.Entity("ListManager.Models.ItemLocationPreference", b =>
+                {
+                    b.HasOne("ListManager.Models.List", "List")
+                        .WithMany("ItemLocationPreferences")
+                        .HasForeignKey("ListID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ListManager.Models.StoreLocationOption", "StoreLocationOption")
+                        .WithMany()
+                        .HasForeignKey("StoreLocationOptionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("List");
+
+                    b.Navigation("StoreLocationOption");
+                });
+
             modelBuilder.Entity("ListManager.Models.List", b =>
                 {
                     b.HasOne("ListManager.Models.Circle", "Circle")
@@ -459,13 +552,31 @@ namespace ListManager.Migrations
                         .HasForeignKey("ListID")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("ListManager.Models.StoreLocationOption", "StoreLocationOption")
+                        .WithMany("ListItems")
+                        .HasForeignKey("StoreLocationOptionID")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("List");
+
+                    b.Navigation("StoreLocationOption");
                 });
 
             modelBuilder.Entity("ListManager.Models.ListShare", b =>
                 {
                     b.HasOne("ListManager.Models.List", "List")
                         .WithMany("Shares")
+                        .HasForeignKey("ListID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("List");
+                });
+
+            modelBuilder.Entity("ListManager.Models.StoreLocationOption", b =>
+                {
+                    b.HasOne("ListManager.Models.List", "List")
+                        .WithMany("StoreLocationOptions")
                         .HasForeignKey("ListID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -533,9 +644,18 @@ namespace ListManager.Migrations
 
             modelBuilder.Entity("ListManager.Models.List", b =>
                 {
+                    b.Navigation("ItemLocationPreferences");
+
                     b.Navigation("Items");
 
                     b.Navigation("Shares");
+
+                    b.Navigation("StoreLocationOptions");
+                });
+
+            modelBuilder.Entity("ListManager.Models.StoreLocationOption", b =>
+                {
+                    b.Navigation("ListItems");
                 });
 #pragma warning restore 612, 618
         }

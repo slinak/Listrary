@@ -199,6 +199,7 @@ public class ListsController : Controller
             OwnerID = CurrentUserId,
             CircleID = list.CircleID,
             ListType = list.ListType,
+            StrictStoreLocations = list.StrictStoreLocations,
             CreatedDate = DateTime.Now,
             LastUpdatedDate = DateTime.Now
         };
@@ -245,6 +246,7 @@ public class ListsController : Controller
             list.ListName = newList.ListName?.Trim();
             list.CircleID = newList.CircleID;
             list.ListType = newList.ListType;
+            list.StrictStoreLocations = newList.StrictStoreLocations;
             list.LastUpdatedDate = DateTime.Now;
             _context.SaveChanges();
         }

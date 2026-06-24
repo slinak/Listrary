@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ListManager.Data;
@@ -53,6 +54,178 @@ public class ListItemController : Controller
         return share != null && share.Permission == ListSharePermission.Edit;
     }
 
+    private static string NormalizeWhitespace(string value)
+    {
+        return Regex.Replace(value.Trim(), "\\s+", " ");
+    }
+
+    private static string NormalizeItemName(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        return NormalizeWhitespace(value).ToLowerInvariant();
+    }
+
+    private static string NormalizeStoreLocationKey(string value)
+    {
+        var canonical = CanonicalizeStoreLocation(value);
+        return Regex.Replace(canonical.ToLowerInvariant(), "[^a-z0-9]+", " ").Trim();
+    }
+
+    private static string CanonicalizeStoreLocation(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        var normalized = NormalizeWhitespace(value)
+            .Trim(',', ';', '.', ':')
+            .ToLowerInvariant();
+
+        var aliasMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["produce section"] = "Produce",
+            ["vegetables"] = "Produce",
+            ["veggies"] = "Produce",
+            ["frozen foods"] = "Frozen",
+            ["frozen section"] = "Frozen",
+            ["checkout"] = "Checkout",
+            ["cashier"] = "Checkout"
+        };
+
+        if (aliasMap.TryGetValue(normalized, out var aliasCanonical))
+            return aliasCanonical;
+
+        var aisleMatch = Regex.Match(normalized, "^aisle\\s*#?\\s*([a-z0-9-]+)$", RegexOptions.IgnoreCase);
+        if (aisleMatch.Success)
+            return $"Aisle {aisleMatch.Groups[1].Value.ToUpperInvariant()}";
+
+        return string.Join(' ', normalized
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(token => char.ToUpperInvariant(token[0]) + token.Substring(1)));
+    }
+
+    private static double GetStringSimilarity(string left, string right)
+    {
+        if (left == right)
+            return 1.0;
+
+        if (string.IsNullOrEmpty(left) || string.IsNullOrEmpty(right))
+            return 0.0;
+
+        var distance = LevenshteinDistance(left, right);
+        var maxLength = Math.Max(left.Length, right.Length);
+        return maxLength == 0 ? 1.0 : 1.0 - (double)distance / maxLength;
+    }
+
+    private static int LevenshteinDistance(string left, string right)
+    {
+        var leftLength = left.Length;
+        var rightLength = right.Length;
+        var costs = new int[rightLength + 1];
+
+        for (var j = 0; j <= rightLength; j++)
+            costs[j] = j;
+
+        for (var i = 1; i <= leftLength; i++)
+        {
+            var previousCost = costs[0];
+            costs[0] = i;
+
+            for (var j = 1; j <= rightLength; j++)
+            {
+                var currentCost = costs[j];
+                var substitutionCost = left[i - 1] == right[j - 1] ? 0 : 1;
+                costs[j] = Math.Min(
+                    Math.Min(costs[j] + 1, costs[j - 1] + 1),
+                    previousCost + substitutionCost);
+                previousCost = currentCost;
+            }
+        }
+
+        return costs[rightLength];
+    }
+
+    private StoreLocationOption? FindSimilarStoreLocationOption(int listID, string normalizedName)
+    {
+        var options = _context.StoreLocationOptions.Where(option => option.ListID == listID).ToList();
+        if (!options.Any())
+            return null;
+
+        return options
+            .Select(option => new
+            {
+                Option = option,
+                Similarity = GetStringSimilarity(option.NormalizedName, normalizedName)
+            })
+            .Where(candidate => candidate.Similarity >= 0.75)
+            .OrderByDescending(candidate => candidate.Similarity)
+            .ThenBy(candidate => candidate.Option.Name)
+            .Select(candidate => candidate.Option)
+            .FirstOrDefault();
+    }
+
+    private (StoreLocationOption? option, string? warning, string? error) ResolveStoreLocationOption(int listID, string? rawStoreLocation, bool strictStoreLocations)
+    {
+        var canonicalStoreLocation = CanonicalizeStoreLocation(rawStoreLocation);
+        if (string.IsNullOrWhiteSpace(canonicalStoreLocation))
+            return (null, null, null);
+
+        var normalizedName = NormalizeStoreLocationKey(canonicalStoreLocation);
+        var existingOption = _context.StoreLocationOptions.FirstOrDefault(option => option.ListID == listID && option.NormalizedName == normalizedName);
+        if (existingOption != null)
+        {
+            existingOption.LastUsedDate = DateTime.Now;
+            return (existingOption, null, null);
+        }
+
+        var hasAnyOption = _context.StoreLocationOptions.Any(option => option.ListID == listID);
+        if (strictStoreLocations && hasAnyOption)
+            return (null, null, "This list only allows predefined store locations. Choose one from suggestions.");
+
+        var similarOption = FindSimilarStoreLocationOption(listID, normalizedName);
+        var warning = similarOption == null
+            ? null
+            : $"Did you mean '{similarOption.Name}'? A new location '{canonicalStoreLocation}' was added.";
+
+        var newOption = new StoreLocationOption
+        {
+            ListID = listID,
+            Name = canonicalStoreLocation,
+            NormalizedName = normalizedName,
+            CreatedDate = DateTime.Now,
+            LastUsedDate = DateTime.Now
+        };
+        _context.StoreLocationOptions.Add(newOption);
+
+        return (newOption, warning, null);
+    }
+
+    private void LearnItemLocationPreference(int listID, string? itemName, int storeLocationOptionID)
+    {
+        var normalizedItemName = NormalizeItemName(itemName);
+        if (string.IsNullOrWhiteSpace(normalizedItemName))
+            return;
+
+        var preference = _context.ItemLocationPreferences.FirstOrDefault(pref => pref.ListID == listID && pref.ItemNameNormalized == normalizedItemName);
+        if (preference == null)
+        {
+            _context.ItemLocationPreferences.Add(new ItemLocationPreference
+            {
+                ListID = listID,
+                ItemNameNormalized = normalizedItemName,
+                StoreLocationOptionID = storeLocationOptionID,
+                UsageCount = 1,
+                LastUsedDate = DateTime.Now
+            });
+            return;
+        }
+
+        preference.StoreLocationOptionID = storeLocationOptionID;
+        preference.UsageCount += 1;
+        preference.LastUsedDate = DateTime.Now;
+    }
+
     [HttpPost]
     public IActionResult Create(int listID, ListItem item, string? shareToken)
     {
@@ -62,13 +235,35 @@ public class ListItemController : Controller
         if (!ModelState.IsValid)
             return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
 
+        var list = _context.Lists.FirstOrDefault(l => l.ListID == listID);
+        if (list == null)
+            return NotFound();
+
+        var locationResolution = ResolveStoreLocationOption(listID, item.StoreLocation, list.StrictStoreLocations);
+        if (!string.IsNullOrWhiteSpace(locationResolution.error))
+        {
+            TempData["StoreLocationError"] = locationResolution.error;
+            return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
+        }
+
+        if (!string.IsNullOrWhiteSpace(locationResolution.warning))
+            TempData["StoreLocationWarning"] = locationResolution.warning;
+
         item.ListID = listID;
         item.CreatedDate = DateTime.Now;
         item.LastUpdatedDate = DateTime.Now;
         item.AddedDate = DateTime.Now;
+        item.StoreLocationOption = locationResolution.option;
+        item.StoreLocation = locationResolution.option?.Name;
 
         _context.ListItems.Add(item);
         _context.SaveChanges();
+
+        if (locationResolution.option?.StoreLocationOptionID > 0)
+        {
+            LearnItemLocationPreference(listID, item.ItemName, locationResolution.option.StoreLocationOptionID);
+            _context.SaveChanges();
+        }
 
         return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
     }
@@ -78,11 +273,16 @@ public class ListItemController : Controller
         if (!UserOwnsList(listID))
             return NotFound();
 
+        var list = _context.Lists.FirstOrDefault(l => l.ListID == listID);
+        if (list == null)
+            return NotFound();
+
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == listItemID);
         if (item == null)
             return NotFound();
 
         ViewBag.ListID = listID;
+        ViewBag.StrictStoreLocations = list.StrictStoreLocations;
         return View(item);
     }
 
@@ -95,18 +295,42 @@ public class ListItemController : Controller
         if (!ModelState.IsValid)
         {
             ViewBag.ListID = listID;
+            ViewBag.StrictStoreLocations = _context.Lists.Where(l => l.ListID == listID).Select(l => l.StrictStoreLocations).FirstOrDefault();
             return View(updatedItem);
         }
+
+        var list = _context.Lists.FirstOrDefault(l => l.ListID == listID);
+        if (list == null)
+            return NotFound();
+
+        var locationResolution = ResolveStoreLocationOption(listID, updatedItem.StoreLocation, list.StrictStoreLocations);
+        if (!string.IsNullOrWhiteSpace(locationResolution.error))
+        {
+            ModelState.AddModelError(nameof(updatedItem.StoreLocation), locationResolution.error);
+            ViewBag.ListID = listID;
+            ViewBag.StrictStoreLocations = list.StrictStoreLocations;
+            return View(updatedItem);
+        }
+
+        if (!string.IsNullOrWhiteSpace(locationResolution.warning))
+            TempData["StoreLocationWarning"] = locationResolution.warning;
 
         var item = _context.ListItems.FirstOrDefault(li => li.ListID == listID && li.ListItemID == updatedItem.ListItemID);
         if (item != null)
         {
             item.ItemName = updatedItem.ItemName;
             item.ItemDetails = updatedItem.ItemDetails;
-            item.StoreLocation = updatedItem.StoreLocation;
+            item.StoreLocationOption = locationResolution.option;
+            item.StoreLocation = locationResolution.option?.Name;
             item.IsCompleted = updatedItem.IsCompleted;
             item.LastUpdatedDate = DateTime.Now;
             _context.SaveChanges();
+
+            if (locationResolution.option?.StoreLocationOptionID > 0)
+            {
+                LearnItemLocationPreference(listID, item.ItemName, locationResolution.option.StoreLocationOptionID);
+                _context.SaveChanges();
+            }
         }
 
         return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
@@ -185,26 +409,25 @@ public class ListItemController : Controller
         if (!HasEditAccess(listID, shareToken))
             return Unauthorized();
 
-        if (string.IsNullOrWhiteSpace(itemName))
-            return Json(new List<string>());
-
-        var normalizedItemName = itemName.Trim().ToLower();
+        var normalizedItemName = NormalizeItemName(itemName);
         var normalizedQuery = query?.Trim().ToLower() ?? string.Empty;
 
-        var suggestionsQuery = _context.ListItems
-            .Where(li => li.ListID == listID
-                && !li.IsDeleted
-                && li.ItemName != null
-                && li.StoreLocation != null
-                && li.ItemName.ToLower().Contains(normalizedItemName));
-
+        var optionsQuery = _context.StoreLocationOptions.Where(option => option.ListID == listID);
         if (!string.IsNullOrWhiteSpace(normalizedQuery))
-            suggestionsQuery = suggestionsQuery.Where(li => li.StoreLocation!.ToLower().Contains(normalizedQuery));
+            optionsQuery = optionsQuery.Where(option => option.Name.ToLower().Contains(normalizedQuery));
 
-        var suggestions = suggestionsQuery
-            .Select(li => li.StoreLocation!)
-            .Distinct()
-            .OrderBy(location => location)
+        var preferredOptionUsage = string.IsNullOrWhiteSpace(normalizedItemName)
+            ? new Dictionary<int, int>()
+            : _context.ItemLocationPreferences
+                .Where(preference => preference.ListID == listID && preference.ItemNameNormalized == normalizedItemName)
+                .ToDictionary(preference => preference.StoreLocationOptionID, preference => preference.UsageCount);
+
+        var suggestions = optionsQuery
+            .ToList()
+            .OrderByDescending(option => preferredOptionUsage.TryGetValue(option.StoreLocationOptionID, out var usage) ? usage : 0)
+            .ThenByDescending(option => option.LastUsedDate)
+            .ThenBy(option => option.Name)
+            .Select(option => option.Name)
             .Take(10)
             .ToList();
 

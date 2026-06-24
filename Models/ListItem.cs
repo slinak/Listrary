@@ -16,6 +16,10 @@ public class ListItem
     [Description("Name")]
     public string? ItemName { get; set; }
     public string? ItemDetails { get; set; }
+
+    public int? StoreLocationOptionID { get; set; }
+    public StoreLocationOption? StoreLocationOption { get; set; }
+
     [StringLength(100)]
     [Description("Store Location")]
     public string? StoreLocation { get; set; }
