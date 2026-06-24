@@ -9,8 +9,14 @@
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Account
             </a>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">@User.Identity?.Name</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <button class="dropdown-item dark-mode-toggle" type="button" id="darkModeToggle">
+                        <span class="dark-mode-label"></span>
+                    </button>
+                </li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout">Logout</a></li>
             </ul>
@@ -23,6 +29,11 @@
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link btn btn-link dark-mode-toggle" type="button" id="darkModeToggleGuest">
+                <span class="dark-mode-label"></span>
+            </button>
         </li>
     }
 </ul>
