@@ -181,7 +181,7 @@ public class ListsController : Controller
     public IActionResult Create()
     {
         ViewBag.CircleOptions = GetCircleSelectList();
-        return View(new ListManager.Models.List { ListType = ListType.Shopping });
+        return View(new List { ListType = ListType.Shopping });
     }
 
     [HttpPost]
@@ -193,7 +193,7 @@ public class ListsController : Controller
             return View(list);
         }
 
-        var newList = new ListManager.Models.List
+        var newList = new List
         {
             ListName = list.ListName?.Trim() ?? string.Empty,
             OwnerID = CurrentUserId,

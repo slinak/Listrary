@@ -30,10 +30,10 @@ public class List
     public bool IsCompleted { get; set; } = false;
     public bool StrictStoreLocations { get; set; } = false;
 
-    public ICollection<ListItem> Items { get; set; } = new System.Collections.Generic.List<ListItem>();
-    public ICollection<ListShare> Shares { get; set; } = new System.Collections.Generic.List<ListShare>();
-    public ICollection<StoreLocationOption> StoreLocationOptions { get; set; } = new System.Collections.Generic.List<StoreLocationOption>();
-    public ICollection<ItemLocationPreference> ItemLocationPreferences { get; set; } = new System.Collections.Generic.List<ItemLocationPreference>();
+    public ICollection<ListItem> Items { get; set; } = new List<ListItem>();
+    public ICollection<ListShare> Shares { get; set; } = new List<ListShare>();
+    public ICollection<StoreLocationOption> StoreLocationOptions { get; set; } = new List<StoreLocationOption>();
+    public ICollection<ItemLocationPreference> ItemLocationPreferences { get; set; } = new List<ItemLocationPreference>();
 }
 
 public enum ListType
