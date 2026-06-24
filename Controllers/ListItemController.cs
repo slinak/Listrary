@@ -2,6 +2,8 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using ListManager;
 using ListManager.Data;
 using ListManager.Models;
 
@@ -11,10 +13,12 @@ namespace ListManager.Controllers;
 public class ListItemController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
-    public ListItemController(ApplicationDbContext context)
+    public ListItemController(ApplicationDbContext context, IStringLocalizer<SharedResource> localizer)
     {
         _context = context;
+        _localizer = localizer;
     }
 
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
@@ -113,26 +117,23 @@ public class ListItemController : Controller
         if (string.IsNullOrEmpty(left) || string.IsNullOrEmpty(right))
             return 0.0;
 
-        var distance = LevenshteinDistance(left, right);
         var maxLength = Math.Max(left.Length, right.Length);
-        return maxLength == 0 ? 1.0 : 1.0 - (double)distance / maxLength;
+        return maxLength == 0 ? 1.0 : 1.0 - (double)LevenshteinDistance(left, right) / maxLength;
     }
 
     private static int LevenshteinDistance(string left, string right)
     {
-        var leftLength = left.Length;
-        var rightLength = right.Length;
-        var costs = new int[rightLength + 1];
+        var costs = new int[right.Length + 1];
 
-        for (var j = 0; j <= rightLength; j++)
+        for (var j = 0; j <= right.Length; j++)
             costs[j] = j;
 
-        for (var i = 1; i <= leftLength; i++)
+        for (var i = 1; i <= left.Length; i++)
         {
             var previousCost = costs[0];
             costs[0] = i;
 
-            for (var j = 1; j <= rightLength; j++)
+            for (var j = 1; j <= right.Length; j++)
             {
                 var currentCost = costs[j];
                 var substitutionCost = left[i - 1] == right[j - 1] ? 0 : 1;
@@ -143,7 +144,7 @@ public class ListItemController : Controller
             }
         }
 
-        return costs[rightLength];
+        return costs[right.Length];
     }
 
     private StoreLocationOption? FindSimilarStoreLocationOption(int listID, string normalizedName)
@@ -181,12 +182,12 @@ public class ListItemController : Controller
 
         var hasAnyOption = _context.StoreLocationOptions.Any(option => option.ListID == listID);
         if (strictStoreLocations && hasAnyOption)
-            return (null, null, "This list only allows predefined store locations. Choose one from suggestions.");
+            return (null, null, _localizer["StoreLocations.StrictError"]);
 
         var similarOption = FindSimilarStoreLocationOption(listID, normalizedName);
         var warning = similarOption == null
             ? null
-            : $"Did you mean '{similarOption.Name}'? A new location '{canonicalStoreLocation}' was added.";
+            : _localizer["StoreLocations.SimilarWarning", similarOption.Name, canonicalStoreLocation].Value;
 
         var newOption = new StoreLocationOption
         {

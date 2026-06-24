@@ -1,11 +1,11 @@
 @model ListManager.Models.List
 
 @{
-    ViewData["Title"] = "Create a List";
+    ViewData["Title"] = SharedLocalizer["Lists.Create.Title"].Value;
 }
 
 <div class="text-center">
-    <h1 class="display-4">Create</h1>
+    <h1 class="display-4">@SharedLocalizer["Common.Create"]</h1>
 
 </div>
 @using (Html.BeginForm("Create", "Lists", FormMethod.Post, new { @class = "form-horizontal" }))
@@ -15,15 +15,15 @@
     <div class="form-horizontal">
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group row">
-            @Html.LabelFor(model => model.ListName, "List Name", htmlAttributes: new { @class = "control-label col-sm" })
+            @Html.LabelFor(model => model.ListName, SharedLocalizer["Lists.Fields.ListName"].Value, htmlAttributes: new { @class = "control-label col-sm" })
             <div class="col-md-10">
-                <small>Please enter the list name.</small>
+                <small>@SharedLocalizer["Lists.Help.ListName"]</small>
                 @Html.TextBoxFor(model => model.ListName, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.ListName, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.ListType, "List Type", htmlAttributes: new { @class = "control-label col-sm" })
+            @Html.LabelFor(model => model.ListType, SharedLocalizer["Lists.Fields.ListType"].Value, htmlAttributes: new { @class = "control-label col-sm" })
             <div class="col-md-10">
                 <dl>
                 @foreach (var value in Enum.GetValues(typeof(ListType)))
@@ -38,24 +38,24 @@
             </div>
         </div>
         <div class="form-group row">
-            @Html.LabelFor(model => model.CircleID, "Circle", htmlAttributes: new { @class = "control-label col-sm" })
+            @Html.LabelFor(model => model.CircleID, SharedLocalizer["Lists.Fields.Circle"].Value, htmlAttributes: new { @class = "control-label col-sm" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.CircleID, ViewBag.CircleOptions as SelectList, "None", new { @class = "form-control" })
-                <span class="form-text text-muted">Add this list to one of your circles.</span>
+                @Html.DropDownListFor(model => model.CircleID, ViewBag.CircleOptions as SelectList, SharedLocalizer["Common.None"].Value, new { @class = "form-control" })
+                <span class="form-text text-muted">@SharedLocalizer["Lists.Help.CircleCreate"]</span>
             </div>
         </div>
         <div class="form-group row mt-2">
             <div class="col-md-10 offset-sm-2">
                 <div class="form-check">
                     @Html.CheckBoxFor(model => model.StrictStoreLocations, new { @class = "form-check-input", @id = "StrictStoreLocations" })
-                    <label class="form-check-label" for="StrictStoreLocations">Only allow predefined store locations for this list</label>
+                    <label class="form-check-label" for="StrictStoreLocations">@SharedLocalizer["StoreLocations.StrictToggle"]</label>
                 </div>
-                <small class="text-muted">When enabled, shoppers must choose an existing location instead of creating new ones.</small>
+                <small class="text-muted">@SharedLocalizer["StoreLocations.StrictHelp"]</small>
             </div>
         </div>
         <div class="form-group row">
             <div class="col-md-offset-2 col-md-2">
-                <input type="submit" value="Create" class="btn btn-primary mb-2" />
+                <input type="submit" value="@SharedLocalizer["Common.Create"]" class="btn btn-primary mb-2" />
             </div>
         </div>
     </div>

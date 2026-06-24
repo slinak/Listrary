@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="App.Title" xml:space="preserve"><value>Listrary</value></data>
+  <data name="App.Tagline" xml:space="preserve"><value>Listrary, a Library of your Lists</value></data>
+  <data name="Nav.Toggle" xml:space="preserve"><value>Toggle navigation</value></data>
+  <data name="Nav.Lists" xml:space="preserve"><value>Lists</value></data>
+  <data name="Nav.Circles" xml:space="preserve"><value>Circles</value></data>
+  <data name="Account.Menu" xml:space="preserve"><value>Account</value></data>
+  <data name="Account.Login" xml:space="preserve"><value>Login</value></data>
+  <data name="Account.Register" xml:space="preserve"><value>Register</value></data>
+  <data name="Account.Logout" xml:space="preserve"><value>Logout</value></data>
+  <data name="Theme.LightMode" xml:space="preserve"><value>☀ Light mode</value></data>
+  <data name="Theme.DarkMode" xml:space="preserve"><value>🌙 Dark mode</value></data>
+  <data name="StoreLocations.StrictError" xml:space="preserve"><value>This list only allows predefined store locations. Choose one from suggestions.</value></data>
+  <data name="StoreLocations.SimilarWarning" xml:space="preserve"><value>Did you mean '{0}'? A new location '{1}' was added.</value></data>
+  <data name="StoreLocations.StrictToggle" xml:space="preserve"><value>Only allow predefined store locations for this list</value></data>
+  <data name="StoreLocations.StrictHelp" xml:space="preserve"><value>When enabled, shoppers must choose an existing location instead of creating new ones.</value></data>
+  <data name="StoreLocations.StrictInputHelp" xml:space="preserve"><value>This list only accepts predefined store locations.</value></data>
+  <data name="StoreLocations.StrictEnabled" xml:space="preserve"><value>Strict store locations enabled</value></data>
+  <data name="StoreLocations.Label" xml:space="preserve"><value>Store Location</value></data>
+  <data name="StoreLocations.Placeholder" xml:space="preserve"><value>Aisle 5, Produce, Frozen</value></data>
+  <data name="StoreLocations.JumpToSection" xml:space="preserve"><value>Jump to section</value></data>
+  <data name="Lists.Create.Title" xml:space="preserve"><value>Create a List</value></data>
+  <data name="Lists.Edit.Title" xml:space="preserve"><value>Edit List</value></data>
+  <data name="Lists.Edit.Heading" xml:space="preserve"><value>Edit List</value></data>
+  <data name="Lists.Fields.ListName" xml:space="preserve"><value>List Name</value></data>
+  <data name="Lists.Fields.ListType" xml:space="preserve"><value>List Type</value></data>
+  <data name="Lists.Fields.Circle" xml:space="preserve"><value>Circle</value></data>
+  <data name="Lists.Help.ListName" xml:space="preserve"><value>Please enter the list name.</value></data>
+  <data name="Lists.Help.CircleCreate" xml:space="preserve"><value>Add this list to one of your circles.</value></data>
+  <data name="Lists.Help.CircleEdit" xml:space="preserve"><value>Place this list in one of your circles.</value></data>
+  <data name="ListItems.Manage.Title" xml:space="preserve"><value>Manage Items</value></data>
+  <data name="ListItems.Edit.Title" xml:space="preserve"><value>Edit Item</value></data>
+  <data name="ListItems.Edit.Heading" xml:space="preserve"><value>Edit Item</value></data>
+  <data name="ListItems.Fields.ItemName" xml:space="preserve"><value>Item Name</value></data>
+  <data name="ListItems.Fields.Details" xml:space="preserve"><value>Details</value></data>
+  <data name="ListItems.Help.ItemName" xml:space="preserve"><value>Please enter the item name.</value></data>
+  <data name="ListItems.Placeholders.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="ListItems.Placeholders.Details" xml:space="preserve"><value>Optional details</value></data>
+  <data name="ListItems.Placeholders.DetailsLong" xml:space="preserve"><value>Optional details, quantity, brand, etc</value></data>
+  <data name="ListItems.MarkCompleted" xml:space="preserve"><value>Mark as Completed</value></data>
+  <data name="ListItems.CompletedItems" xml:space="preserve"><value>Completed Items</value></data>
+  <data name="ListItems.Status.Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="ListItems.Status.Active" xml:space="preserve"><value>Active</value></data>
+  <data name="ListItems.EmptyState" xml:space="preserve"><value>This list has no items yet. Add your first item below.</value></data>
+  <data name="ListItems.AddHeading" xml:space="preserve"><value>Add an Item</value></data>
+  <data name="ListItems.AddButton" xml:space="preserve"><value>Add Item</value></data>
+  <data name="ListItems.DeletePrompt" xml:space="preserve"><value>Are you sure you want to delete the item</value></data>
+  <data name="ListItems.ViewOnlyMessage" xml:space="preserve"><value>This list is shared as view-only. Item changes are disabled.</value></data>
+  <data name="Shares.ShareList" xml:space="preserve"><value>Share List</value></data>
+  <data name="Shares.Permission" xml:space="preserve"><value>Permission</value></data>
+  <data name="Shares.GenerateLink" xml:space="preserve"><value>Generate link</value></data>
+  <data name="Shares.LinkCreated" xml:space="preserve"><value>Share link created. Send this URL to another user:</value></data>
+  <data name="Shares.ActiveLinks" xml:space="preserve"><value>Active share links</value></data>
+  <data name="Common.Create" xml:space="preserve"><value>Create</value></data>
+  <data name="Common.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Common.SaveChanges" xml:space="preserve"><value>Save changes</value></data>
+  <data name="Common.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Common.None" xml:space="preserve"><value>None</value></data>
+  <data name="Common.BackToLists" xml:space="preserve"><value>Back to Lists</value></data>
+  <data name="Common.Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Common.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Common.Complete" xml:space="preserve"><value>Complete</value></data>
+  <data name="Common.ViewOnly" xml:space="preserve"><value>View only</value></data>
+  <data name="Common.ConfirmDelete" xml:space="preserve"><value>Confirm Delete</value></data>
+  <data name="Account.Login.Welcome" xml:space="preserve"><value>Welcome back</value></data>
+  <data name="Account.Login.Subtitle" xml:space="preserve"><value>Sign in to your Listrary account.</value></data>
+  <data name="Account.Login.RegisterPrompt" xml:space="preserve"><value>Don&apos;t have an account? Register</value></data>
+  <data name="Account.ForgotPassword" xml:space="preserve"><value>Forgot your password?</value></data>
+  <data name="Account.Register.Heading" xml:space="preserve"><value>Create an account</value></data>
+  <data name="Account.Register.Subtitle" xml:space="preserve"><value>Join Listrary to start managing your lists.</value></data>
+  <data name="Account.Register.LoginPrompt" xml:space="preserve"><value>Already have an account? Log in</value></data>
+  <data name="Account.Logout.Click" xml:space="preserve"><value>Click here to Logout</value></data>
+  <data name="Account.Logout.Success" xml:space="preserve"><value>You have successfully logged out of the application.</value></data>
+  <data name="Account.Manage.Settings" xml:space="preserve"><value>Account Settings</value></data>
+  <data name="Account.Manage.Profile" xml:space="preserve"><value>Profile</value></data>
+  <data name="Account.Manage.ChangePassword" xml:space="preserve"><value>Change Password</value></data>
+  <data name="Account.Manage.UpdatePassword" xml:space="preserve"><value>Update password</value></data>
+  <data name="Account.Manage.Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Account.Manage.Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Account.Manage.ExternalLogins" xml:space="preserve"><value>External logins</value></data>
+  <data name="Account.Manage.TwoFactor" xml:space="preserve"><value>Two-factor auth</value></data>
+  <data name="Account.Manage.PersonalData" xml:space="preserve"><value>Personal data</value></data>
+</root>

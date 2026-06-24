@@ -23,7 +23,9 @@
     function updateLabels() {
         var dark = isDark();
         document.querySelectorAll('.dark-mode-label').forEach(function (el) {
-            el.textContent = dark ? '☀ Light mode' : '🌙 Dark mode';
+            var lightLabel = el.getAttribute('data-light-label') || 'Light mode';
+            var darkLabel = el.getAttribute('data-dark-label') || 'Dark mode';
+            el.textContent = dark ? lightLabel : darkLabel;
         });
     }
 

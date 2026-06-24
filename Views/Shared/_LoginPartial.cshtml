@@ -7,32 +7,32 @@
     {
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Account
+                @SharedLocalizer["Account.Menu"]
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">@User.Identity?.Name</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <button class="dropdown-item dark-mode-toggle" type="button" id="darkModeToggle">
-                        <span class="dark-mode-label"></span>
+                        <span class="dark-mode-label" data-light-label="@SharedLocalizer["Theme.LightMode"]" data-dark-label="@SharedLocalizer["Theme.DarkMode"]"></span>
                     </button>
                 </li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout">Logout</a></li>
+                <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout">@SharedLocalizer["Account.Logout"]</a></li>
             </ul>
         </li>
     }
     else
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">@SharedLocalizer["Account.Login"]</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">@SharedLocalizer["Account.Register"]</a>
         </li>
         <li class="nav-item">
             <button class="nav-link btn btn-link dark-mode-toggle" type="button" id="darkModeToggleGuest">
-                <span class="dark-mode-label"></span>
+                <span class="dark-mode-label" data-light-label="@SharedLocalizer["Theme.LightMode"]" data-dark-label="@SharedLocalizer["Theme.DarkMode"]"></span>
             </button>
         </li>
     }

@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Listrary</title>
+    <title>@ViewData["Title"] - @SharedLocalizer["App.Title"]</title>
     <script>(function(){var t=localStorage.getItem('listrary-theme');if(t==='dark')document.documentElement.setAttribute('data-bs-theme','dark');}());</script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -18,9 +18,9 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Lists" asp-action="Index">Listrary, a Library of your Lists</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Lists" asp-action="Index">@SharedLocalizer["App.Tagline"]</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                        aria-expanded="false" aria-label="@SharedLocalizer["Nav.Toggle"]">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -29,10 +29,10 @@
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Lists" asp-action="Index">Lists</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Lists" asp-action="Index">@SharedLocalizer["Nav.Lists"]</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Circles" asp-action="Index">Circles</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Circles" asp-action="Index">@SharedLocalizer["Nav.Circles"]</a>
                             </li>
                         }
                     </ul>
@@ -49,7 +49,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - Listrary
+            &copy; 2026 - @SharedLocalizer["App.Title"]
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -2,7 +2,7 @@
 @using System.Security.Claims
 
 @{
-    ViewData["Title"] = "Manage Items";
+    ViewData["Title"] = SharedLocalizer["ListItems.Manage.Title"].Value;
 
     string ToAnchorSlug(string value)
     {
@@ -59,18 +59,18 @@
                 <h2 class="mb-0">@Model.ListModel.ListName</h2>
                 @if (Model.ListModel.StrictStoreLocations)
                 {
-                    <span class="badge bg-secondary mt-2">Strict store locations enabled</span>
+                    <span class="badge bg-secondary mt-2">@SharedLocalizer["StoreLocations.StrictEnabled"]</span>
                 }
             </div>
             <div class="text-end">
-                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Lists</a>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@SharedLocalizer["Common.BackToLists"]</a>
                 @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.ListModel.OwnerID)
                 {
                     <button type="button" class="btn btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#shareListModal">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share me-2" viewBox="0 0 16 16" aria-hidden="true">
                             <path d="M13.5 1a1.5 1.5 0 1 0-1.415 2.096L6.9 6.12a1.5 1.5 0 0 0 0 3.76l5.185 3.024A1.5 1.5 0 1 0 13.5 15a1.5 1.5 0 0 0-1.415-2.096L7.9 9.88a.5.5 0 0 1 0-.76l4.185-2.44A1.5 1.5 0 0 0 13.5 1z"/>
                         </svg>
-                        Share List
+                        @SharedLocalizer["Shares.ShareList"]
                     </button>
                 }
             </div>
@@ -151,7 +151,7 @@
                                 completedHeaderShown = true;
                                 <tr class="location-group-row completed-group-row">
                                     <td colspan="@(showStoreLocation ? 5 : 4)">
-                                        <span class="location-group-label">Completed Items</span>
+                                            <span class="location-group-label">@SharedLocalizer["ListItems.CompletedItems"]</span>
                                     </td>
                                 </tr>
                             }
@@ -170,7 +170,7 @@
                                 }
                                 <td>
                                     <span class="badge rounded-pill @(item.IsCompleted ? "text-bg-success" : "text-bg-warning")">
-                                        @(item.IsCompleted ? "Completed" : "Active")
+                                        @(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["ListItems.Status.Active"].Value)
                                     </span>
                                 </td>
                                 <td>
@@ -182,17 +182,17 @@
                                                 @Html.Hidden("listID", Model.ListModel.ListID)
                                                 @Html.Hidden("listItemID", item.ListItemID)
                                                 @Html.Hidden("shareToken", Model.ShareToken)
-                                                <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-outline-success" : "btn-outline-warning")">@(item.IsCompleted ? "Completed" : "Complete")</button>
+                                                <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-outline-success" : "btn-outline-warning")">@(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["Common.Complete"].Value)</button>
                                             }
                                             <button type="button" class="btn btn-sm btn-outline-danger delete-list-item-btn"
                                                     data-list-id="@Model.ListModel.ListID"
                                                     data-list-item-id="@item.ListItemID"
-                                                    data-list-item-name="@item.ItemName">Delete</button>
+                                                    data-list-item-name="@item.ItemName">@SharedLocalizer["Common.Delete"]</button>
                                         </div>
                                     }
                                     else
                                     {
-                                        <span class="text-muted">View only</span>
+                                        <span class="text-muted">@SharedLocalizer["Common.ViewOnly"]</span>
                                     }
                                 </td>
                             </tr>
@@ -205,7 +205,7 @@
                 @if (mobileSections.Any())
                 {
                     <div class="mobile-group-jump mb-3">
-                        <div class="small text-muted mb-1">Jump to section</div>
+                        <div class="small text-muted mb-1">@SharedLocalizer["StoreLocations.JumpToSection"]</div>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach (var navSection in mobileSections)
                             {
@@ -233,7 +233,7 @@
                     else if (!completedHeaderShownMobile)
                     {
                         completedHeaderShownMobile = true;
-                        <div class="location-group-mobile completed-group-mobile" id="group-completed">Completed Items</div>
+                        <div class="location-group-mobile completed-group-mobile" id="group-completed">@SharedLocalizer["ListItems.CompletedItems"]</div>
                     }
 
                     <div class="card list-mobile-card mb-3">
@@ -241,7 +241,7 @@
                             <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                 <h6 class="mb-0 fw-semibold">@item.ItemName</h6>
                                 <span class="badge rounded-pill @(item.IsCompleted ? "text-bg-success" : "text-bg-warning")">
-                                    @(item.IsCompleted ? "Completed" : "Active")
+                                    @(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["ListItems.Status.Active"].Value)
                                 </span>
                             </div>
                             @if (!string.IsNullOrWhiteSpace(item.ItemDetails))
@@ -263,17 +263,17 @@
                                             @Html.Hidden("listID", Model.ListModel.ListID)
                                             @Html.Hidden("listItemID", item.ListItemID)
                                             @Html.Hidden("shareToken", Model.ShareToken)
-                                            <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-outline-success" : "btn-outline-warning")">@(item.IsCompleted ? "Completed" : "Complete")</button>
+                                            <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-outline-success" : "btn-outline-warning")">@(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["Common.Complete"].Value)</button>
                                         }
                                         <button type="button" class="btn btn-sm btn-outline-danger delete-list-item-btn"
                                                 data-list-id="@Model.ListModel.ListID"
                                                 data-list-item-id="@item.ListItemID"
-                                                data-list-item-name="@item.ItemName">Delete</button>
+                                                data-list-item-name="@item.ItemName">@SharedLocalizer["Common.Delete"]</button>
                                     </div>
                                 }
                                 else
                                 {
-                                    <span class="text-muted">View only</span>
+                                    <span class="text-muted">@SharedLocalizer["Common.ViewOnly"]</span>
                                 }
                             </div>
                         </div>
@@ -285,19 +285,19 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="deleteListItemModalLabel">Confirm Delete</h5>
+                            <h5 class="modal-title" id="deleteListItemModalLabel">@SharedLocalizer["Common.ConfirmDelete"]</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <form asp-action="Delete" asp-controller="ListItem" method="post" id="deleteListItemForm">
                             <div class="modal-body">
-                                <p>Are you sure you want to delete the item <strong id="deleteListItemName"></strong>?</p>
+                                <p>@SharedLocalizer["ListItems.DeletePrompt"] <strong id="deleteListItemName"></strong>?</p>
                                 @Html.Hidden("listID", Model.ListModel.ListID, new { id = "deleteListItemListId" })
                                 @Html.Hidden("listItemID", "", new { id = "deleteListItemId" })
                                 @Html.Hidden("shareToken", Model.ShareToken)
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-danger">Delete</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["Common.Cancel"]</button>
+                                <button type="submit" class="btn btn-danger">@SharedLocalizer["Common.Delete"]</button>
                             </div>
                         </form>
                     </div>
@@ -306,11 +306,11 @@
         }
         else
         {
-            <div class="alert alert-info">This list has no items yet. Add your first item below.</div>
+            <div class="alert alert-info">@SharedLocalizer["ListItems.EmptyState"]</div>
         }
         <div class="card mt-4">
             <div class="card-body">
-                <h4 class="card-title">Add an Item</h4>
+                <h4 class="card-title">@SharedLocalizer["ListItems.AddHeading"]</h4>
                 @if (Model.CanEdit)
                 {
                     @using (Html.BeginForm("Create", "ListItem", FormMethod.Post))
@@ -318,29 +318,29 @@
                         @Html.Hidden("listID", Model.ListModel.ListID)
                         @Html.Hidden("shareToken", Model.ShareToken)
                         <div class="form-group">
-                            <label for="ItemName">Item Name</label>
-                            @Html.TextBox("ItemName", Model.NewItem.ItemName, new { @class = "form-control", placeholder = "Name", autofocus = "autofocus", @list = "itemSuggestions" })
+                            <label for="ItemName">@SharedLocalizer["ListItems.Fields.ItemName"]</label>
+                            @Html.TextBox("ItemName", Model.NewItem.ItemName, new { @class = "form-control", placeholder = SharedLocalizer["ListItems.Placeholders.Name"].Value, autofocus = "autofocus", @list = "itemSuggestions" })
                             <datalist id="itemSuggestions"></datalist>
                         </div>
                         <div class="form-group mt-2">
-                            <label for="ItemDetails">Details</label>
-                            @Html.TextArea("ItemDetails", Model.NewItem.ItemDetails, 3, 0, new { @class = "form-control", placeholder = "Optional details, quantity, brand, etc" })
+                            <label for="ItemDetails">@SharedLocalizer["ListItems.Fields.Details"]</label>
+                            @Html.TextArea("ItemDetails", Model.NewItem.ItemDetails, 3, 0, new { @class = "form-control", placeholder = SharedLocalizer["ListItems.Placeholders.DetailsLong"].Value })
                         </div>
                         <div class="form-group mt-2">
-                            <label for="StoreLocation">Store Location</label>
-                            @Html.TextBox("StoreLocation", Model.NewItem.StoreLocation, new { @class = "form-control", placeholder = "Aisle 5, Produce, Frozen", @list = "storeLocationSuggestions" })
+                            <label for="StoreLocation">@SharedLocalizer["StoreLocations.Label"]</label>
+                            @Html.TextBox("StoreLocation", Model.NewItem.StoreLocation, new { @class = "form-control", placeholder = SharedLocalizer["StoreLocations.Placeholder"].Value, @list = "storeLocationSuggestions" })
                             <datalist id="storeLocationSuggestions"></datalist>
                             @if (Model.ListModel.StrictStoreLocations)
                             {
-                                <small class="text-muted">This list only accepts predefined store locations.</small>
+                                <small class="text-muted">@SharedLocalizer["StoreLocations.StrictInputHelp"]</small>
                             }
                         </div>
-                        <button type="submit" class="btn btn-success mt-3">Add Item</button>
+                        <button type="submit" class="btn btn-success mt-3">@SharedLocalizer["ListItems.AddButton"]</button>
                     }
                 }
                 else
                 {
-                    <div class="alert alert-secondary">This list is shared as view-only. Item changes are disabled.</div>
+                    <div class="alert alert-secondary">@SharedLocalizer["ListItems.ViewOnlyMessage"]</div>
                 }
             </div>
         </div>
@@ -350,28 +350,28 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="shareListModalLabel">Share this list</h5>
+                        <h5 class="modal-title" id="shareListModalLabel">@SharedLocalizer["Shares.ShareList"]</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form asp-action="Share" asp-controller="Lists" method="post" class="row gy-2 gx-2 align-items-end">
                             @Html.Hidden("id", Model.ListModel.ListID)
                             <div class="col-md-6">
-                                <label class="form-label" for="permission">Permission</label>
+                                <label class="form-label" for="permission">@SharedLocalizer["Shares.Permission"]</label>
                                 <select class="form-select" id="permission" name="permission">
-                                    <option value="View">View only</option>
+                                    <option value="View">@SharedLocalizer["Common.ViewOnly"]</option>
                                     <option value="Edit">Edit</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary mt-1">Generate link</button>
+                                <button type="submit" class="btn btn-primary mt-1">@SharedLocalizer["Shares.GenerateLink"]</button>
                             </div>
                         </form>
 
                         @if (!string.IsNullOrEmpty(Model.GeneratedShareLink))
                         {
                             <div class="alert alert-success mt-3" role="alert">
-                                Share link created. Send this URL to another user:
+                                @SharedLocalizer["Shares.LinkCreated"]
                                 <div><a href="@Model.GeneratedShareLink" target="_blank">@Model.GeneratedShareLink</a></div>
                             </div>
                         }
@@ -379,7 +379,7 @@
                         @if (Model.ActiveShares != null && Model.ActiveShares.Any())
                         {
                             <div class="mt-3">
-                                <h6>Active share links</h6>
+                                <h6>@SharedLocalizer["Shares.ActiveLinks"]</h6>
                                 <ul class="list-group">
                                     @foreach (var share in Model.ActiveShares)
                                     {
@@ -396,7 +396,7 @@
                         }
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["Common.Close"]</button>
                     </div>
                 </div>
             </div>
