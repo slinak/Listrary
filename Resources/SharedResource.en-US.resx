@@ -93,4 +93,78 @@
   <data name="Account.Manage.ExternalLogins" xml:space="preserve"><value>External logins</value></data>
   <data name="Account.Manage.TwoFactor" xml:space="preserve"><value>Two-factor auth</value></data>
   <data name="Account.Manage.PersonalData" xml:space="preserve"><value>Personal data</value></data>
+  <data name="Language.Label" xml:space="preserve"><value>Language</value></data>
+  <data name="Language.en-US" xml:space="preserve"><value>English (United States)</value></data>
+  <data name="Common.View" xml:space="preserve"><value>View</value></data>
+  <data name="Common.Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Common.Accept" xml:space="preserve"><value>Accept</value></data>
+  <data name="Common.Reject" xml:space="preserve"><value>Reject</value></data>
+  <data name="Common.Manage" xml:space="preserve"><value>Manage</value></data>
+  <data name="Common.Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Common.Leave" xml:space="preserve"><value>Leave</value></data>
+  <data name="Common.Accepted" xml:space="preserve"><value>Accepted</value></data>
+  <data name="Common.Pending" xml:space="preserve"><value>Pending</value></data>
+  <data name="Common.Send" xml:space="preserve"><value>Send</value></data>
+  <data name="Common.ListSingular" xml:space="preserve"><value>list</value></data>
+  <data name="Common.ListPlural" xml:space="preserve"><value>lists</value></data>
+  <data name="Common.ItemSingular" xml:space="preserve"><value>item</value></data>
+  <data name="Common.ItemPlural" xml:space="preserve"><value>items</value></data>
+  <data name="Lists.YourLists" xml:space="preserve"><value>Your Lists</value></data>
+  <data name="Lists.DeletePrompt" xml:space="preserve"><value>Are you sure you want to delete the list</value></data>
+  <data name="Lists.Circle.Title" xml:space="preserve"><value>Lists in Circle</value></data>
+  <data name="Lists.Circle.Heading" xml:space="preserve"><value>Lists in &quot;{0}&quot;</value></data>
+  <data name="Lists.Circle.Empty" xml:space="preserve"><value>No lists in this circle yet.</value></data>
+  <data name="Lists.CirclePrefix" xml:space="preserve"><value>Circle:</value></data>
+  <data name="Lists.Fields.Items" xml:space="preserve"><value>Items</value></data>
+  <data name="Lists.Fields.CreatedDate" xml:space="preserve"><value>Created Date</value></data>
+  <data name="Lists.Fields.Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Lists.ActionsAria" xml:space="preserve"><value>List actions</value></data>
+  <data name="Lists.DeleteFallbackName" xml:space="preserve"><value>this list</value></data>
+  <data name="Circles.ViewCircle" xml:space="preserve"><value>View Circle</value></data>
+  <data name="Circles.ViewLists" xml:space="preserve"><value>View Lists</value></data>
+  <data name="Circles.CircleFallback" xml:space="preserve"><value>Circle</value></data>
+  <data name="Circles.BackToCircles" xml:space="preserve"><value>Back to Circles</value></data>
+  <data name="Circles.YourCircles" xml:space="preserve"><value>Your Circles</value></data>
+  <data name="Circles.Create.Help" xml:space="preserve"><value>Give your circle a friendly name. You can invite members after creation.</value></data>
+  <data name="Circles.Create.InvalidName" xml:space="preserve"><value>Please enter a circle name.</value></data>
+  <data name="Circles.PendingInvitations" xml:space="preserve"><value>Pending Invitations</value></data>
+  <data name="Circles.InvitedBy" xml:space="preserve"><value>Invited by:</value></data>
+  <data name="Circles.InvitedOn" xml:space="preserve"><value>Invited on</value></data>
+  <data name="Circles.Owner" xml:space="preserve"><value>Owner:</value></data>
+  <data name="Circles.Members" xml:space="preserve"><value>Members</value></data>
+  <data name="Circles.Manage.Title" xml:space="preserve"><value>Manage Circle</value></data>
+  <data name="Circles.Manage.Heading" xml:space="preserve"><value>Manage: {0}</value></data>
+  <data name="Circles.DeleteConfirm" xml:space="preserve"><value>Delete this circle? This will remove members and invitations, and unset circle on associated lists.</value></data>
+  <data name="Circles.DeleteCircle" xml:space="preserve"><value>Delete Circle</value></data>
+  <data name="Circles.Members.User" xml:space="preserve"><value>User</value></data>
+  <data name="Circles.Members.Joined" xml:space="preserve"><value>Joined</value></data>
+  <data name="Circles.Invitations" xml:space="preserve"><value>Invitations</value></data>
+  <data name="Circles.Invitations.Recipient" xml:space="preserve"><value>Recipient</value></data>
+  <data name="Circles.Invitations.Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Circles.AcceptLink" xml:space="preserve"><value>Accept Link</value></data>
+  <data name="Circles.AcceptedBy" xml:space="preserve"><value>Accepted by:</value></data>
+  <data name="Circles.Invite" xml:space="preserve"><value>Invite</value></data>
+  <data name="Circles.RecipientEmail" xml:space="preserve"><value>Recipient Email</value></data>
+  <data name="Circles.RecipientEmailPlaceholder" xml:space="preserve"><value>name@example.com</value></data>
+  <data name="Circles.RecipientUserIdOptional" xml:space="preserve"><value>Recipient UserID (optional)</value></data>
+  <data name="Circles.Invite.Validation" xml:space="preserve"><value>Please provide a recipient email or a recipient user id.</value></data>
+  <data name="Circles.RecipientFallback" xml:space="preserve"><value>recipient</value></data>
+  <data name="Circles.RecipientUnspecified" xml:space="preserve"><value>(unspecified)</value></data>
+  <data name="Circles.Status.InvitationSent" xml:space="preserve"><value>Invitation sent to {0}.</value></data>
+  <data name="Circles.Status.MemberRemoved" xml:space="preserve"><value>Removed member {0}.</value></data>
+  <data name="Circles.Status.InvitationCanceled" xml:space="preserve"><value>Invitation canceled for {0}.</value></data>
+  <data name="Circles.Status.CircleDeleted" xml:space="preserve"><value>Circle '{0}' deleted.</value></data>
+  <data name="Home.Title" xml:space="preserve"><value>Home</value></data>
+  <data name="Home.Welcome" xml:space="preserve"><value>Welcome</value></data>
+  <data name="Home.RegisterPrompt" xml:space="preserve"><value>Please</value></data>
+  <data name="Home.RegisterPromptTail" xml:space="preserve"><value>to create and manage your lists.</value></data>
+  <data name="Home.LoginPrompt" xml:space="preserve"><value>Already have an account?</value></data>
+  <data name="Error.Title" xml:space="preserve"><value>Error</value></data>
+  <data name="Error.Heading" xml:space="preserve"><value>Error.</value></data>
+  <data name="Error.Subheading" xml:space="preserve"><value>An error occurred while processing your request.</value></data>
+  <data name="Error.RequestId" xml:space="preserve"><value>Request ID:</value></data>
+  <data name="Error.DevelopmentMode" xml:space="preserve"><value>Development Mode</value></data>
+  <data name="Error.DevelopmentHelp1" xml:space="preserve"><value>Swapping to Development environment will display more detailed information about the error that occurred.</value></data>
+  <data name="Error.DevelopmentWarning" xml:space="preserve"><value>The Development environment shouldn't be enabled for deployed applications.</value></data>
+  <data name="Error.DevelopmentHelp2" xml:space="preserve"><value>It can result in displaying sensitive information from exceptions to end users. For local debugging, enable the Development environment by setting the ASPNETCORE_ENVIRONMENT environment variable to Development and restarting the app.</value></data>
 </root>

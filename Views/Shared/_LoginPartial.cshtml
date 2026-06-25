@@ -1,6 +1,12 @@
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Localization
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+
+@{
+    var requestCultureFeature = Context.Features.Get<IRequestCultureFeature>();
+    var currentCulture = requestCultureFeature?.RequestCulture.UICulture.Name ?? "en-US";
+}
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
@@ -11,6 +17,17 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">@User.Identity?.Name</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li class="px-3 py-2">
+                    <form asp-controller="Localization" asp-action="SetLanguage" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                        <label for="languageSelect" class="form-label small mb-1">@SharedLocalizer["Language.Label"]</label>
+                        <select id="languageSelect" name="culture" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="en-US" selected="@(currentCulture == "en-US")">@SharedLocalizer["Language.en-US"]</option>
+                        </select>
+                    </form>
+                </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <button class="dropdown-item dark-mode-toggle" type="button" id="darkModeToggle">
@@ -34,6 +51,15 @@
             <button class="nav-link btn btn-link dark-mode-toggle" type="button" id="darkModeToggleGuest">
                 <span class="dark-mode-label" data-light-label="@SharedLocalizer["Theme.LightMode"]" data-dark-label="@SharedLocalizer["Theme.DarkMode"]"></span>
             </button>
+        </li>
+        <li class="nav-item ms-2">
+            <form asp-controller="Localization" asp-action="SetLanguage" method="post" class="d-flex align-items-center">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                <select name="culture" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="@SharedLocalizer["Language.Label"]">
+                    <option value="en-US" selected="@(currentCulture == "en-US")">@SharedLocalizer["Language.en-US"]</option>
+                </select>
+            </form>
         </li>
     }
 </ul>

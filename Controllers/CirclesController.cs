@@ -3,6 +3,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using ListManager;
 using ListManager.Data;
 using ListManager.Models;
 
@@ -13,11 +15,13 @@ public class CirclesController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<CirclesController> _logger;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
-    public CirclesController(ApplicationDbContext context, ILogger<CirclesController> logger)
+    public CirclesController(ApplicationDbContext context, ILogger<CirclesController> logger, IStringLocalizer<SharedResource> localizer)
     {
         _context = context;
         _logger = logger;
+        _localizer = localizer;
     }
 
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
@@ -180,7 +184,7 @@ public class CirclesController : Controller
         _context.CircleInvitations.Add(invite);
         _context.SaveChanges();
 
-        TempData["StatusMessage"] = $"Invitation sent to {(invite.RecipientEmail ?? invite.RecipientID ?? "recipient")}.";
+        TempData["StatusMessage"] = _localizer["Circles.Status.InvitationSent", invite.RecipientEmail ?? invite.RecipientID ?? _localizer["Circles.RecipientFallback"].Value].Value;
 
         return RedirectToAction("Manage", new { id = circleId });
     }
@@ -203,7 +207,7 @@ public class CirclesController : Controller
         {
             _context.CircleMembers.Remove(member);
             _context.SaveChanges();
-            TempData["StatusMessage"] = $"Removed member {userId}.";
+            TempData["StatusMessage"] = _localizer["Circles.Status.MemberRemoved", userId].Value;
         }
 
         return RedirectToAction("Manage", new { id = circleId });
@@ -234,11 +238,11 @@ public class CirclesController : Controller
         if (!isOwnerOrInviter)
             return Forbid();
 
-        var recip = invite.RecipientEmail ?? invite.RecipientID ?? "(unspecified)";
+        var recip = invite.RecipientEmail ?? invite.RecipientID ?? _localizer["Circles.RecipientUnspecified"].Value;
         _context.CircleInvitations.Remove(invite);
         _context.SaveChanges();
 
-        TempData["StatusMessage"] = $"Invitation canceled for {recip}.";
+        TempData["StatusMessage"] = _localizer["Circles.Status.InvitationCanceled", recip].Value;
 
         return RedirectToAction("Manage", new { id = invite.CircleID });
     }
@@ -257,7 +261,7 @@ public class CirclesController : Controller
         _context.Circles.Remove(circle);
         _context.SaveChanges();
 
-        TempData["StatusMessage"] = $"Circle '{name}' deleted.";
+        TempData["StatusMessage"] = _localizer["Circles.Status.CircleDeleted", name].Value;
 
         return RedirectToAction("Index");
     }

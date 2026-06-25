@@ -1,16 +1,16 @@
 @model ListManager.Models.ListsIndexViewModel
 
 @{
-    ViewData["Title"] = "Lists";
+    ViewData["Title"] = SharedLocalizer["Nav.Lists"].Value;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="display-4 mb-0">Lists</h1>
+    <h1 class="display-4 mb-0">@SharedLocalizer["Nav.Lists"]</h1>
     <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg me-2" viewBox="0 0 16 16" aria-hidden="true">
             <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5V7.5H14a.5.5 0 0 1 0 1H8.5V14a.5.5 0 0 1-1 0V8.5H2a.5.5 0 0 1 0-1h5.5V1.5A.5.5 0 0 1 8 1z"/>
         </svg>
-        Create List
+        @SharedLocalizer["Lists.Create.Title"]
     </a>
 </div>
 
@@ -32,15 +32,15 @@
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
-                <strong>Circle: @group.Circle.Name</strong>
-                <span class="badge bg-secondary ms-2">@group.Lists.Count() list@(group.Lists.Count() == 1 ? "" : "s")</span>
+                <strong>@SharedLocalizer["Lists.CirclePrefix"] @group.Circle.Name</strong>
+                <span class="badge bg-secondary ms-2">@group.Lists.Count() @SharedLocalizer[group.Lists.Count() == 1 ? "Common.ListSingular" : "Common.ListPlural"]</span>
             </div>
-            <a asp-action="Circle" asp-route-id="@group.Circle.CircleID" class="btn btn-sm btn-outline-primary">View Circle</a>
+            <a asp-action="Circle" asp-route-id="@group.Circle.CircleID" class="btn btn-sm btn-outline-primary">@SharedLocalizer["Circles.ViewCircle"]</a>
         </div>
         <div class="card-body">
             @if (!group.Lists.Any())
             {
-                <p class="text-muted mb-0">No lists in this circle yet.</p>
+                <p class="text-muted mb-0">@SharedLocalizer["Lists.Circle.Empty"]</p>
             }
             else
             {
@@ -55,11 +55,11 @@
                         </colgroup>
                         <thead>
                             <tr class="tableHeadRow">
-                                <th>List Name</th>
-                                <th>List Type</th>
-                                <th>Items</th>
-                                <th>Created Date</th>
-                                <th>Actions</th>
+                                <th>@SharedLocalizer["Lists.Fields.ListName"]</th>
+                                <th>@SharedLocalizer["Lists.Fields.ListType"]</th>
+                                <th>@SharedLocalizer["Lists.Fields.Items"]</th>
+                                <th>@SharedLocalizer["Lists.Fields.CreatedDate"]</th>
+                                <th>@SharedLocalizer["Lists.Fields.Actions"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -70,15 +70,15 @@
                                     <td>
                                         <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
                                     </td>
-                                        <td><span class="badge rounded-pill bg-primary">@item.ItemCount item@(item.ItemCount == 1 ? "" : "s")</span></td>
+                                        <td><span class="badge rounded-pill bg-primary">@item.ItemCount @SharedLocalizer[item.ItemCount == 1 ? "Common.ItemSingular" : "Common.ItemPlural"]</span></td>
                                     <td>@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</td>
                                     <td>
-                                        <div class="btn-group btn-group-sm list-action-group" role="group" aria-label="List actions">
-                                            <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-primary">View</a>
-                                            <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-secondary">Edit</a>
+                                        <div class="btn-group btn-group-sm list-action-group" role="group" aria-label="@SharedLocalizer["Lists.ActionsAria"]">
+                                            <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-primary">@SharedLocalizer["Common.View"]</a>
+                                            <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-secondary">@SharedLocalizer["Common.Edit"]</a>
                                             <button type="button" class="btn btn-outline-danger delete-list-btn"
                                                     data-list-id="@item.ListModel!.ListID"
-                                                    data-list-name="@item.ListModel!.ListName">Delete</button>
+                                                    data-list-name="@item.ListModel!.ListName">@SharedLocalizer["Common.Delete"]</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -94,18 +94,18 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                     <h6 class="mb-0 fw-semibold">@item.ListModel!.ListName</h6>
-                                        <span class="badge rounded-pill bg-primary">@item.ItemCount item@(item.ItemCount == 1 ? "" : "s")</span>
+                                        <span class="badge rounded-pill bg-primary">@item.ItemCount @SharedLocalizer[item.ItemCount == 1 ? "Common.ItemSingular" : "Common.ItemPlural"]</span>
                                 </div>
                                 <div class="d-flex flex-wrap gap-2 mb-3">
                                     <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
                                     <span class="badge rounded-pill bg-light text-dark border">@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</span>
                                 </div>
                                 <div class="d-flex flex-wrap gap-2">
-                                    <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-primary">View</a>
-                                    <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-primary">@SharedLocalizer["Common.View"]</a>
+                                    <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-secondary">@SharedLocalizer["Common.Edit"]</a>
                                     <button type="button" class="btn btn-sm btn-outline-danger delete-list-btn"
                                             data-list-id="@item.ListModel!.ListID"
-                                            data-list-name="@item.ListModel!.ListName">Delete</button>
+                                            data-list-name="@item.ListModel!.ListName">@SharedLocalizer["Common.Delete"]</button>
                                 </div>
                             </div>
                         </div>
@@ -120,7 +120,7 @@
 {
     <div class="card mb-4">
         <div class="card-header">
-            <strong>Your Lists</strong>
+            <strong>@SharedLocalizer["Lists.YourLists"]</strong>
         </div>
         <div class="card-body">
             <div class="d-none d-md-block">
@@ -134,11 +134,11 @@
                     </colgroup>
                     <thead>
                         <tr class="tableHeadRow">
-                            <th>List Name</th>
-                            <th>List Type</th>
-                            <th>Items</th>
-                            <th>Created Date</th>
-                            <th>Actions</th>
+                            <th>@SharedLocalizer["Lists.Fields.ListName"]</th>
+                            <th>@SharedLocalizer["Lists.Fields.ListType"]</th>
+                            <th>@SharedLocalizer["Lists.Fields.Items"]</th>
+                            <th>@SharedLocalizer["Lists.Fields.CreatedDate"]</th>
+                            <th>@SharedLocalizer["Lists.Fields.Actions"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -149,15 +149,15 @@
                                 <td>
                                     <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
                                 </td>
-                                    <td><span class="badge rounded-pill bg-primary">@item.ItemCount item@(item.ItemCount == 1 ? "" : "s")</span></td>
+                                    <td><span class="badge rounded-pill bg-primary">@item.ItemCount @SharedLocalizer[item.ItemCount == 1 ? "Common.ItemSingular" : "Common.ItemPlural"]</span></td>
                                 <td>@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</td>
                                 <td>
-                                    <div class="btn-group btn-group-sm list-action-group" role="group" aria-label="List actions">
-                                        <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-primary">View</a>
-                                        <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-secondary">Edit</a>
+                                    <div class="btn-group btn-group-sm list-action-group" role="group" aria-label="@SharedLocalizer["Lists.ActionsAria"]">
+                                        <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-primary">@SharedLocalizer["Common.View"]</a>
+                                        <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-secondary">@SharedLocalizer["Common.Edit"]</a>
                                         <button type="button" class="btn btn-outline-danger delete-list-btn"
                                                 data-list-id="@item.ListModel!.ListID"
-                                                data-list-name="@item.ListModel!.ListName">Delete</button>
+                                                data-list-name="@item.ListModel!.ListName">@SharedLocalizer["Common.Delete"]</button>
                                     </div>
                                 </td>
                             </tr>
@@ -173,18 +173,18 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                 <h6 class="mb-0 fw-semibold">@item.ListModel!.ListName</h6>
-                                <span class="badge rounded-pill text-bg-primary">@item.ItemCount item@(item.ItemCount == 1 ? "" : "s")</span>
+                                <span class="badge rounded-pill text-bg-primary">@item.ItemCount @SharedLocalizer[item.ItemCount == 1 ? "Common.ItemSingular" : "Common.ItemPlural"]</span>
                             </div>
                             <div class="d-flex flex-wrap gap-2 mb-3">
                                 <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
                                 <span class="badge rounded-pill bg-light text-dark border">@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</span>
                             </div>
                             <div class="d-flex flex-wrap gap-2">
-                                <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-primary">View</a>
-                                <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-primary">@SharedLocalizer["Common.View"]</a>
+                                <a asp-action="Edit" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-secondary">@SharedLocalizer["Common.Edit"]</a>
                                 <button type="button" class="btn btn-sm btn-outline-danger delete-list-btn"
                                         data-list-id="@item.ListModel!.ListID"
-                                        data-list-name="@item.ListModel!.ListName">Delete</button>
+                                        data-list-name="@item.ListModel!.ListName">@SharedLocalizer["Common.Delete"]</button>
                             </div>
                         </div>
                     </div>
@@ -198,17 +198,17 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteListModalLabel">Confirm Delete</h5>
+                <h5 class="modal-title" id="deleteListModalLabel">@SharedLocalizer["Common.ConfirmDelete"]</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form asp-action="Delete" asp-controller="Lists" method="post" id="deleteListForm">
                 <div class="modal-body">
-                    <p>Are you sure you want to delete the list <strong id="deleteListName"></strong>?</p>
+                    <p>@SharedLocalizer["Lists.DeletePrompt"] <strong id="deleteListName"></strong>?</p>
                     @Html.Hidden("id", "", new { id = "deleteListId" })
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["Common.Cancel"]</button>
+                    <button type="submit" class="btn btn-danger">@SharedLocalizer["Common.Delete"]</button>
                 </div>
             </form>
         </div>
@@ -226,7 +226,7 @@
 
             deleteButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
-                    deleteListName.textContent = button.getAttribute('data-list-name') || 'this list';
+                    deleteListName.textContent = button.getAttribute('data-list-name') || '@SharedLocalizer["Lists.DeleteFallbackName"]';
                     deleteListId.value = button.getAttribute('data-list-id');
                     deleteModal.show();
                 });
