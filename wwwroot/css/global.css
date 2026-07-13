@@ -30,6 +30,12 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+/* Remove all borders for single-item tables */
+.table tbody tr:only-child,
+.table tbody tr:only-child td {
+  border: none !important;
+}
+
 .list-action-group .btn {
   min-width: 4.5rem;
 }
