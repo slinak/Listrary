@@ -38,6 +38,7 @@ jobs:
       APP_DIR: /opt/listmanager
       APP_USER: homer
       APP_GROUP: homer
+      DB_DIR: /var/lib/listmanager
     
     steps:
     - uses: actions/checkout@v4
@@ -56,6 +57,8 @@ jobs:
         
         # Ensure app directory exists for first-time deployments.
         sudo -n mkdir -p "$APP_DIR"
+        sudo -n mkdir -p "$DB_DIR"
+        sudo -n chown -R "$APP_USER":"$APP_GROUP" "$DB_DIR"
 
         # Stop service
         sudo -n systemctl stop listmanager || true
@@ -69,10 +72,6 @@ jobs:
         sudo -n cp -r /tmp/listmanager-new/* "$APP_DIR"/
         sudo -n chown -R "$APP_USER":"$APP_GROUP" "$APP_DIR"
         sudo -n chmod +x "$APP_DIR"/ListManager
-        
-        # Run migrations
-        cd "$APP_DIR"
-        dotnet ef database update --no-build 2>/dev/null || true
         
         # Start service
         sudo -n systemctl start listmanager
