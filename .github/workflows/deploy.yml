@@ -54,11 +54,16 @@ jobs:
       run: |
         set -e
         
+        # Ensure app directory exists for first-time deployments.
+        sudo -n mkdir -p "$APP_DIR"
+
         # Stop service
         sudo -n systemctl stop listmanager || true
         
         # Backup
-        sudo -n cp -r "$APP_DIR" "$APP_DIR".backup.$(date +%s)
+        if [ -d "$APP_DIR" ] && [ "$(sudo -n find "$APP_DIR" -mindepth 1 -maxdepth 1 | wc -l)" -gt 0 ]; then
+          sudo -n cp -r "$APP_DIR" "$APP_DIR".backup.$(date +%s)
+        fi
         
         # Deploy
         sudo -n cp -r /tmp/listmanager-new/* "$APP_DIR"/
