@@ -53,26 +53,32 @@ jobs:
     - name: Deploy
       run: |
         set -e
+
+        # Ensure CI can elevate without an interactive password prompt.
+        if ! sudo -n true 2>/dev/null; then
+          echo "Passwordless sudo is required for deploy user on self-hosted runner."
+          exit 1
+        fi
         
         # Stop service
-        sudo systemctl stop listmanager || true
+        sudo -n systemctl stop listmanager || true
         
         # Backup
-        sudo cp -r "$APP_DIR" "$APP_DIR".backup.$(date +%s)
+        sudo -n cp -r "$APP_DIR" "$APP_DIR".backup.$(date +%s)
         
         # Deploy
-        sudo cp -r /tmp/listmanager-new/* "$APP_DIR"/
-        sudo chown -R "$APP_USER":"$APP_GROUP" "$APP_DIR"
-        sudo chmod +x "$APP_DIR"/ListManager
+        sudo -n cp -r /tmp/listmanager-new/* "$APP_DIR"/
+        sudo -n chown -R "$APP_USER":"$APP_GROUP" "$APP_DIR"
+        sudo -n chmod +x "$APP_DIR"/ListManager
         
         # Run migrations
         cd "$APP_DIR"
         dotnet ef database update --no-build 2>/dev/null || true
         
         # Start service
-        sudo systemctl start listmanager
+        sudo -n systemctl start listmanager
         sleep 2
-        sudo systemctl status listmanager
+        sudo -n systemctl status listmanager
         
         # Cleanup
         rm -rf /tmp/listmanager-new
