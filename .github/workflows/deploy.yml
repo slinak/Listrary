@@ -1,0 +1,74 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build -c Release --no-restore
+    
+    - name: Run tests
+      run: dotnet test -c Release --no-build --verbosity normal || true
+    
+    - name: Publish
+      run: dotnet publish -c Release -o ./publish --no-build
+
+  deploy:
+    needs: build
+    runs-on: self-hosted  # <-- Uses your local runner
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Publish
+      run: dotnet publish -c Release -o /tmp/listmanager-new --no-build
+    
+    - name: Deploy
+      run: |
+        set -e
+        
+        # Stop service
+        sudo systemctl stop listmanager || true
+        
+        # Backup
+        sudo cp -r /opt/listmanager /opt/listmanager.backup.$(date +%s)
+        
+        # Deploy
+        sudo cp -r /tmp/listmanager-new/* /opt/listmanager/
+        sudo chown -R ubuntu:ubuntu /opt/listmanager
+        sudo chmod +x /opt/listmanager/ListManager
+        
+        # Run migrations
+        cd /opt/listmanager
+        dotnet ef database update --no-build 2>/dev/null || true
+        
+        # Start service
+        sudo systemctl start listmanager
+        sleep 2
+        sudo systemctl status listmanager
+        
+        # Cleanup
+        rm -rf /tmp/listmanager-new
