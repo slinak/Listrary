@@ -29,10 +29,10 @@
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Lists" asp-action="Index">@SharedLocalizer["Nav.Lists"]</a>
+                                <a class="nav-link" asp-area="" asp-controller="Lists" asp-action="Index">@SharedLocalizer["Nav.Lists"]</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Circles" asp-action="Index">@SharedLocalizer["Nav.Circles"]</a>
+                                <a class="nav-link" asp-area="" asp-controller="Circles" asp-action="Index">@SharedLocalizer["Nav.Circles"]</a>
                             </li>
                         }
                     </ul>

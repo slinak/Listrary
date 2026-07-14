@@ -164,12 +164,12 @@
                                     <td>
                                         @if (!string.IsNullOrWhiteSpace(item.StoreLocation))
                                         {
-                                            <span class="badge rounded-pill bg-light text-dark border">@item.StoreLocation</span>
+                                            <span class="badge rounded-pill badge-theme-neutral">@item.StoreLocation</span>
                                         }
                                     </td>
                                 }
                                 <td>
-                                    <span class="badge rounded-pill @(item.IsCompleted ? "text-bg-success" : "text-bg-warning")">
+                                    <span class="badge rounded-pill @(item.IsCompleted ? "badge-status-completed" : "badge-status-active")">
                                         @(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["ListItems.Status.Active"].Value)
                                     </span>
                                 </td>
@@ -240,7 +240,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                 <h6 class="mb-0 fw-semibold">@item.ItemName</h6>
-                                <span class="badge rounded-pill @(item.IsCompleted ? "text-bg-success" : "text-bg-warning")">
+                                <span class="badge rounded-pill @(item.IsCompleted ? "badge-status-completed" : "badge-status-active")">
                                     @(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["ListItems.Status.Active"].Value)
                                 </span>
                             </div>
@@ -251,7 +251,7 @@
                             @if (showStoreLocation && !string.IsNullOrWhiteSpace(item.StoreLocation))
                             {
                                 <div class="mb-3">
-                                    <span class="badge rounded-pill bg-light text-dark border">@item.StoreLocation</span>
+                                    <span class="badge rounded-pill badge-theme-neutral">@item.StoreLocation</span>
                                 </div>
                             }
                             <div>

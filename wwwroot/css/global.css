@@ -2,10 +2,28 @@
 :root {
   --app-primary-color: #258cfb;
   --app-background-color: #f8f9fa;
+  --app-text-color: #212529;
+  --app-muted-text-color: #6c757d;
+  --app-table-header-text-color: #212529;
+  --app-surface-muted-bg: #eef2f6;
+  --app-surface-muted-border: rgba(33, 37, 41, 0.18);
+  --app-status-active-bg: #f8d97a;
+  --app-status-active-color: #4d3a00;
+  --app-status-completed-bg: #198754;
+  --app-status-completed-color: #ffffff;
+  --app-listtype-shopping-bg: #74c0fc;
+  --app-listtype-shopping-color: #0b3552;
+  --app-listtype-todo-bg: #ffe08a;
+  --app-listtype-todo-color: #4d3a00;
+  --app-listtype-wishlist-bg: #198754;
+  --app-listtype-wishlist-color: #ffffff;
+  --app-listtype-default-bg: #6c757d;
+  --app-listtype-default-color: #ffffff;
 }
 
 body {
   background-color: var(--app-background-color);
+  color: var(--app-text-color);
 }
 
 .tableHeadRow {
@@ -17,6 +35,14 @@ body {
 
 .tableBody > tr > td {
   text-align:center;
+}
+
+.table thead th {
+  color: var(--app-table-header-text-color);
+}
+
+.table tbody td {
+  color: var(--app-text-color);
 }
 
 .navbar-brand,
@@ -76,6 +102,42 @@ body {
   color: #198754;
 }
 
+.badge-theme-neutral {
+  background-color: var(--app-surface-muted-bg);
+  color: var(--app-text-color);
+  border: 1px solid var(--app-surface-muted-border);
+}
+
+.badge-status-active {
+  background-color: var(--app-status-active-bg);
+  color: var(--app-status-active-color);
+}
+
+.badge-status-completed {
+  background-color: var(--app-status-completed-bg);
+  color: var(--app-status-completed-color);
+}
+
+.badge-listtype-shopping {
+  background-color: var(--app-listtype-shopping-bg);
+  color: var(--app-listtype-shopping-color);
+}
+
+.badge-listtype-todo {
+  background-color: var(--app-listtype-todo-bg);
+  color: var(--app-listtype-todo-color);
+}
+
+.badge-listtype-wishlist {
+  background-color: var(--app-listtype-wishlist-bg);
+  color: var(--app-listtype-wishlist-color);
+}
+
+.badge-listtype-default {
+  background-color: var(--app-listtype-default-bg);
+  color: var(--app-listtype-default-color);
+}
+
 /* ── Identity / Account pages ── */
 .manage-nav .nav-link {
   border-radius: 0;
@@ -114,6 +176,23 @@ body {
 [data-bs-theme="dark"] {
   --app-background-color: #1a1d21;
   --app-primary-color: #5aabff;
+  --app-text-color: #e1e3e6;
+  --app-muted-text-color: #aeb4bc;
+  --app-table-header-text-color: #f1f3f5;
+  --app-surface-muted-bg: #343a40;
+  --app-surface-muted-border: rgba(225, 227, 230, 0.22);
+  --app-status-active-bg: #6d5600;
+  --app-status-active-color: #fff3cd;
+  --app-status-completed-bg: #198754;
+  --app-status-completed-color: #ffffff;
+  --app-listtype-shopping-bg: #0f4f78;
+  --app-listtype-shopping-color: #cfe9ff;
+  --app-listtype-todo-bg: #6d5600;
+  --app-listtype-todo-color: #fff3cd;
+  --app-listtype-wishlist-bg: #1f7a4f;
+  --app-listtype-wishlist-color: #e7f8ef;
+  --app-listtype-default-bg: #495057;
+  --app-listtype-default-color: #f8f9fa;
 }
 
 [data-bs-theme="dark"] body {
