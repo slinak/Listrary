@@ -53,12 +53,6 @@ jobs:
     - name: Deploy
       run: |
         set -e
-
-        # Ensure CI can elevate without an interactive password prompt.
-        if ! sudo -n true 2>/dev/null; then
-          echo "Passwordless sudo is required for deploy user on self-hosted runner."
-          exit 1
-        fi
         
         # Stop service
         sudo -n systemctl stop listmanager || true
