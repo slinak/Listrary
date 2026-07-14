@@ -17,6 +17,7 @@ public class List
     public int? CircleID { get; set; }
     public Circle? Circle { get; set; }
 
+
     [Description("Type")]
     public ListType? ListType { get; set; }
 
