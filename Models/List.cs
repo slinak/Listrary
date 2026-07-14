@@ -20,6 +20,7 @@ public class List
     [Description("Type")]
     public ListType? ListType { get; set; }
 
+
     [Description("Created Date")]
     public DateTime CreatedDate { get; set; } = DateTime.Now;
 
