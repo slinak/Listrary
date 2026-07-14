@@ -60,8 +60,8 @@ jobs:
         # Stop service
         sudo -n systemctl stop listmanager || true
         
-        # Backup
-        if [ -d "$APP_DIR" ] && [ "$(sudo -n find "$APP_DIR" -mindepth 1 -maxdepth 1 | wc -l)" -gt 0 ]; then
+        # Backup current deployment when present.
+        if [ -d "$APP_DIR" ]; then
           sudo -n cp -r "$APP_DIR" "$APP_DIR".backup.$(date +%s)
         fi
         
