@@ -34,6 +34,10 @@ jobs:
     needs: build
     runs-on: self-hosted  # <-- Uses your local runner
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    env:
+      APP_DIR: /opt/listmanager
+      APP_USER: homer
+      APP_GROUP: homer
     
     steps:
     - uses: actions/checkout@v4
@@ -44,7 +48,7 @@ jobs:
         dotnet-version: '8.0.x'
     
     - name: Publish
-      run: dotnet publish -c Release -o /tmp/listmanager-new --no-build
+      run: dotnet publish -c Release -o /tmp/listmanager-new
     
     - name: Deploy
       run: |
@@ -54,15 +58,15 @@ jobs:
         sudo systemctl stop listmanager || true
         
         # Backup
-        sudo cp -r /opt/listmanager /opt/listmanager.backup.$(date +%s)
+        sudo cp -r "$APP_DIR" "$APP_DIR".backup.$(date +%s)
         
         # Deploy
-        sudo cp -r /tmp/listmanager-new/* /opt/listmanager/
-        sudo chown -R ubuntu:ubuntu /opt/listmanager
-        sudo chmod +x /opt/listmanager/ListManager
+        sudo cp -r /tmp/listmanager-new/* "$APP_DIR"/
+        sudo chown -R "$APP_USER":"$APP_GROUP" "$APP_DIR"
+        sudo chmod +x "$APP_DIR"/ListManager
         
         # Run migrations
-        cd /opt/listmanager
+        cd "$APP_DIR"
         dotnet ef database update --no-build 2>/dev/null || true
         
         # Start service
