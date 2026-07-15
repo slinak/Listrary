@@ -40,3 +40,5 @@ obj/ListManager.csproj.nuget.dgspec.json
 .vscode/settings.json
 publish/
 ListManager.dev.db
+ListManager.dev.db-shm
+ListManager.dev.db-wal
