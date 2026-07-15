@@ -58,7 +58,7 @@
                                 <th>@SharedLocalizer["Lists.Fields.ListName"]</th>
                                 <th>@SharedLocalizer["Lists.Fields.ListType"]</th>
                                 <th>@SharedLocalizer["Lists.Fields.Items"]</th>
-                                <th>@SharedLocalizer["Lists.Fields.CreatedDate"]</th>
+                                <th>@SharedLocalizer["Lists.Fields.LastUpdatedDate"]</th>
                                 <th>@SharedLocalizer["Lists.Fields.Actions"]</th>
                             </tr>
                         </thead>
@@ -71,7 +71,7 @@
                                         <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
                                     </td>
                                         <td><span class="badge rounded-pill bg-primary">@item.ItemCount @SharedLocalizer[item.ItemCount == 1 ? "Common.ItemSingular" : "Common.ItemPlural"]</span></td>
-                                    <td>@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</td>
+                                    <td>@item.ListModel!.LastUpdatedDate.ToString("MMM d, yyyy")</td>
                                     <td>
                                         <div class="btn-group btn-group-sm list-action-group" role="group" aria-label="@SharedLocalizer["Lists.ActionsAria"]">
                                             <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-primary">@SharedLocalizer["Common.View"]</a>
@@ -98,7 +98,7 @@
                                 </div>
                                 <div class="d-flex flex-wrap gap-2 mb-3">
                                     <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
-                                    <span class="badge rounded-pill badge-theme-neutral">@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</span>
+                                    <span class="badge rounded-pill badge-theme-neutral">@item.ListModel!.LastUpdatedDate.ToString("MMM d, yyyy")</span>
                                 </div>
                                 <div class="d-flex flex-wrap gap-2">
                                     <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-primary">@SharedLocalizer["Common.View"]</a>
@@ -137,7 +137,7 @@
                             <th>@SharedLocalizer["Lists.Fields.ListName"]</th>
                             <th>@SharedLocalizer["Lists.Fields.ListType"]</th>
                             <th>@SharedLocalizer["Lists.Fields.Items"]</th>
-                            <th>@SharedLocalizer["Lists.Fields.CreatedDate"]</th>
+                            <th>@SharedLocalizer["Lists.Fields.LastUpdatedDate"]</th>
                             <th>@SharedLocalizer["Lists.Fields.Actions"]</th>
                         </tr>
                     </thead>
@@ -150,7 +150,7 @@
                                     <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
                                 </td>
                                     <td><span class="badge rounded-pill bg-primary">@item.ItemCount @SharedLocalizer[item.ItemCount == 1 ? "Common.ItemSingular" : "Common.ItemPlural"]</span></td>
-                                <td>@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</td>
+                                <td>@item.ListModel!.LastUpdatedDate.ToString("MMM d, yyyy")</td>
                                 <td>
                                     <div class="btn-group btn-group-sm list-action-group" role="group" aria-label="@SharedLocalizer["Lists.ActionsAria"]">
                                         <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-outline-primary">@SharedLocalizer["Common.View"]</a>
@@ -177,7 +177,7 @@
                             </div>
                             <div class="d-flex flex-wrap gap-2 mb-3">
                                 <span class="badge rounded-pill @GetListTypeBadgeClass(item.ListModel!.ListType)">@item.ListModel!.ListType</span>
-                                <span class="badge rounded-pill badge-theme-neutral">@item.ListModel!.CreatedDate.ToString("MMM d, yyyy")</span>
+                                <span class="badge rounded-pill badge-theme-neutral">@item.ListModel!.LastUpdatedDate.ToString("MMM d, yyyy")</span>
                             </div>
                             <div class="d-flex flex-wrap gap-2">
                                 <a asp-action="Manage" asp-route-id="@item.ListModel!.ListID" class="btn btn-sm btn-outline-primary">@SharedLocalizer["Common.View"]</a>
