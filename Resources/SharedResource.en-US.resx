@@ -125,6 +125,7 @@
   <data name="Circles.CircleFallback" xml:space="preserve"><value>Circle</value></data>
   <data name="Circles.BackToCircles" xml:space="preserve"><value>Back to Circles</value></data>
   <data name="Circles.YourCircles" xml:space="preserve"><value>Your Circles</value></data>
+  <data name="Circles.Create.Title" xml:space="preserve"><value>Create Circle</value></data>
   <data name="Circles.Create.Help" xml:space="preserve"><value>Give your circle a friendly name. You can invite members after creation.</value></data>
   <data name="Circles.Create.InvalidName" xml:space="preserve"><value>Please enter a circle name.</value></data>
   <data name="Circles.PendingInvitations" xml:space="preserve"><value>Pending Invitations</value></data>
