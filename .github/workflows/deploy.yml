@@ -57,6 +57,13 @@ jobs:
     - name: Deploy
       run: |
         set -e
+
+        show_service_diagnostics() {
+          echo "==== systemctl status listmanager (full) ===="
+          sudo -n systemctl status listmanager --no-pager -l || true
+          echo "==== journalctl -u listmanager (last 200 lines) ===="
+          sudo -n journalctl -u listmanager --no-pager -n 200 || true
+        }
         
         # Ensure app directory exists for first-time deployments.
         sudo -n mkdir -p "$APP_DIR"
@@ -65,6 +72,8 @@ jobs:
 
         # Stop service
         sudo -n systemctl stop listmanager || true
+        sudo -n systemctl reset-failed listmanager || true
+        sudo -n systemctl daemon-reload || true
         
         # Backup current deployment when present.
         if [ -d "$APP_DIR" ]; then
@@ -75,11 +84,21 @@ jobs:
         sudo -n cp -r /tmp/listmanager-new/* "$APP_DIR"/
         sudo -n chown -R "$APP_USER":"$APP_GROUP" "$APP_DIR"
         sudo -n chmod +x "$APP_DIR"/ListManager
+
+        echo "==== systemctl cat listmanager ===="
+        sudo -n systemctl cat listmanager || true
         
         # Start service
-        sudo -n systemctl start listmanager
+        if ! sudo -n systemctl start listmanager; then
+          show_service_diagnostics
+          exit 1
+        fi
         sleep 2
-        sudo -n systemctl status listmanager
+        if ! sudo -n systemctl is-active --quiet listmanager; then
+          show_service_diagnostics
+          exit 1
+        fi
+        sudo -n systemctl status listmanager --no-pager -l
         
         # Cleanup
         rm -rf /tmp/listmanager-new
