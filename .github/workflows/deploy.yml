@@ -92,7 +92,10 @@ jobs:
 
         # The app does not emit sd_notify messages; force simple startup semantics.
         sudo -n mkdir -p /etc/systemd/system/listmanager.service.d
-        printf "[Service]\nType=simple\n" | sudo -n tee /etc/systemd/system/listmanager.service.d/override.conf >/dev/null
+        override_tmp="$(mktemp)"
+        printf "[Service]\nType=simple\n" > "$override_tmp"
+        sudo -n cp "$override_tmp" /etc/systemd/system/listmanager.service.d/override.conf
+        rm -f "$override_tmp"
         sudo -n systemctl daemon-reload || true
         
         # Backup current deployment when present.
