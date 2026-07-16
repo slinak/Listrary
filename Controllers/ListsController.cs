@@ -39,6 +39,7 @@ public class ListsController : Controller
         return _context.Lists.Any(list => list.ListID == listId && list.OwnerID == CurrentUserId);
     }
 
+
     private ListShare? FindShare(int listId, string? shareToken)
     {
         if (string.IsNullOrEmpty(shareToken))
