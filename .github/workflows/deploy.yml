@@ -53,10 +53,26 @@ jobs:
     
     - name: Publish
       run: dotnet publish -c Release -o /tmp/listmanager-new
+
+    - name: Validate deploy privileges
+      run: |
+        set -e
+        if ! sudo -n true 2>/dev/null; then
+          echo "::error::Self-hosted runner user '$USER' does not have passwordless sudo."
+          echo "::error::Configure /etc/sudoers.d/listmanager-runner with the required commands, for example:"
+          echo "::error::${USER} ALL=(root) NOPASSWD: /usr/bin/mkdir, /usr/bin/chown, /usr/bin/chmod, /usr/bin/cp, /usr/bin/systemctl, /usr/bin/journalctl"
+          echo "::error::Then run: sudo visudo -cf /etc/sudoers.d/listmanager-runner"
+          exit 1
+        fi
     
     - name: Deploy
       run: |
         set -e
+
+        if ! sudo -n true 2>/dev/null; then
+          echo "Passwordless sudo is required for deployment commands on this runner."
+          exit 1
+        fi
 
         show_service_diagnostics() {
           echo "==== systemctl status listmanager (full) ===="
