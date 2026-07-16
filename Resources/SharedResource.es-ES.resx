@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="App.Title" xml:space="preserve"><value>Listrary</value></data>
+  <data name="App.Tagline" xml:space="preserve"><value>Listrary, una Biblioteca de tus Listas</value></data>
+  <data name="Nav.Toggle" xml:space="preserve"><value>Alternar navegación</value></data>
+  <data name="Nav.Lists" xml:space="preserve"><value>Listas</value></data>
+  <data name="Nav.Circles" xml:space="preserve"><value>Círculos</value></data>
+  <data name="Account.Menu" xml:space="preserve"><value>Cuenta</value></data>
+  <data name="Account.Login" xml:space="preserve"><value>Iniciar sesión</value></data>
+  <data name="Account.Register" xml:space="preserve"><value>Registrarse</value></data>
+  <data name="Account.Logout" xml:space="preserve"><value>Cerrar sesión</value></data>
+  <data name="Theme.LightMode" xml:space="preserve"><value>☀ Modo claro</value></data>
+  <data name="Theme.DarkMode" xml:space="preserve"><value>🌙 Modo oscuro</value></data>
+  <data name="StoreLocations.StrictError" xml:space="preserve"><value>Esta lista solo permite ubicaciones de tienda predefinidas. Elige una de las sugerencias.</value></data>
+  <data name="StoreLocations.SimilarWarning" xml:space="preserve"><value>¿Quisiste decir '{0}'? Se agregó una nueva ubicación '{1}'.</value></data>
+  <data name="StoreLocations.StrictToggle" xml:space="preserve"><value>Permitir solo ubicaciones de tienda predefinidas para esta lista</value></data>
+  <data name="StoreLocations.StrictHelp" xml:space="preserve"><value>Cuando está activado, los compradores deben elegir una ubicación existente en lugar de crear nuevas.</value></data>
+  <data name="StoreLocations.StrictInputHelp" xml:space="preserve"><value>Esta lista solo acepta ubicaciones de tienda predefinidas.</value></data>
+  <data name="StoreLocations.StrictEnabled" xml:space="preserve"><value>Ubicaciones estrictas activadas</value></data>
+  <data name="StoreLocations.Label" xml:space="preserve"><value>Ubicación en tienda</value></data>
+  <data name="StoreLocations.Placeholder" xml:space="preserve"><value>Pasillo 5, Frutas y verduras, Congelados</value></data>
+  <data name="StoreLocations.JumpToSection" xml:space="preserve"><value>Ir a sección</value></data>
+  <data name="Lists.Create.Title" xml:space="preserve"><value>Crear una lista</value></data>
+  <data name="Lists.Edit.Title" xml:space="preserve"><value>Editar lista</value></data>
+  <data name="Lists.Edit.Heading" xml:space="preserve"><value>Editar lista</value></data>
+  <data name="Lists.Fields.ListName" xml:space="preserve"><value>Nombre de la lista</value></data>
+  <data name="Lists.Fields.ListType" xml:space="preserve"><value>Tipo de lista</value></data>
+  <data name="Lists.Fields.Circle" xml:space="preserve"><value>Círculo</value></data>
+  <data name="Lists.Help.ListName" xml:space="preserve"><value>Ingresa el nombre de la lista.</value></data>
+  <data name="Lists.Help.CircleCreate" xml:space="preserve"><value>Agrega esta lista a uno de tus círculos.</value></data>
+  <data name="Lists.Help.CircleEdit" xml:space="preserve"><value>Coloca esta lista en uno de tus círculos.</value></data>
+  <data name="ListItems.Manage.Title" xml:space="preserve"><value>Administrar elementos</value></data>
+  <data name="ListItems.Edit.Title" xml:space="preserve"><value>Editar elemento</value></data>
+  <data name="ListItems.Edit.Heading" xml:space="preserve"><value>Editar elemento</value></data>
+  <data name="ListItems.Fields.ItemName" xml:space="preserve"><value>Nombre del elemento</value></data>
+  <data name="ListItems.Fields.Details" xml:space="preserve"><value>Detalles</value></data>
+  <data name="ListItems.Help.ItemName" xml:space="preserve"><value>Ingresa el nombre del elemento.</value></data>
+  <data name="ListItems.Placeholders.Name" xml:space="preserve"><value>Nombre</value></data>
+  <data name="ListItems.Placeholders.Details" xml:space="preserve"><value>Detalles opcionales</value></data>
+  <data name="ListItems.Placeholders.DetailsLong" xml:space="preserve"><value>Detalles opcionales, cantidad, marca, etc.</value></data>
+  <data name="ListItems.MarkCompleted" xml:space="preserve"><value>Marcar como completado</value></data>
+  <data name="ListItems.MarkAllIncomplete" xml:space="preserve"><value>Devolver todos los completados a activos</value></data>
+  <data name="ListItems.CompletedItems" xml:space="preserve"><value>Elementos completados</value></data>
+  <data name="ListItems.Status.Completed" xml:space="preserve"><value>Completado</value></data>
+  <data name="ListItems.Status.Active" xml:space="preserve"><value>Activo</value></data>
+  <data name="ListItems.EmptyState" xml:space="preserve"><value>Esta lista aún no tiene elementos. Agrega el primero abajo.</value></data>
+  <data name="ListItems.AddHeading" xml:space="preserve"><value>Agregar un elemento</value></data>
+  <data name="ListItems.AddButton" xml:space="preserve"><value>Agregar elemento</value></data>
+  <data name="ListItems.DeletePrompt" xml:space="preserve"><value>¿Seguro que deseas eliminar el elemento</value></data>
+  <data name="ListItems.ViewOnlyMessage" xml:space="preserve"><value>Esta lista está compartida como solo lectura. Los cambios en elementos están deshabilitados.</value></data>
+  <data name="Shares.ShareList" xml:space="preserve"><value>Compartir lista</value></data>
+  <data name="Shares.Permission" xml:space="preserve"><value>Permiso</value></data>
+  <data name="Shares.GenerateLink" xml:space="preserve"><value>Generar enlace</value></data>
+  <data name="Shares.LinkCreated" xml:space="preserve"><value>Enlace compartido creado. Envía esta URL a otro usuario:</value></data>
+  <data name="Shares.ActiveLinks" xml:space="preserve"><value>Enlaces compartidos activos</value></data>
+  <data name="Common.Create" xml:space="preserve"><value>Crear</value></data>
+  <data name="Common.Save" xml:space="preserve"><value>Guardar</value></data>
+  <data name="Common.SaveChanges" xml:space="preserve"><value>Guardar cambios</value></data>
+  <data name="Common.Cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="Common.None" xml:space="preserve"><value>Ninguno</value></data>
+  <data name="Common.BackToLists" xml:space="preserve"><value>Volver a listas</value></data>
+  <data name="Common.Delete" xml:space="preserve"><value>Eliminar</value></data>
+  <data name="Common.Close" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="Common.Complete" xml:space="preserve"><value>Completar</value></data>
+  <data name="Common.ViewOnly" xml:space="preserve"><value>Solo lectura</value></data>
+  <data name="Common.ConfirmDelete" xml:space="preserve"><value>Confirmar eliminación</value></data>
+  <data name="Account.Login.Welcome" xml:space="preserve"><value>Bienvenido de nuevo</value></data>
+  <data name="Account.Login.Subtitle" xml:space="preserve"><value>Inicia sesión en tu cuenta de Listrary.</value></data>
+  <data name="Account.Login.RegisterPrompt" xml:space="preserve"><value>¿No tienes cuenta? Regístrate</value></data>
+  <data name="Account.ForgotPassword" xml:space="preserve"><value>¿Olvidaste tu contraseña?</value></data>
+  <data name="Account.Register.Heading" xml:space="preserve"><value>Crear una cuenta</value></data>
+  <data name="Account.Register.Subtitle" xml:space="preserve"><value>Únete a Listrary para comenzar a gestionar tus listas.</value></data>
+  <data name="Account.Register.LoginPrompt" xml:space="preserve"><value>¿Ya tienes una cuenta? Inicia sesión</value></data>
+  <data name="Account.Logout.Click" xml:space="preserve"><value>Haz clic aquí para cerrar sesión</value></data>
+  <data name="Account.Logout.Success" xml:space="preserve"><value>Has cerrado sesión correctamente en la aplicación.</value></data>
+  <data name="Account.Manage.Settings" xml:space="preserve"><value>Configuración de cuenta</value></data>
+  <data name="Account.Manage.Profile" xml:space="preserve"><value>Perfil</value></data>
+  <data name="Account.Manage.ChangePassword" xml:space="preserve"><value>Cambiar contraseña</value></data>
+  <data name="Account.Manage.UpdatePassword" xml:space="preserve"><value>Actualizar contraseña</value></data>
+  <data name="Account.Manage.Email" xml:space="preserve"><value>Correo electrónico</value></data>
+  <data name="Account.Manage.Password" xml:space="preserve"><value>Contraseña</value></data>
+  <data name="Account.Manage.ExternalLogins" xml:space="preserve"><value>Inicios de sesión externos</value></data>
+  <data name="Account.Manage.TwoFactor" xml:space="preserve"><value>Autenticación de dos factores</value></data>
+  <data name="Account.Manage.PersonalData" xml:space="preserve"><value>Datos personales</value></data>
+  <data name="Language.Label" xml:space="preserve"><value>Idioma</value></data>
+  <data name="Language.en-US" xml:space="preserve"><value>Inglés (Estados Unidos)</value></data>
+  <data name="Language.es-ES" xml:space="preserve"><value>Español (España)</value></data>
+  <data name="Common.View" xml:space="preserve"><value>Ver</value></data>
+  <data name="Common.Edit" xml:space="preserve"><value>Editar</value></data>
+  <data name="Common.Accept" xml:space="preserve"><value>Aceptar</value></data>
+  <data name="Common.Reject" xml:space="preserve"><value>Rechazar</value></data>
+  <data name="Common.Manage" xml:space="preserve"><value>Gestionar</value></data>
+  <data name="Common.Remove" xml:space="preserve"><value>Quitar</value></data>
+  <data name="Common.Leave" xml:space="preserve"><value>Salir</value></data>
+  <data name="Common.Accepted" xml:space="preserve"><value>Aceptado</value></data>
+  <data name="Common.Pending" xml:space="preserve"><value>Pendiente</value></data>
+  <data name="Common.Send" xml:space="preserve"><value>Enviar</value></data>
+  <data name="Common.ListSingular" xml:space="preserve"><value>lista</value></data>
+  <data name="Common.ListPlural" xml:space="preserve"><value>listas</value></data>
+  <data name="Common.ItemSingular" xml:space="preserve"><value>elemento</value></data>
+  <data name="Common.ItemPlural" xml:space="preserve"><value>elementos</value></data>
+  <data name="Lists.YourLists" xml:space="preserve"><value>Tus listas</value></data>
+  <data name="Lists.DeletePrompt" xml:space="preserve"><value>¿Seguro que deseas eliminar la lista</value></data>
+  <data name="Lists.Circle.Title" xml:space="preserve"><value>Listas en el círculo</value></data>
+  <data name="Lists.Circle.Heading" xml:space="preserve"><value>Listas en &quot;{0}&quot;</value></data>
+  <data name="Lists.Circle.Empty" xml:space="preserve"><value>Aún no hay listas en este círculo.</value></data>
+  <data name="Lists.CirclePrefix" xml:space="preserve"><value>Círculo:</value></data>
+  <data name="Lists.Fields.Items" xml:space="preserve"><value>Elementos</value></data>
+  <data name="Lists.Fields.CreatedDate" xml:space="preserve"><value>Fecha de creación</value></data>
+  <data name="Lists.Fields.LastUpdatedDate" xml:space="preserve"><value>Fecha de última actualización</value></data>
+  <data name="Lists.Fields.Actions" xml:space="preserve"><value>Acciones</value></data>
+  <data name="Lists.ActionsAria" xml:space="preserve"><value>Acciones de la lista</value></data>
+  <data name="Lists.DeleteFallbackName" xml:space="preserve"><value>esta lista</value></data>
+  <data name="Circles.ViewCircle" xml:space="preserve"><value>Ver círculo</value></data>
+  <data name="Circles.ViewLists" xml:space="preserve"><value>Ver listas</value></data>
+  <data name="Circles.CircleFallback" xml:space="preserve"><value>Círculo</value></data>
+  <data name="Circles.BackToCircles" xml:space="preserve"><value>Volver a círculos</value></data>
+  <data name="Circles.YourCircles" xml:space="preserve"><value>Tus círculos</value></data>
+  <data name="Circles.Create.Title" xml:space="preserve"><value>Crear círculo</value></data>
+  <data name="Circles.Create.Help" xml:space="preserve"><value>Dale a tu círculo un nombre amigable. Puedes invitar miembros después de crearlo.</value></data>
+  <data name="Circles.Create.InvalidName" xml:space="preserve"><value>Ingresa un nombre para el círculo.</value></data>
+  <data name="Circles.PendingInvitations" xml:space="preserve"><value>Invitaciones pendientes</value></data>
+  <data name="Circles.InvitedBy" xml:space="preserve"><value>Invitado por:</value></data>
+  <data name="Circles.InvitedOn" xml:space="preserve"><value>Invitado el</value></data>
+  <data name="Circles.Owner" xml:space="preserve"><value>Propietario:</value></data>
+  <data name="Circles.Members" xml:space="preserve"><value>Miembros</value></data>
+  <data name="Circles.Manage.Title" xml:space="preserve"><value>Gestionar círculo</value></data>
+  <data name="Circles.Manage.Heading" xml:space="preserve"><value>Gestionar: {0}</value></data>
+  <data name="Circles.DeleteConfirm" xml:space="preserve"><value>¿Eliminar este círculo? Esto quitará miembros e invitaciones y desvinculará el círculo de las listas asociadas.</value></data>
+  <data name="Circles.DeleteCircle" xml:space="preserve"><value>Eliminar círculo</value></data>
+  <data name="Circles.Members.User" xml:space="preserve"><value>Usuario</value></data>
+  <data name="Circles.Members.Joined" xml:space="preserve"><value>Se unió</value></data>
+  <data name="Circles.Invitations" xml:space="preserve"><value>Invitaciones</value></data>
+  <data name="Circles.Invitations.Recipient" xml:space="preserve"><value>Destinatario</value></data>
+  <data name="Circles.Invitations.Status" xml:space="preserve"><value>Estado</value></data>
+  <data name="Circles.AcceptLink" xml:space="preserve"><value>Aceptar enlace</value></data>
+  <data name="Circles.AcceptedBy" xml:space="preserve"><value>Aceptado por:</value></data>
+  <data name="Circles.Invite" xml:space="preserve"><value>Invitar</value></data>
+  <data name="Circles.RecipientEmail" xml:space="preserve"><value>Correo del destinatario</value></data>
+  <data name="Circles.RecipientEmailPlaceholder" xml:space="preserve"><value>nombre@ejemplo.com</value></data>
+  <data name="Circles.RecipientUserIdOptional" xml:space="preserve"><value>ID de usuario del destinatario (opcional)</value></data>
+  <data name="Circles.Invite.Validation" xml:space="preserve"><value>Proporciona un correo del destinatario o un ID de usuario del destinatario.</value></data>
+  <data name="Circles.RecipientFallback" xml:space="preserve"><value>destinatario</value></data>
+  <data name="Circles.RecipientUnspecified" xml:space="preserve"><value>(sin especificar)</value></data>
+  <data name="Circles.Status.InvitationSent" xml:space="preserve"><value>Invitación enviada a {0}.</value></data>
+  <data name="Circles.Status.MemberRemoved" xml:space="preserve"><value>Se eliminó al miembro {0}.</value></data>
+  <data name="Circles.Status.InvitationCanceled" xml:space="preserve"><value>Invitación cancelada para {0}.</value></data>
+  <data name="Circles.Status.CircleDeleted" xml:space="preserve"><value>Círculo '{0}' eliminado.</value></data>
+  <data name="Home.Title" xml:space="preserve"><value>Inicio</value></data>
+  <data name="Home.Welcome" xml:space="preserve"><value>Bienvenido</value></data>
+  <data name="Home.RegisterPrompt" xml:space="preserve"><value>Por favor</value></data>
+  <data name="Home.RegisterPromptTail" xml:space="preserve"><value>para crear y gestionar tus listas.</value></data>
+  <data name="Home.LoginPrompt" xml:space="preserve"><value>¿Ya tienes una cuenta?</value></data>
+  <data name="Error.Title" xml:space="preserve"><value>Error</value></data>
+  <data name="Error.Heading" xml:space="preserve"><value>Error.</value></data>
+  <data name="Error.Subheading" xml:space="preserve"><value>Ocurrió un error al procesar tu solicitud.</value></data>
+  <data name="Error.RequestId" xml:space="preserve"><value>ID de solicitud:</value></data>
+  <data name="Error.DevelopmentMode" xml:space="preserve"><value>Modo de desarrollo</value></data>
+  <data name="Error.DevelopmentHelp1" xml:space="preserve"><value>Cambiar al entorno de desarrollo mostrará información más detallada sobre el error ocurrido.</value></data>
+  <data name="Error.DevelopmentWarning" xml:space="preserve"><value>El entorno de desarrollo no debería estar habilitado en aplicaciones desplegadas.</value></data>
+  <data name="Error.DevelopmentHelp2" xml:space="preserve"><value>Puede mostrar información sensible de excepciones a usuarios finales. Para depuración local, habilita el entorno de desarrollo estableciendo la variable ASPNETCORE_ENVIRONMENT en Development y reinicia la aplicación.</value></data>
+</root>
