@@ -381,6 +381,31 @@ public class ListItemController : Controller
         return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
     }
 
+    [HttpPost]
+    public IActionResult MarkAllIncomplete(int listID, string? shareToken)
+    {
+        if (!HasEditAccess(listID, shareToken))
+            return NotFound();
+
+        var completedItems = _context.ListItems
+            .Where(li => li.ListID == listID && !li.IsDeleted && li.IsCompleted)
+            .ToList();
+
+        if (completedItems.Any())
+        {
+            var updatedAt = DateTime.Now;
+            foreach (var item in completedItems)
+            {
+                item.IsCompleted = false;
+                item.LastUpdatedDate = updatedAt;
+            }
+
+            _context.SaveChanges();
+        }
+
+        return RedirectToAction("Manage", "Lists", new { id = listID, shareToken });
+    }
+
     [HttpGet]
     public IActionResult GetItemNameSuggestions(int listID, string? query, string? shareToken)
     {

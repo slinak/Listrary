@@ -51,6 +51,7 @@
   <data name="ListItems.Placeholders.Details" xml:space="preserve"><value>Optional details</value></data>
   <data name="ListItems.Placeholders.DetailsLong" xml:space="preserve"><value>Optional details, quantity, brand, etc</value></data>
   <data name="ListItems.MarkCompleted" xml:space="preserve"><value>Mark as Completed</value></data>
+  <data name="ListItems.MarkAllIncomplete" xml:space="preserve"><value>Return All Completed to Active</value></data>
   <data name="ListItems.CompletedItems" xml:space="preserve"><value>Completed Items</value></data>
   <data name="ListItems.Status.Completed" xml:space="preserve"><value>Completed</value></data>
   <data name="ListItems.Status.Active" xml:space="preserve"><value>Active</value></data>

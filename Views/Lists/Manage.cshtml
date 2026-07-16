@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = SharedLocalizer["ListItems.Manage.Title"].Value;
+    var hasCompletedItems = Model.Items != null && Model.Items.Any(item => item.IsCompleted);
 
     string ToAnchorSlug(string value)
     {
@@ -63,6 +64,15 @@
                 }
             </div>
             <div class="text-end">
+                @if (Model.CanEdit && hasCompletedItems)
+                {
+                    @using (Html.BeginForm("MarkAllIncomplete", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
+                    {
+                        @Html.Hidden("listID", Model.ListModel.ListID)
+                        @Html.Hidden("shareToken", Model.ShareToken)
+                        <button type="submit" class="btn btn-outline-warning btn-sm">@SharedLocalizer["ListItems.MarkAllIncomplete"]</button>
+                    }
+                }
                 <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@SharedLocalizer["Common.BackToLists"]</a>
                 @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.ListModel.OwnerID)
                 {
