@@ -89,6 +89,10 @@ jobs:
         # Stop service
         sudo -n systemctl stop listmanager || true
         sudo -n systemctl reset-failed listmanager || true
+
+        # The app does not emit sd_notify messages; force simple startup semantics.
+        sudo -n mkdir -p /etc/systemd/system/listmanager.service.d
+        printf "[Service]\nType=simple\n" | sudo -n tee /etc/systemd/system/listmanager.service.d/override.conf >/dev/null
         sudo -n systemctl daemon-reload || true
         
         # Backup current deployment when present.
