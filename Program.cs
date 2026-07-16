@@ -66,4 +66,12 @@ app.MapControllerRoute(
     pattern: "{controller=Lists}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch (IOException ex) when (ex.Message.Contains("address already in use", StringComparison.OrdinalIgnoreCase))
+{
+    Console.Error.WriteLine("Startup failed because one of the configured URLs is already in use. Stop the existing process or change the launch profile URL.");
+    throw;
+}
