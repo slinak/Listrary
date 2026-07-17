@@ -43,6 +43,15 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+      with:
+        clean: false
+
+    - name: Ensure workspace ownership for runner
+      run: |
+        set -e
+        if sudo -n /usr/bin/chown --version >/dev/null 2>&1; then
+          sudo -n chown -R "$USER":"$USER" "$GITHUB_WORKSPACE" || true
+        fi
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
