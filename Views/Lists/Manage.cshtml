@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = SharedLocalizer["ListItems.Manage.Title"].Value;
     var hasCompletedItems = Model.Items != null && Model.Items.Any(item => item.IsCompleted);
+    var isShoppingList = Model.ListModel.ListType == ListManager.Models.ListType.Shopping;
 
     string ToAnchorSlug(string value)
     {
@@ -88,7 +89,7 @@
 
         @if (Model.Items != null && Model.Items.Any())
         {
-            var showStoreLocation = Model.Items.Any(i => !string.IsNullOrWhiteSpace(i.StoreLocation));
+            var showStoreLocation = isShoppingList && Model.Items.Any(i => !string.IsNullOrWhiteSpace(i.StoreLocation));
             var mobileSectionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var mobileSections = new List<(string Id, string Label, bool IsCompleted)>();
 
@@ -336,15 +337,18 @@
                             <label for="ItemDetails">@SharedLocalizer["ListItems.Fields.Details"]</label>
                             @Html.TextArea("ItemDetails", Model.NewItem.ItemDetails, 3, 0, new { @class = "form-control", placeholder = SharedLocalizer["ListItems.Placeholders.DetailsLong"].Value })
                         </div>
-                        <div class="form-group mt-2">
-                            <label for="StoreLocation">@SharedLocalizer["StoreLocations.Label"]</label>
-                            @Html.TextBox("StoreLocation", Model.NewItem.StoreLocation, new { @class = "form-control", placeholder = SharedLocalizer["StoreLocations.Placeholder"].Value, @list = "storeLocationSuggestions" })
-                            <datalist id="storeLocationSuggestions"></datalist>
-                            @if (Model.ListModel.StrictStoreLocations)
-                            {
-                                <small class="text-muted">@SharedLocalizer["StoreLocations.StrictInputHelp"]</small>
-                            }
-                        </div>
+                        @if (isShoppingList)
+                        {
+                            <div class="form-group mt-2">
+                                <label for="StoreLocation">@SharedLocalizer["StoreLocations.Label"]</label>
+                                @Html.TextBox("StoreLocation", Model.NewItem.StoreLocation, new { @class = "form-control", placeholder = SharedLocalizer["StoreLocations.Placeholder"].Value, @list = "storeLocationSuggestions" })
+                                <datalist id="storeLocationSuggestions"></datalist>
+                                @if (Model.ListModel.StrictStoreLocations)
+                                {
+                                    <small class="text-muted">@SharedLocalizer["StoreLocations.StrictInputHelp"]</small>
+                                }
+                            </div>
+                        }
                         <button type="submit" class="btn btn-success mt-3">@SharedLocalizer["ListItems.AddButton"]</button>
                     }
                 }

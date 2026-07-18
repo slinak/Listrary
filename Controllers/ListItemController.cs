@@ -240,7 +240,10 @@ public class ListItemController : Controller
         if (list == null)
             return NotFound();
 
-        var locationResolution = ResolveStoreLocationOption(listID, item.StoreLocation, list.StrictStoreLocations);
+        var shouldUseStoreLocation = list.ListType == ListType.Shopping;
+        var rawStoreLocation = shouldUseStoreLocation ? item.StoreLocation : null;
+
+        var locationResolution = ResolveStoreLocationOption(listID, rawStoreLocation, list.StrictStoreLocations);
         if (!string.IsNullOrWhiteSpace(locationResolution.error))
         {
             TempData["StoreLocationError"] = locationResolution.error;
@@ -284,6 +287,7 @@ public class ListItemController : Controller
 
         ViewBag.ListID = listID;
         ViewBag.StrictStoreLocations = list.StrictStoreLocations;
+        ViewBag.ShowStoreLocation = list.ListType == ListType.Shopping;
         return View(item);
     }
 
@@ -297,6 +301,7 @@ public class ListItemController : Controller
         {
             ViewBag.ListID = listID;
             ViewBag.StrictStoreLocations = _context.Lists.Where(l => l.ListID == listID).Select(l => l.StrictStoreLocations).FirstOrDefault();
+            ViewBag.ShowStoreLocation = _context.Lists.Where(l => l.ListID == listID).Select(l => l.ListType == ListType.Shopping).FirstOrDefault();
             return View(updatedItem);
         }
 
@@ -304,12 +309,16 @@ public class ListItemController : Controller
         if (list == null)
             return NotFound();
 
-        var locationResolution = ResolveStoreLocationOption(listID, updatedItem.StoreLocation, list.StrictStoreLocations);
+        var shouldUseStoreLocation = list.ListType == ListType.Shopping;
+        var rawStoreLocation = shouldUseStoreLocation ? updatedItem.StoreLocation : null;
+
+        var locationResolution = ResolveStoreLocationOption(listID, rawStoreLocation, list.StrictStoreLocations);
         if (!string.IsNullOrWhiteSpace(locationResolution.error))
         {
             ModelState.AddModelError(nameof(updatedItem.StoreLocation), locationResolution.error);
             ViewBag.ListID = listID;
             ViewBag.StrictStoreLocations = list.StrictStoreLocations;
+            ViewBag.ShowStoreLocation = list.ListType == ListType.Shopping;
             return View(updatedItem);
         }
 

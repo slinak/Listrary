@@ -4,6 +4,7 @@
     ViewData["Title"] = SharedLocalizer["ListItems.Edit.Title"].Value;
     int listID = ViewBag.ListID;
     bool strictStoreLocations = ViewBag.StrictStoreLocations != null && (bool)ViewBag.StrictStoreLocations;
+    bool showStoreLocation = ViewBag.ShowStoreLocation != null && (bool)ViewBag.ShowStoreLocation;
 }
 
 <div class="row">
@@ -32,18 +33,21 @@
                         @Html.ValidationMessageFor(model => model.ItemDetails, "", new { @class = "text-danger" })
                     </div>
                 </div>
-                <div class="form-group row">
-                    @Html.LabelFor(model => model.StoreLocation, SharedLocalizer["StoreLocations.Label"].Value, htmlAttributes: new { @class = "control-label col-sm" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.StoreLocation, new { @class = "form-control", placeholder = SharedLocalizer["StoreLocations.Placeholder"].Value, @list = "storeLocationSuggestions" })
-                        <datalist id="storeLocationSuggestions"></datalist>
-                        @if (strictStoreLocations)
-                        {
-                            <small class="text-muted">@SharedLocalizer["StoreLocations.StrictInputHelp"]</small>
-                        }
-                        @Html.ValidationMessageFor(model => model.StoreLocation, "", new { @class = "text-danger" })
+                @if (showStoreLocation)
+                {
+                    <div class="form-group row">
+                        @Html.LabelFor(model => model.StoreLocation, SharedLocalizer["StoreLocations.Label"].Value, htmlAttributes: new { @class = "control-label col-sm" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.StoreLocation, new { @class = "form-control", placeholder = SharedLocalizer["StoreLocations.Placeholder"].Value, @list = "storeLocationSuggestions" })
+                            <datalist id="storeLocationSuggestions"></datalist>
+                            @if (strictStoreLocations)
+                            {
+                                <small class="text-muted">@SharedLocalizer["StoreLocations.StrictInputHelp"]</small>
+                            }
+                            @Html.ValidationMessageFor(model => model.StoreLocation, "", new { @class = "text-danger" })
+                        </div>
                     </div>
-                </div>
+                }
                 <div class="form-group row">
                     <div class="col-md-offset-2 col-md-10">
                         <div class="form-check">
