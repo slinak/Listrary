@@ -20,16 +20,16 @@ jobs:
         dotnet-version: '8.0.x'
     
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ListManager.csproj --force
     
     - name: Build
-      run: dotnet build -c Release --no-restore
+      run: dotnet build ListManager.csproj -c Release --no-restore
     
     - name: Run tests
-      run: dotnet test -c Release --no-build --verbosity normal || true
+      run: dotnet test tests/ListManager.Tests.csproj -c Release --verbosity normal || true
     
     - name: Publish
-      run: dotnet publish -c Release -o ./publish --no-build
+      run: dotnet publish ListManager.csproj -c Release -o ./publish --no-build
 
   deploy:
     needs: build
@@ -44,7 +44,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        clean: false
+        clean: true
 
     - name: Ensure workspace ownership for runner
       run: |
@@ -61,7 +61,7 @@ jobs:
         DOTNET_INSTALL_DIR: ${{ runner.temp }}/.dotnet
     
     - name: Publish
-      run: dotnet publish -c Release -o /tmp/listmanager-new
+      run: dotnet publish ListManager.csproj -c Release -o /tmp/listmanager-new
 
     - name: Validate deploy privileges
       run: |
