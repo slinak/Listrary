@@ -73,6 +73,22 @@ jobs:
           echo "::error::Then run: sudo visudo -cf /etc/sudoers.d/listmanager-runner"
           exit 1
         fi
+
+    - name: Configure database connection
+      env:
+        LISTMANAGER_CONNECTION_STRING: ${{ secrets.LISTMANAGER_CONNECTION_STRING }}
+      run: |
+        set -eu
+        if [ -z "$LISTMANAGER_CONNECTION_STRING" ]; then
+          echo "::error::The LISTMANAGER_CONNECTION_STRING GitHub Actions secret is not configured."
+          exit 1
+        fi
+
+        printf 'ConnectionStrings__DefaultConnection=%s\n' "$LISTMANAGER_CONNECTION_STRING" > "$RUNNER_TEMP/listmanager.env"
+        sudo -n mkdir -p /etc/listmanager
+        sudo -n cp "$RUNNER_TEMP/listmanager.env" /etc/listmanager/listmanager.env
+        sudo -n chmod 600 /etc/listmanager/listmanager.env
+        rm -f "$RUNNER_TEMP/listmanager.env"
     
     - name: Deploy
       run: |
@@ -102,7 +118,7 @@ jobs:
         # The app does not emit sd_notify messages; force simple startup semantics.
         sudo -n mkdir -p /etc/systemd/system/listmanager.service.d
         override_tmp="$(mktemp)"
-        printf "[Service]\nType=simple\n" > "$override_tmp"
+        printf "[Service]\nType=simple\nEnvironmentFile=/etc/listmanager/listmanager.env\n" > "$override_tmp"
         sudo -n cp "$override_tmp" /etc/systemd/system/listmanager.service.d/override.conf
         rm -f "$override_tmp"
         sudo -n systemctl daemon-reload || true
