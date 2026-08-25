@@ -61,7 +61,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .HasOne(item => item.StoreLocationOption)
             .WithMany(option => option.ListItems)
             .HasForeignKey(item => item.StoreLocationOptionID)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.ClientSetNull);
 
         modelBuilder.Entity<StoreLocationOption>()
             .HasIndex(option => new { option.ListID, option.NormalizedName })
@@ -75,7 +75,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .HasOne(preference => preference.StoreLocationOption)
             .WithMany()
             .HasForeignKey(preference => preference.StoreLocationOptionID)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Circle>()
             .HasMany(c => c.Members)

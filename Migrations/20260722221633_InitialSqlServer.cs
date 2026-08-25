@@ -317,7 +317,7 @@ namespace ListManager.Migrations
                         column: x => x.StoreLocationOptionID,
                         principalTable: "StoreLocationOptions",
                         principalColumn: "StoreLocationOptionID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -352,7 +352,7 @@ namespace ListManager.Migrations
                         column: x => x.StoreLocationOptionID,
                         principalTable: "StoreLocationOptions",
                         principalColumn: "StoreLocationOptionID",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateIndex(

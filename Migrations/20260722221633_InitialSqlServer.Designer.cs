@@ -557,7 +557,7 @@ namespace ListManager.Migrations
                     b.HasOne("ListManager.Models.StoreLocationOption", "StoreLocationOption")
                         .WithMany()
                         .HasForeignKey("StoreLocationOptionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("List");
@@ -585,7 +585,7 @@ namespace ListManager.Migrations
                     b.HasOne("ListManager.Models.StoreLocationOption", "StoreLocationOption")
                         .WithMany("ListItems")
                         .HasForeignKey("StoreLocationOptionID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.ClientSetNull);
 
                     b.Navigation("List");
 
