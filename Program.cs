@@ -14,10 +14,19 @@ var supportedCultures = new[] { new CultureInfo("en-US") };
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
 
+// A paused serverless database can take a minute or more to resume.
+var connectionStringBuilder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
+if (connectionStringBuilder.ConnectTimeout < 120)
+    connectionStringBuilder.ConnectTimeout = 120;
+connectionString = connectionStringBuilder.ConnectionString;
+
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString, sqlOptions =>
-        sqlOptions.EnableRetryOnFailure()));
+    {
+        sqlOptions.CommandTimeout(120);
+        sqlOptions.EnableRetryOnFailure(maxRetryCount: 6, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+    }));
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
