@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -277,7 +278,7 @@ public class CirclesController : Controller
             return NotFound();
 
         if (!User.Identity?.IsAuthenticated ?? false)
-            return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Accept", "Circles", new { token = token }) });
+            return Challenge(new AuthenticationProperties { RedirectUri = Url.Action("Accept", "Circles", new { token }) });
 
         var userId = CurrentUserId;
 

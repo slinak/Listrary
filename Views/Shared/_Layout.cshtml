@@ -1,7 +1,6 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
-
+@{
+    var isSignedIn = User.Identity?.IsAuthenticated ?? false;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +25,7 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <!-- Create link moved to Lists page header -->
-                        @if (SignInManager.IsSignedIn(User))
+                        @if (isSignedIn)
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="Lists" asp-action="Index">@SharedLocalizer["Nav.Lists"]</a>

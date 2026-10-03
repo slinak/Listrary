@@ -1,9 +1,12 @@
 using ListManager.Data;
 using System.Globalization;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,11 +21,41 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
-    options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+
+// Use the stable Entra object ID as the user ID and expose the email claim the app expects.
+builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+{
+    var onTokenValidated = options.Events.OnTokenValidated;
+    options.Events.OnTokenValidated = async context =>
+    {
+        await onTokenValidated(context);
+
+        if (context.Principal?.Identity is ClaimsIdentity identity)
+        {
+            var oid = identity.FindFirst("oid")?.Value
+                ?? identity.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+            if (oid != null)
+            {
+                foreach (var claim in identity.FindAll(ClaimTypes.NameIdentifier).ToList())
+                    identity.RemoveClaim(claim);
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, oid));
+            }
+
+            if (identity.FindFirst(ClaimTypes.Email) == null)
+            {
+                var email = identity.FindFirst("email")?.Value
+                    ?? identity.FindFirst("preferred_username")?.Value;
+                if (email != null)
+                    identity.AddClaim(new Claim(ClaimTypes.Email, email));
+            }
+        }
+    };
+});
 
 builder.Services.AddControllersWithViews()
+    .AddMicrosoftIdentityUI()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();
 

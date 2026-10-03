@@ -4,6 +4,5 @@
 
 <div class="text-center">
     <h1 class="display-4">@SharedLocalizer["Home.Welcome"]</h1>
-    <p>@SharedLocalizer["Home.RegisterPrompt"] <a asp-area="Identity" asp-page="/Account/Register">@SharedLocalizer["Account.Register"]</a> @SharedLocalizer["Home.RegisterPromptTail"]</p>
-    <p>@SharedLocalizer["Home.LoginPrompt"] <a asp-area="Identity" asp-page="/Account/Login">@SharedLocalizer["Account.Login"]</a></p>
+    <p>@SharedLocalizer["Home.LoginPrompt"] <a asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignIn">@SharedLocalizer["Account.Login"]</a></p>
 </div>
