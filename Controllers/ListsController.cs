@@ -255,6 +255,7 @@ public class ListsController : Controller
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult Manage(int id, string? shareToken)
     {
         var list = _context.Lists
@@ -265,10 +266,31 @@ public class ListsController : Controller
         if (list == null)
             return NotFound();
 
-        if (!HasViewAccess(id, shareToken))
+        var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+        var publicViewShare = !string.IsNullOrEmpty(shareToken)
+            ? list.Shares.FirstOrDefault(s => s.Token == shareToken && s.Permission == ListSharePermission.View)
+            : null;
+
+        if (!isAuthenticated)
+        {
+            if (publicViewShare == null)
+                return Challenge();
+
+            return View(new ListItemManagementViewModel
+            {
+                ListModel = list,
+                Items = GetManageViewOrderedItems(list.Items),
+                CanEdit = false,
+                ShareToken = publicViewShare.Token,
+                ActiveShares = new List<ListShare>(),
+                GeneratedShareLink = null
+            });
+        }
+
+        if (!HasViewAccess(id, shareToken) && publicViewShare == null)
             return NotFound();
 
-        var share = FindShare(id, shareToken);
+        var share = FindShare(id, shareToken) ?? publicViewShare;
         var viewModel = new ListItemManagementViewModel
         {
             ListModel = list,
