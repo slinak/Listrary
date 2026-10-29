@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ListManager.Data;
 using ListManager.Models;
+using ListManager.Services;
 
 namespace ListManager.Controllers;
 
@@ -14,11 +15,13 @@ public class ListsController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<ListsController> _logger;
+    private readonly IListItemService _listItemService;
 
-    public ListsController(ApplicationDbContext context, ILogger<ListsController> logger)
+    public ListsController(ApplicationDbContext context, ILogger<ListsController> logger, IListItemService listItemService)
     {
         _context = context;
         _logger = logger;
+        _listItemService = listItemService;
     }
 
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
@@ -78,16 +81,6 @@ public class ListsController : Controller
 
         var share = FindShare(listId, shareToken);
         return share?.Permission == ListSharePermission.Edit;
-    }
-
-    private static List<ListItem> GetManageViewOrderedItems(IEnumerable<ListItem> items)
-    {
-        return items
-            .OrderBy(item => item.IsCompleted)
-            .ThenBy(item => item.IsCompleted ? 0 : (string.IsNullOrWhiteSpace(item.StoreLocation) ? 1 : 0))
-            .ThenBy(item => item.IsCompleted ? string.Empty : item.StoreLocation?.Trim(), StringComparer.OrdinalIgnoreCase)
-            .ThenBy(item => item.SortOrder)
-            .ToList();
     }
 
     [HttpGet]
@@ -279,7 +272,7 @@ public class ListsController : Controller
             return View(new ListItemManagementViewModel
             {
                 ListModel = list,
-                Items = GetManageViewOrderedItems(list.Items),
+                Items = _listItemService.GetManageViewOrderedItems(list.Items),
                 CanEdit = false,
                 ShareToken = publicViewShare.Token,
                 ActiveShares = new List<ListShare>(),
@@ -294,7 +287,7 @@ public class ListsController : Controller
         var viewModel = new ListItemManagementViewModel
         {
             ListModel = list,
-            Items = GetManageViewOrderedItems(list.Items),
+            Items = _listItemService.GetManageViewOrderedItems(list.Items),
             CanEdit = HasEditAccess(id, shareToken),
             ShareToken = share?.Token,
             ActiveShares = list.Shares.ToList(),
@@ -335,7 +328,7 @@ public class ListsController : Controller
         var viewModel = new ListItemManagementViewModel
         {
             ListModel = list,
-            Items = GetManageViewOrderedItems(list.Items),
+            Items = _listItemService.GetManageViewOrderedItems(list.Items),
             CanEdit = true,
             ShareToken = share.Token,
             ActiveShares = list.Shares.ToList(),
