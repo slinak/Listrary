@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Listrary</string>
+
+    <!-- Common -->
+    <string name="action_back">Atrás</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_create">Crear</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_add">Añadir</string>
+    <string name="action_retry">Reintentar</string>
+    <string name="action_refresh">Actualizar</string>
+    <string name="loading">Cargando…</string>
+    <string name="error_generic">Algo salió mal. Inténtalo de nuevo.</string>
+    <string name="error_network">No se puede conectar con el servidor. Mostrando datos guardados.</string>
+    <string name="error_unauthorized">Tu sesión ha caducado. Inicia sesión de nuevo.</string>
+    <string name="error_forbidden">No tienes permiso para hacer eso.</string>
+    <string name="error_not_found">Ese elemento ya no existe.</string>
+
+    <!-- Navigation -->
+    <string name="nav_lists">Listas</string>
+    <string name="nav_circles">Círculos</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Sign-in -->
+    <string name="sign_in_title">Bienvenido a Listrary</string>
+    <string name="sign_in_subtitle">Inicia sesión con tu cuenta de Microsoft para ver tus listas.</string>
+    <string name="sign_in_button">Iniciar sesión</string>
+    <string name="sign_in_failed">No se pudo iniciar sesión. Inténtalo de nuevo.</string>
+    <string name="sign_out">Cerrar sesión</string>
+
+    <!-- List types -->
+    <string name="list_type_shopping">Compras</string>
+    <string name="list_type_todo">Tareas</string>
+    <string name="list_type_wishlist">Lista de deseos</string>
+    <string name="list_type_other">Otra</string>
+
+    <!-- Lists screen -->
+    <string name="lists_title">Listas</string>
+    <string name="my_lists">Mis listas</string>
+    <string name="new_list">Nueva lista</string>
+    <string name="edit_list">Editar lista</string>
+    <string name="list_name">Nombre de la lista</string>
+    <string name="list_type">Tipo de lista</string>
+    <string name="list_circle_optional">Círculo (opcional)</string>
+    <string name="list_no_circle">Sin círculo (personal)</string>
+    <string name="list_strict_store_locations">Ubicaciones de tienda estrictas</string>
+    <string name="list_strict_store_locations_help">Solo permitir ubicaciones de tienda que ya existan en esta lista.</string>
+    <string name="delete_list">Eliminar lista</string>
+    <string name="delete_list_confirm">¿Eliminar \"%1$s\"? Esta acción no se puede deshacer.</string>
+    <string name="empty_lists">Aún no tienes listas. Toca + para crear una.</string>
+    <string name="items_count">%1$d elementos</string>
+    <string name="list_completed">Completada</string>
+
+    <!-- List detail -->
+    <string name="add_item_hint">Añadir un elemento</string>
+    <string name="item_name">Nombre del elemento</string>
+    <string name="item_details">Detalles</string>
+    <string name="item_store_location">Ubicación en la tienda</string>
+    <string name="item_no_location">Sin ubicación</string>
+    <string name="edit_item">Editar elemento</string>
+    <string name="delete_item">Eliminar elemento</string>
+    <string name="mark_all_incomplete">Marcar todo como pendiente</string>
+    <string name="empty_items">Esta lista está vacía.</string>
+    <string name="read_only_banner">Solo tienes acceso de lectura a esta lista.</string>
+    <string name="section_completed">Completados</string>
+    <string name="item_completed">Completado</string>
+
+    <!-- Store location messages -->
+    <string name="store_locations_strict_error">Esta lista solo permite ubicaciones de tienda existentes. Elige una de las sugerencias.</string>
+    <string name="store_locations_similar_warning">Ya existe una ubicación de tienda similar en esta lista. Comprueba que no querías usarla.</string>
+
+    <!-- Share -->
+    <string name="share">Compartir</string>
+    <string name="share_title">Compartir lista</string>
+    <string name="share_permission">Permiso</string>
+    <string name="share_permission_view">Ver</string>
+    <string name="share_permission_edit">Editar</string>
+    <string name="share_generate_link">Generar enlace</string>
+    <string name="share_copy_link">Copiar enlace</string>
+    <string name="share_send_link">Compartir mediante…</string>
+    <string name="share_link_copied">Enlace copiado al portapapeles</string>
+    <string name="share_active_shares">Enlaces activos</string>
+    <string name="share_none">Aún no hay enlaces activos.</string>
+    <string name="share_assigned">Reclamado</string>
+    <string name="share_unclaimed">Aún no abierto</string>
+    <string name="share_message">Mira mi lista \"%1$s\" en Listrary: %2$s</string>
+
+    <!-- Circles -->
+    <string name="circles_title">Círculos</string>
+    <string name="new_circle">Nuevo círculo</string>
+    <string name="circle_name">Nombre del círculo</string>
+    <string name="empty_circles">Aún no perteneces a ningún círculo. Toca + para crear uno.</string>
+    <string name="pending_invitations">Invitaciones pendientes</string>
+    <string name="circle_invited_by">Invitación para unirte a \"%1$s\"</string>
+    <string name="action_accept">Aceptar</string>
+    <string name="action_reject">Rechazar</string>
+    <string name="circle_members">Miembros</string>
+    <string name="circle_invitations">Invitaciones</string>
+    <string name="circle_invite_title">Invitar a alguien</string>
+    <string name="circle_invite_hint">Correo electrónico o ID de usuario</string>
+    <string name="circle_invite_send">Enviar invitación</string>
+    <string name="circle_remove_member">Quitar miembro</string>
+    <string name="circle_cancel_invitation">Cancelar invitación</string>
+    <string name="circle_leave">Salir del círculo</string>
+    <string name="circle_leave_confirm">¿Salir de \"%1$s\"?</string>
+    <string name="circle_delete">Eliminar círculo</string>
+    <string name="circle_delete_confirm">¿Eliminar \"%1$s\" y quitar a todos los miembros?</string>
+    <string name="circle_owner">Propietario</string>
+    <string name="circle_you">Tú</string>
+    <string name="circle_invitation_accepted">Aceptada</string>
+    <string name="circle_invitation_pending">Pendiente</string>
+    <string name="circle_member_count">%1$d miembros</string>
+
+    <!-- Circle status messages -->
+    <string name="circles_status_created">Círculo creado.</string>
+    <string name="circles_status_invited">Invitación enviada.</string>
+    <string name="circles_status_accepted">Te has unido al círculo.</string>
+    <string name="circles_status_rejected">Invitación rechazada.</string>
+    <string name="circles_status_cancelled">Invitación cancelada.</string>
+    <string name="circles_status_member_removed">Miembro eliminado.</string>
+    <string name="circles_status_left">Has salido del círculo.</string>
+    <string name="circles_status_deleted">Círculo eliminado.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_language">Idioma</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="settings_account">Cuenta</string>
+    <string name="settings_signed_in_as">Sesión iniciada como %1$s</string>
+    <string name="settings_version">Versión %1$s</string>
+</resources>
