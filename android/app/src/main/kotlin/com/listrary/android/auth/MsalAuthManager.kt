@@ -75,7 +75,7 @@ class MsalAuthManager @Inject constructor(
     }
 
     private fun loadCurrentAccount(application: ISingleAccountPublicClientApplication) {
-        application.getCurrentAccount(object : ISingleAccountPublicClientApplication.CurrentAccountCallback {
+        application.getCurrentAccountAsync(object : ISingleAccountPublicClientApplication.CurrentAccountCallback {
             override fun onAccountLoaded(activeAccount: IAccount?) {
                 _state.value = activeAccount?.toSignedIn() ?: AuthState.SignedOut()
             }

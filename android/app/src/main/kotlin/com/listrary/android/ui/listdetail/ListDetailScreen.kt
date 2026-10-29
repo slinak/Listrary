@@ -25,8 +25,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.PullToRefreshBox
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SuggestionChip
@@ -72,7 +72,7 @@ fun ListDetailScreen(
     var editTarget by remember { mutableStateOf<ListItemEntity?>(null) }
 
     LaunchedEffect(Unit) {
-        viewModel.messageFlow.collect { snackbar.showSnackbar(context.getString(it)) }
+        viewModel.messageFlow.collect { snackbar.showSnackbar(it.resolve(context)) }
     }
 
     Scaffold(
@@ -145,11 +145,10 @@ fun ListDetailScreen(
                     ) { Text(stringResource(R.string.empty_items)) }
                     else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 16.dp)) {
                         state.sections.forEach { section ->
-                            val header = sectionTitle(section.kind)
-                            if (header != null) {
+                            if (section.kind != SectionKind.Pending) {
                                 item(key = "h-${section.kind}") {
                                     Text(
-                                        header,
+                                        sectionTitle(section.kind).orEmpty(),
                                         style = MaterialTheme.typography.titleSmall,
                                         color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp),

@@ -70,3 +70,13 @@ fun Throwable.toMessageRes(): Int = when (this) {
     is IOException -> R.string.error_network
     else -> R.string.error_generic
 }
+
+/** Extracts the backend's `{"error": "..."}` body text from a failed API call, when present. */
+fun HttpException.backendErrorMessage(): String? = try {
+    response()?.errorBody()?.string()
+        ?.let { org.json.JSONObject(it) }
+        ?.optString("error")
+        ?.takeIf { it.isNotBlank() }
+} catch (e: Exception) {
+    null
+}

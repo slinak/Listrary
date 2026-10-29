@@ -52,6 +52,7 @@ public record CircleMemberDto(int CircleMemberId, int CircleId, string UserId, D
 public record CircleInvitationDto(
     int CircleInvitationId,
     int CircleId,
+    string? CircleName,
     string InviterId,
     string? RecipientEmail,
     string? RecipientId,

@@ -59,6 +59,7 @@ public static class DtoMappingExtensions
         return new CircleInvitationDto(
             invitation.CircleInvitationID,
             invitation.CircleID,
+            invitation.Circle?.Name,
             invitation.InviterID,
             invitation.RecipientEmail,
             invitation.RecipientID,

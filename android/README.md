@@ -63,7 +63,7 @@ Base path `/api/v1`, JSON, `Authorization: Bearer <Entra ID access token>` on al
 - `POST /circles/{id}/invite`, `DELETE /circles/{id}/members/{userId}`, `POST /circles/{id}/leave`
 - `POST /circles/invitations/{id}/accept|reject`, `DELETE /circles/invitations/{id}`
 
-Enums (`listType`, `permission`) are exchanged as strings (`Shopping|ToDo|WishList|Other`, `View|Edit`). The DTOs are in `data/remote/dto/`. Assumed (not in the contract): incoming `pendingInvitations` may carry an optional `circleName` for display.
+Enums (`listType`, `permission`) are exchanged as strings (`Shopping|ToDo|WishList|Other`, `View|Edit`). The DTOs are in `data/remote/dto/`. `circleInvitationDto.circleName` is now populated by the backend (see `CircleInvitationDto`/`DtoMappingExtensions.ToDto(CircleInvitation)`), so incoming `pendingInvitations` always carry it for display.
 
 ## Deep links / sharing
 

@@ -121,6 +121,7 @@ public class CirclesApiController : ControllerBase
         _context.CircleInvitations.Add(invite);
         _context.SaveChanges();
 
+        invite.Circle = circle;
         return Ok(invite.ToDto());
     }
 

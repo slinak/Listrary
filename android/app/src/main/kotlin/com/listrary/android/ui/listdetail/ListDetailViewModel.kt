@@ -12,6 +12,8 @@ import com.listrary.android.data.local.entities.ListType
 import com.listrary.android.data.local.entities.SharePermission
 import com.listrary.android.data.repository.ListItemsRepository
 import com.listrary.android.data.repository.ListsRepository
+import com.listrary.android.ui.common.UiMessage
+import com.listrary.android.ui.common.backendErrorMessage
 import com.listrary.android.ui.common.toMessageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -87,7 +89,7 @@ class ListDetailViewModel @Inject constructor(
     private val _draft = MutableStateFlow(ItemDraft())
     val draft: StateFlow<ItemDraft> = _draft
 
-    private val messages = Channel<Int>(Channel.BUFFERED)
+    private val messages = Channel<UiMessage>(Channel.BUFFERED)
     val messageFlow = messages.receiveAsFlow()
 
     val uiState: StateFlow<ListDetailUiState> = combine(
@@ -156,9 +158,9 @@ class ListDetailViewModel @Inject constructor(
                 .onSuccess { warning ->
                     // Keep the location so consecutive items in the same aisle are quick to add.
                     _draft.value = ItemDraft(location = current.location)
-                    if (!warning.isNullOrBlank()) messages.send(R.string.store_locations_similar_warning)
+                    if (!warning.isNullOrBlank()) messages.send(UiMessage.Text(warning))
                 }
-                .onFailure { messages.send(itemErrorRes(it, current.location)) }
+                .onFailure { messages.send(itemErrorMessage(it, current.location)) }
         }
     }
 
@@ -166,30 +168,30 @@ class ListDetailViewModel @Inject constructor(
         viewModelScope.launch {
             itemsRepository.updateItem(listId, item.listItemId, name, details, location, item.isCompleted, shareToken)
                 .onSuccess { warning ->
-                    if (!warning.isNullOrBlank()) messages.send(R.string.store_locations_similar_warning)
+                    if (!warning.isNullOrBlank()) messages.send(UiMessage.Text(warning))
                 }
-                .onFailure { messages.send(itemErrorRes(it, location)) }
+                .onFailure { messages.send(itemErrorMessage(it, location)) }
         }
     }
 
     fun toggle(item: ListItemEntity) {
         viewModelScope.launch {
             itemsRepository.toggleItem(listId, item.listItemId, shareToken)
-                .onFailure { messages.send(it.toMessageRes()) }
+                .onFailure { messages.send(UiMessage.Res(it.toMessageRes())) }
         }
     }
 
     fun deleteItem(item: ListItemEntity) {
         viewModelScope.launch {
             itemsRepository.deleteItem(listId, item.listItemId, shareToken)
-                .onFailure { messages.send(it.toMessageRes()) }
+                .onFailure { messages.send(UiMessage.Res(it.toMessageRes())) }
         }
     }
 
     fun markAllIncomplete() {
         viewModelScope.launch {
             itemsRepository.markAllIncomplete(listId, shareToken)
-                .onFailure { messages.send(it.toMessageRes()) }
+                .onFailure { messages.send(UiMessage.Res(it.toMessageRes())) }
         }
     }
 
@@ -198,21 +200,24 @@ class ListDetailViewModel @Inject constructor(
             transient.update { it.copy(isSharing = true) }
             listsRepository.createShare(listId, permission)
                 .onSuccess { share -> transient.update { it.copy(generatedLink = share.shareLink) } }
-                .onFailure { messages.send(it.toMessageRes()) }
+                .onFailure { messages.send(UiMessage.Res(it.toMessageRes())) }
             transient.update { it.copy(isSharing = false) }
         }
     }
 
     fun clearGeneratedLink() = transient.update { it.copy(generatedLink = null) }
 
-    /** A 400 on a strict list with a location is the backend's StoreLocations.StrictError. */
-    private fun itemErrorRes(error: Throwable, location: String?): Int {
+    /**
+     * A 400-422 on a strict list with a location is the backend's StoreLocations.StrictError;
+     * surface its real message when present, falling back to the canned string otherwise.
+     */
+    private fun itemErrorMessage(error: Throwable, location: String?): UiMessage {
         val strict = uiState.value.list?.strictStoreLocations == true
-        return if (strict && !location.isNullOrBlank() && error is HttpException && error.code() in 400..422) {
-            R.string.store_locations_strict_error
-        } else {
-            error.toMessageRes()
+        if (strict && !location.isNullOrBlank() && error is HttpException && error.code() in 400..422) {
+            error.backendErrorMessage()?.let { return UiMessage.Text(it) }
+            return UiMessage.Res(R.string.store_locations_strict_error)
         }
+        return UiMessage.Res(error.toMessageRes())
     }
 
     /** Incomplete items first (grouped by store location for Shopping lists), completed last. */
