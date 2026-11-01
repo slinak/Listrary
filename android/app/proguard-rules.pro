@@ -9,3 +9,5 @@
 -keep class com.microsoft.identity.** { *; }
 -keep class io.opentelemetry.** { *; }
 -dontwarn io.opentelemetry.**
+-dontwarn com.google.crypto.tink.subtle.**
+-dontwarn edu.umd.cs.findbugs.annotations.**
