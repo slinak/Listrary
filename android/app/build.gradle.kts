@@ -81,7 +81,7 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.msal) {
-        exclude(group = "io.opentelemetry")
-    }
+    implementation(libs.msal)
+    implementation(libs.opentelemetry.api)
+    implementation(libs.opentelemetry.context)
 }

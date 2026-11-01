@@ -7,3 +7,5 @@
 -keepclasseswithmembers class com.listrary.android.** { kotlinx.serialization.KSerializer serializer(...); }
 -dontwarn org.slf4j.**
 -keep class com.microsoft.identity.** { *; }
+-keep class io.opentelemetry.** { *; }
+-dontwarn io.opentelemetry.**
