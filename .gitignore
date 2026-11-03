@@ -44,3 +44,6 @@ publish/
 ListManager.dev.db
 ListManager.dev.db-shm
 ListManager.dev.db-wal
+
+branding/node_modules/
+branding/package*.json
