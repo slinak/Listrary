@@ -7,6 +7,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - @SharedLocalizer["App.Title"]</title>
+    <link rel="icon" href="~/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="~/images/icons/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="~/images/icons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="~/images/icons/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="~/images/icons/apple-touch-icon.png" />
+    <link rel="mask-icon" href="~/images/icons/safari-pinned-tab.svg" color="#0FAF9F" />
+    <link rel="manifest" href="~/site.webmanifest" />
+    <meta name="msapplication-config" content="@Url.Content("~/browserconfig.xml")" />
+    <meta name="theme-color" content="#0FAF9F" />
+    <meta property="og:title" content="Listrary" />
+    <meta property="og:image" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~/images/icons/og-image.png")}")" />
+    <meta name="twitter:card" content="summary_large_image" />
     <script>(function(){var t=localStorage.getItem('listrary-theme');if(t==='dark')document.documentElement.setAttribute('data-bs-theme','dark');}());</script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
