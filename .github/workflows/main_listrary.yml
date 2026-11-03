@@ -1,13 +1,17 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - listrary
+name: Build and deploy ASP.Net Core app to Azure Web App - listrary-app
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+
+concurrency:
+  group: listrary-app-production
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -51,14 +55,30 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_55C5E417683241DBB7B68E64C96A402B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C9E1B8EC5D0740E6B319740CF6E87719 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_EBD6508D20E34C509267F5B7369BA93E }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5CBC2367D77F4E838257C4E9705855AD }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_02EF648BEDC64E36999992526F494446 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_60EDFA2D49BF40B88EA772A0707E517E }}
+
+      - name: Configure database connection string
+        shell: pwsh
+        env:
+          LISTMANAGER_CONNECTION_STRING: ${{ secrets.LISTMANAGER_CONNECTION_STRING }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:LISTMANAGER_CONNECTION_STRING)) {
+            throw "The LISTMANAGER_CONNECTION_STRING GitHub Actions secret is required."
+          }
+
+          az webapp config connection-string set `
+            --resource-group ListraryServiceGroup `
+            --name listrary-app `
+            --connection-string-type SQLAzure `
+            --settings "DefaultConnection=$env:LISTMANAGER_CONNECTION_STRING" `
+            --output none
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'listrary'
+          app-name: 'listrary-app'
           slot-name: 'Production'
           package: .
