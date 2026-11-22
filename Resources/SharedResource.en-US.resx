@@ -170,4 +170,14 @@
   <data name="Error.DevelopmentHelp1" xml:space="preserve"><value>Swapping to Development environment will display more detailed information about the error that occurred.</value></data>
   <data name="Error.DevelopmentWarning" xml:space="preserve"><value>The Development environment shouldn't be enabled for deployed applications.</value></data>
   <data name="Error.DevelopmentHelp2" xml:space="preserve"><value>It can result in displaying sensitive information from exceptions to end users. For local debugging, enable the Development environment by setting the ASPNETCORE_ENVIRONMENT environment variable to Development and restarting the app.</value></data>
+  <data name="Common.All" xml:space="preserve"><value>All</value></data>
+  <data name="Common.MoreActions" xml:space="preserve"><value>More actions</value></data>
+  <data name="Common.Updated" xml:space="preserve"><value>Updated</value></data>
+  <data name="Lists.Search.Placeholder" xml:space="preserve"><value>Search lists...</value></data>
+  <data name="Lists.Progress" xml:space="preserve"><value>{0} of {1} done</value></data>
+  <data name="Lists.NoMatches" xml:space="preserve"><value>No lists match your search.</value></data>
+  <data name="Lists.Empty.Title" xml:space="preserve"><value>No lists yet</value></data>
+  <data name="Lists.Empty.Body" xml:space="preserve"><value>Create your first list to get organized and make the most of Listrary.</value></data>
+  <data name="Circles.Empty.Title" xml:space="preserve"><value>No circles yet</value></data>
+  <data name="Circles.Empty.Body" xml:space="preserve"><value>Create a circle to share lists with family and friends.</value></data>
 </root>

@@ -106,7 +106,8 @@ public class ListsController : Controller
                 .Select(list => new ListViewItemModel
                 {
                     ListModel = list,
-                    ItemCount = list.Items.Count
+                    ItemCount = list.Items.Count,
+                    CompletedCount = list.Items.Count(i => i.IsCompleted)
                 })
                 .ToList()
         }).ToList();
@@ -122,7 +123,8 @@ public class ListsController : Controller
             .Select(list => new ListViewItemModel
             {
                 ListModel = list,
-                ItemCount = list.Items.Count
+                ItemCount = list.Items.Count,
+                    CompletedCount = list.Items.Count(i => i.IsCompleted)
             })
             .ToList();
 
@@ -160,7 +162,8 @@ public class ListsController : Controller
             .Select(l => new ListViewItemModel
             {
                 ListModel = l,
-                ItemCount = l.Items.Count
+                ItemCount = l.Items.Count,
+                CompletedCount = l.Items.Count(i => i.IsCompleted)
             })
             .ToList();
 

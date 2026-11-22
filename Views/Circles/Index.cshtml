@@ -23,56 +23,72 @@
 
 @if (Model.PendingInvitations.Any())
 {
-    <div class="card mb-4">
-        <div class="card-header">
-            <strong>@SharedLocalizer["Circles.PendingInvitations"]</strong>
-        </div>
-        <div class="card-body">
-            <div class="list-group">
-                @foreach (var invite in Model.PendingInvitations)
-                {
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
+    <section class="mb-4">
+        <h5 class="fw-semibold mb-3">@SharedLocalizer["Circles.PendingInvitations"]</h5>
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            @foreach (var invite in Model.PendingInvitations)
+            {
+                <div class="col">
+                    <div class="card list-card h-100">
+                        <div class="card-body d-flex justify-content-between align-items-start gap-3">
+                            <div class="min-w-0">
                                 <h5 class="mb-1">@invite.Circle?.Name</h5>
-                                <p class="mb-1">@SharedLocalizer["Circles.InvitedBy"] @invite.InviterID</p>
-                                <p class="mb-1 text-muted">@invite.RecipientEmail ?? invite.RecipientID</p>
-                                <small>@SharedLocalizer["Circles.InvitedOn"] @invite.CreatedDate.ToString("g")</small>
+                                <p class="mb-1 small text-body-secondary">@SharedLocalizer["Circles.InvitedBy"] @invite.InviterID</p>
+                                <small class="text-body-secondary">@SharedLocalizer["Circles.InvitedOn"] @invite.CreatedDate.ToString("g")</small>
                             </div>
-                            <div class="btn-group btn-group-sm">
-                                <form asp-action="AcceptInvite" method="post" class="me-1">
+                            <div class="d-flex gap-2">
+                                <form asp-action="AcceptInvite" method="post">
                                     <input type="hidden" name="invitationId" value="@invite.CircleInvitationID" />
-                                    <button type="submit" class="btn btn-success">@SharedLocalizer["Common.Accept"]</button>
+                                    <button type="submit" class="btn btn-sm btn-success">@SharedLocalizer["Common.Accept"]</button>
                                 </form>
                                 <form asp-action="RejectInvite" method="post">
                                     <input type="hidden" name="invitationId" value="@invite.CircleInvitationID" />
-                                    <button type="submit" class="btn btn-outline-danger">@SharedLocalizer["Common.Reject"]</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@SharedLocalizer["Common.Reject"]</button>
                                 </form>
                             </div>
                         </div>
                     </div>
-                }
-            </div>
+                </div>
+            }
         </div>
-    </div>
+    </section>
 }
 
-<div class="row g-3">
-    @foreach (var c in Model.Circles)
-    {
-        <div class="col-sm-6 col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">@c.Name</h5>
-                    <p class="card-text text-muted mb-1"><strong>@SharedLocalizer["Circles.Owner"]</strong> @c.OwnerID</p>
-                    <p class="card-text text-muted mb-3"><strong>@SharedLocalizer["Circles.Members"]</strong> @(c.Members?.Count ?? 0)</p>
-
-                    <div class="mt-auto">
-                        <a class="btn btn-sm btn-outline-primary" asp-action="Manage" asp-route-id="@c.CircleID">@SharedLocalizer["Common.Manage"]</a>
-                        <a class="btn btn-sm btn-outline-secondary ms-2" asp-controller="Lists" asp-action="Circle" asp-route-id="@c.CircleID">@SharedLocalizer["Circles.ViewLists"]</a>
+@if (!Model.Circles.Any())
+{
+    <div class="empty-state text-center p-5">
+        <h4>@SharedLocalizer["Circles.Empty.Title"]</h4>
+        <p class="text-body-secondary mb-3">@SharedLocalizer["Circles.Empty.Body"]</p>
+        <a asp-action="Create" class="btn btn-primary">@SharedLocalizer["Circles.Create.Title"]</a>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+        @foreach (var c in Model.Circles)
+        {
+            <div class="col">
+                <div class="card list-card h-100 position-relative">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <span class="list-icon list-icon-circle" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/></svg>
+                            </span>
+                            <div class="flex-grow-1 min-w-0">
+                                <h5 class="card-title mb-1 text-truncate">
+                                    <a asp-controller="Lists" asp-action="Circle" asp-route-id="@c.CircleID" class="stretched-link text-decoration-none list-card-link">@c.Name</a>
+                                </h5>
+                                <span class="badge rounded-pill badge-theme-neutral">@(c.Members?.Count ?? 0) @SharedLocalizer["Circles.Members"]</span>
+                            </div>
+                        </div>
+                        <p class="small text-body-secondary mb-3 text-truncate"><strong>@SharedLocalizer["Circles.Owner"]</strong> @c.OwnerID</p>
+                        <div class="mt-auto d-flex gap-2 position-relative" style="z-index:2">
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="Lists" asp-action="Circle" asp-route-id="@c.CircleID">@SharedLocalizer["Circles.ViewLists"]</a>
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Manage" asp-route-id="@c.CircleID">@SharedLocalizer["Common.Manage"]</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}

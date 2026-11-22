@@ -59,6 +59,18 @@
         <div class="d-flex justify-content-between align-items-start mb-3">
             <div>
                 <h2 class="mb-0">@Model.ListModel.ListName</h2>
+                @if (Model.Items != null && Model.Items.Any())
+                {
+                    var totalItems = Model.Items.Count();
+                    var doneItems = Model.Items.Count(i => i.IsCompleted);
+                    var donePercent = (int)Math.Round(100.0 * doneItems / totalItems);
+                    <div class="mt-2" style="min-width:12rem">
+                        <div class="progress list-progress" role="progressbar" aria-valuenow="@donePercent" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar" style="width:@donePercent%"></div>
+                        </div>
+                        <small class="text-body-secondary">@SharedLocalizer["Lists.Progress", doneItems, totalItems]</small>
+                    </div>
+                }
                 @if (Model.ListModel.StrictStoreLocations)
                 {
                     <span class="badge bg-secondary mt-2">@SharedLocalizer["StoreLocations.StrictEnabled"]</span>

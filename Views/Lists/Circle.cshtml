@@ -3,39 +3,30 @@
 @{
     ViewData["Title"] = SharedLocalizer["Lists.Circle.Title"].Value;
     var circleName = ViewData["CircleName"] as string ?? SharedLocalizer["Circles.CircleFallback"].Value;
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>@SharedLocalizer["Lists.Circle.Heading", circleName]</h2>
-    <a class="btn btn-secondary" asp-controller="Circles" asp-action="Index">@SharedLocalizer["Circles.BackToCircles"]</a>
+    <a class="btn btn-outline-secondary" asp-controller="Circles" asp-action="Index">@SharedLocalizer["Circles.BackToCircles"]</a>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>@SharedLocalizer["Lists.Fields.ListName"]</th>
-            <th>@SharedLocalizer["Lists.Fields.ListType"]</th>
-            <th>@SharedLocalizer["Lists.Fields.Items"]</th>
-            <th>@SharedLocalizer["Lists.Fields.CreatedDate"]</th>
-            <th>@SharedLocalizer["Lists.Fields.Actions"]</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.ListModel!.ListName</td>
-            <td>@item.ListModel!.ListType</td>
-            <td><span class="badge rounded-pill bg-primary">@item.ItemCount @SharedLocalizer[item.ItemCount == 1 ? "Common.ItemSingular" : "Common.ItemPlural"]</span></td>
-            <td>@item.ListModel!.CreatedDate</td>
-            <td>
-                <a asp-action="Manage" asp-controller="Lists" asp-route-id="@item.ListModel!.ListID">@SharedLocalizer["Common.View"]</a>
-                @if (item.ListModel!.OwnerID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
-                {
-                    <text> | <a asp-action="Edit" asp-controller="Lists" asp-route-id="@item.ListModel!.ListID">@SharedLocalizer["Common.Edit"]</a></text>
-                }
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+@if (!Model.Any())
+{
+    <div class="empty-state text-center p-5">
+        <h4>@SharedLocalizer["Lists.Empty.Title"]</h4>
+        <p class="text-body-secondary mb-3">@SharedLocalizer["Lists.Circle.Empty"]</p>
+        <a asp-controller="Lists" asp-action="Create" class="btn btn-primary">@SharedLocalizer["Lists.Create.Title"]</a>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+        @foreach (var item in Model)
+        {
+            <partial name="_ListCard" model="item" view-data='new ViewDataDictionary(ViewData) { { "CanEdit", item.ListModel!.OwnerID == currentUserId } }' />
+        }
+    </div>
+}
+
+<partial name="_DeleteListModal" />
