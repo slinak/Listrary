@@ -1,0 +1,20 @@
+<div class="modal fade" id="deleteListModal" tabindex="-1" aria-labelledby="deleteListModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteListModalLabel">@SharedLocalizer["Common.ConfirmDelete"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Delete" asp-controller="Lists" method="post" id="deleteListForm">
+                <div class="modal-body">
+                    <p>@SharedLocalizer["Lists.DeletePrompt"] <strong id="deleteListName"></strong>?</p>
+                    @Html.Hidden("id", "", new { id = "deleteListId" })
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["Common.Cancel"]</button>
+                    <button type="submit" class="btn btn-danger">@SharedLocalizer["Common.Delete"]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

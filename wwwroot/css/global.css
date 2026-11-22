@@ -324,3 +324,77 @@ body {
   border-color: #2e3338 !important;
   color: #8a8f98;
 }
+
+/* ── Card-based lists / circles ── */
+.min-w-0 { min-width: 0; }
+
+.list-card {
+  border-radius: 0.85rem;
+  border: 1px solid rgba(37, 140, 251, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.list-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--app-primary-color);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.list-card-link { color: inherit; }
+
+.list-card-menu { position: relative; z-index: 2; }
+
+.list-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.list-icon-shopping { background: #1c7ed6; }
+.list-icon-todo { background: #c99a06; }
+.list-icon-wishlist { background: #198754; }
+.list-icon-default,
+.list-icon-circle { background: #6c757d; }
+
+.list-progress { height: 0.4rem; margin-bottom: 0.35rem; }
+
+.list-search { max-width: 20rem; }
+
+.filter-pill {
+  border: 1px solid var(--app-surface-muted-border);
+  color: var(--app-text-color);
+}
+
+.filter-pill.active {
+  background: var(--app-primary-color);
+  border-color: var(--app-primary-color);
+  color: #fff;
+}
+
+.list-section-header {
+  background: var(--app-surface-muted-bg);
+  border: 1px solid var(--app-surface-muted-border);
+  border-radius: 0.6rem;
+  padding: 0.35rem 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.list-section-toggle {
+  padding-left: 0;
+  color: inherit;
+  border: 0;
+}
+
+.list-section-toggle .chevron { transition: transform 0.15s ease; }
+.list-section-toggle.collapsed .chevron { transform: rotate(-90deg); }
+
+.empty-state {
+  border: 2px dashed var(--app-surface-muted-border);
+  border-radius: 0.85rem;
+}

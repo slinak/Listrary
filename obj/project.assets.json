@@ -8323,11 +8323,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
+      "projectUniqueName": "C:\\Users\\merse\\source\\repos\\copilot-worktrees\\Listrary\\slinak-curly-fortnight\\ListManager.csproj",
       "projectName": "ListManager",
-      "projectPath": "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\ListManager.csproj",
+      "projectPath": "C:\\Users\\merse\\source\\repos\\copilot-worktrees\\Listrary\\slinak-curly-fortnight\\ListManager.csproj",
       "packagesPath": "C:\\Users\\merse\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\merse\\Documents\\GitHub\\ListManager\\obj\\",
+      "outputPath": "C:\\Users\\merse\\source\\repos\\copilot-worktrees\\Listrary\\slinak-curly-fortnight\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

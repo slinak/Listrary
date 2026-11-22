@@ -171,4 +171,14 @@
   <data name="Error.DevelopmentHelp1" xml:space="preserve"><value>Cambiar al entorno de desarrollo mostrará información más detallada sobre el error ocurrido.</value></data>
   <data name="Error.DevelopmentWarning" xml:space="preserve"><value>El entorno de desarrollo no debería estar habilitado en aplicaciones desplegadas.</value></data>
   <data name="Error.DevelopmentHelp2" xml:space="preserve"><value>Puede mostrar información sensible de excepciones a usuarios finales. Para depuración local, habilita el entorno de desarrollo estableciendo la variable ASPNETCORE_ENVIRONMENT en Development y reinicia la aplicación.</value></data>
+  <data name="Common.All" xml:space="preserve"><value>Todas</value></data>
+  <data name="Common.MoreActions" xml:space="preserve"><value>Más acciones</value></data>
+  <data name="Common.Updated" xml:space="preserve"><value>Actualizada</value></data>
+  <data name="Lists.Search.Placeholder" xml:space="preserve"><value>Buscar listas...</value></data>
+  <data name="Lists.Progress" xml:space="preserve"><value>{0} de {1} completados</value></data>
+  <data name="Lists.NoMatches" xml:space="preserve"><value>Ninguna lista coincide con tu búsqueda.</value></data>
+  <data name="Lists.Empty.Title" xml:space="preserve"><value>Aún no hay listas</value></data>
+  <data name="Lists.Empty.Body" xml:space="preserve"><value>Crea tu primera lista para organizarte y aprovechar Listrary.</value></data>
+  <data name="Circles.Empty.Title" xml:space="preserve"><value>Aún no hay círculos</value></data>
+  <data name="Circles.Empty.Body" xml:space="preserve"><value>Crea un círculo para compartir listas con familiares y amigos.</value></data>
 </root>
