@@ -207,7 +207,7 @@ public class ListsController : Controller
         _context.Lists.Add(newList);
         _context.SaveChanges();
 
-        return RedirectToAction("Index");
+        return RedirectToAction("Manage", new { id = newList.ListID });
     }
 
     [HttpGet]
