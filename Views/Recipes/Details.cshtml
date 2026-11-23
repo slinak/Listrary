@@ -1,3 +1,4 @@
+@using ListManager.Services
 @model ListManager.Models.Recipe
 
 @{
@@ -44,7 +45,12 @@
 @if (!string.IsNullOrWhiteSpace(Model.Instructions))
 {
     <h2 class="h5">@SharedLocalizer["Recipes.Instructions"]</h2>
-    <p style="white-space: pre-wrap">@Model.Instructions</p>
+    <ol class="ps-3">
+        @foreach (var step in RecipeInstructionParser.Parse(Model.Instructions))
+        {
+            <li class="mb-2">@step</li>
+        }
+    </ol>
 }
 
 <div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
