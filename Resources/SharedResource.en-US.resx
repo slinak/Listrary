@@ -18,6 +18,12 @@
   <data name="Nav.Lists" xml:space="preserve"><value>Lists</value></data>
   <data name="Nav.Circles" xml:space="preserve"><value>Circles</value></data>
   <data name="Nav.Recipes" xml:space="preserve"><value>Recipes</value></data>
+  <data name="Recipes.Create.Title" xml:space="preserve"><value>Add a Recipe</value></data>
+  <data name="Recipes.Fields.Name" xml:space="preserve"><value>Recipe name</value></data>
+  <data name="Recipes.Instructions" xml:space="preserve"><value>Instructions</value></data>
+  <data name="Recipes.Instructions.Placeholder" xml:space="preserve"><value>Type the steps, or add a screenshot above</value></data>
+  <data name="Recipes.Instructions.Help" xml:space="preserve"><value>Type the instructions, or choose or paste (Ctrl+V) a screenshot to fill them in. Review the text before saving.</value></data>
+  <data name="Recipes.Empty.Body" xml:space="preserve"><value>Add a recipe to get started.</value></data>
   <data name="Recipes.Title" xml:space="preserve"><value>Recipes</value></data>
   <data name="Recipes.UrlPlaceholder" xml:space="preserve"><value>Paste a recipe URL</value></data>
   <data name="Recipes.UrlHelp" xml:space="preserve"><value>The recipe is saved to your account so you can make lists from it any time.</value></data>

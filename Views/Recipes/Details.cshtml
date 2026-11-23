@@ -50,6 +50,12 @@
     </div>
 </form>
 
+@if (!string.IsNullOrWhiteSpace(Model.Instructions))
+{
+    <h2 class="h5">@SharedLocalizer["Recipes.Instructions"]</h2>
+    <p style="white-space: pre-wrap">@Model.Instructions</p>
+}
+
 <form asp-action="Delete" asp-route-id="@Model.RecipeID" method="post">
     @Html.AntiForgeryToken()
     <button type="submit" class="btn btn-outline-danger btn-sm">@SharedLocalizer["Recipes.Delete"]</button>

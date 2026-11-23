@@ -1,0 +1,97 @@
+@model ListManager.Models.RecipeFormModel
+
+@{
+    ViewData["Title"] = SharedLocalizer["Recipes.Create.Title"].Value;
+}
+
+<h1 class="display-6 mb-3">@SharedLocalizer["Recipes.Create.Title"]</h1>
+
+@if (TempData["RecipeError"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<form asp-action="Import" method="post" class="row g-2 mb-4">
+    @Html.AntiForgeryToken()
+    <div class="col-md-9">
+        <input type="url" name="url" class="form-control" required placeholder="@SharedLocalizer["Recipes.UrlPlaceholder"]" />
+        <small class="text-muted">@SharedLocalizer["Recipes.UrlHelp"]</small>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-outline-primary">@SharedLocalizer["Recipes.Import"]</button>
+    </div>
+</form>
+
+<hr />
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">@SharedLocalizer["Recipes.Fields.Name"]</label>
+        <input asp-for="Name" class="form-control" maxlength="200" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="IngredientsText" class="form-label">@SharedLocalizer["Recipes.Ingredients"]</label>
+        <input type="file" class="form-control mb-2 ocr-file" accept="image/*" data-target="IngredientsText" data-status="ocr-status-ingredients" />
+        <div id="ocr-status-ingredients" class="small text-muted mb-2" role="status"></div>
+        <textarea asp-for="IngredientsText" class="form-control" rows="8" placeholder="@SharedLocalizer["Recipes.Screenshot.TextPlaceholder"]"></textarea>
+        <small class="text-muted">@SharedLocalizer["Recipes.Screenshot.Help"]</small>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Instructions" class="form-label">@SharedLocalizer["Recipes.Instructions"]</label>
+        <input type="file" class="form-control mb-2 ocr-file" accept="image/*" data-target="Instructions" data-status="ocr-status-instructions" />
+        <div id="ocr-status-instructions" class="small text-muted mb-2" role="status"></div>
+        <textarea asp-for="Instructions" class="form-control" rows="10" placeholder="@SharedLocalizer["Recipes.Instructions.Placeholder"]"></textarea>
+        <small class="text-muted">@SharedLocalizer["Recipes.Instructions.Help"]</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">@SharedLocalizer["Common.Create"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">@SharedLocalizer["Common.Cancel"]</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" crossorigin="anonymous"></script>
+    <script>
+        (function () {
+            let lastFocused = document.getElementById('IngredientsText');
+            document.querySelectorAll('textarea').forEach(t => t.addEventListener('focus', () => lastFocused = t));
+
+            async function recognize(file, textArea, status) {
+                if (!file || !file.type.startsWith('image/'))
+                    return;
+                if (typeof Tesseract === 'undefined') {
+                    status.textContent = '@SharedLocalizer["Recipes.Screenshot.Unavailable"]';
+                    return;
+                }
+                status.textContent = '@SharedLocalizer["Recipes.Screenshot.Reading"]';
+                try {
+                    const result = await Tesseract.recognize(file, 'eng');
+                    textArea.value = result.data.text.trim();
+                    status.textContent = '@SharedLocalizer["Recipes.Screenshot.Done"]';
+                } catch (e) {
+                    status.textContent = '@SharedLocalizer["Recipes.Screenshot.Failed"]';
+                }
+            }
+
+            document.querySelectorAll('.ocr-file').forEach(input => {
+                input.addEventListener('change', () =>
+                    recognize(input.files[0], document.getElementById(input.dataset.target), document.getElementById(input.dataset.status)));
+            });
+
+            // Pasted screenshots fill whichever text box was last focused.
+            document.addEventListener('paste', e => {
+                const item = Array.from(e.clipboardData?.items ?? []).find(i => i.type.startsWith('image/'));
+                if (!item)
+                    return;
+                const status = document.getElementById(lastFocused.id === 'Instructions' ? 'ocr-status-instructions' : 'ocr-status-ingredients');
+                recognize(item.getAsFile(), lastFocused, status);
+            });
+        })();
+    </script>
+}

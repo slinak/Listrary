@@ -18,6 +18,12 @@
   <data name="Nav.Lists" xml:space="preserve"><value>Listas</value></data>
   <data name="Nav.Circles" xml:space="preserve"><value>Círculos</value></data>
   <data name="Nav.Recipes" xml:space="preserve"><value>Recetas</value></data>
+  <data name="Recipes.Create.Title" xml:space="preserve"><value>Agregar una receta</value></data>
+  <data name="Recipes.Fields.Name" xml:space="preserve"><value>Nombre de la receta</value></data>
+  <data name="Recipes.Instructions" xml:space="preserve"><value>Instrucciones</value></data>
+  <data name="Recipes.Instructions.Placeholder" xml:space="preserve"><value>Escribe los pasos o agrega una captura arriba</value></data>
+  <data name="Recipes.Instructions.Help" xml:space="preserve"><value>Escribe las instrucciones, o elige o pega (Ctrl+V) una captura para rellenarlas. Revisa el texto antes de guardar.</value></data>
+  <data name="Recipes.Empty.Body" xml:space="preserve"><value>Agrega una receta para empezar.</value></data>
   <data name="Recipes.Title" xml:space="preserve"><value>Recetas</value></data>
   <data name="Recipes.UrlPlaceholder" xml:space="preserve"><value>Pega la URL de una receta</value></data>
   <data name="Recipes.UrlHelp" xml:space="preserve"><value>La receta se guarda en tu cuenta para que puedas crear listas cuando quieras.</value></data>

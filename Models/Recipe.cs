@@ -17,6 +17,9 @@ public class Recipe
     [StringLength(2000)]
     public string? SourceUrl { get; set; }
 
+    [StringLength(20000)]
+    public string? Instructions { get; set; }
+
     public DateTime CreatedDate { get; set; } = DateTime.Now;
 
     public ICollection<RecipeIngredient> Ingredients { get; set; } = new List<RecipeIngredient>();
