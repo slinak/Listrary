@@ -26,8 +26,8 @@
   <data name="Recipes.Ingredients" xml:space="preserve"><value>Ingredientes</value></data>
   <data name="Recipes.CreateList" xml:space="preserve"><value>Crear lista con la selección</value></data>
   <data name="Recipes.Delete" xml:space="preserve"><value>Eliminar receta</value></data>
-  <data name="Recipes.Screenshot.Title" xml:space="preserve"><value>Crear una lista desde una captura de pantalla</value></data>
-  <data name="Recipes.Screenshot.Help" xml:space="preserve"><value>Elige o pega (Ctrl+V) una captura de una lista de ingredientes. Revisa el texto antes de crear la lista.</value></data>
+  <data name="Recipes.Screenshot.Title" xml:space="preserve"><value>Crear una lista desde texto o una captura</value></data>
+  <data name="Recipes.Screenshot.Help" xml:space="preserve"><value>Pega o escribe los ingredientes abajo (uno por línea), o elige o pega (Ctrl+V) una captura para rellenarlos automáticamente. Revisa el texto antes de crear la lista.</value></data>
   <data name="Recipes.Screenshot.TextPlaceholder" xml:space="preserve"><value>Un ingrediente por línea</value></data>
   <data name="Recipes.Screenshot.CreateList" xml:space="preserve"><value>Crear lista</value></data>
   <data name="Recipes.Screenshot.Reading" xml:space="preserve"><value>Leyendo la captura...</value></data>
