@@ -30,7 +30,7 @@
   <data name="Recipes.Import" xml:space="preserve"><value>Import recipe</value></data>
   <data name="Recipes.Empty" xml:space="preserve"><value>No saved recipes yet.</value></data>
   <data name="Recipes.Ingredients" xml:space="preserve"><value>Ingredients</value></data>
-  <data name="Recipes.CreateList" xml:space="preserve"><value>Create list from selected</value></data>
+  <data name="Recipes.CreateList" xml:space="preserve"><value>Create list</value></data>
   <data name="Recipes.Delete" xml:space="preserve"><value>Delete recipe</value></data>
   <data name="Recipes.Screenshot.Title" xml:space="preserve"><value>Create a list from text or a screenshot</value></data>
   <data name="Recipes.Screenshot.Help" xml:space="preserve"><value>Paste or type ingredients below (one per line), or choose or paste (Ctrl+V) a screenshot to fill them in automatically. Review the text before creating the list.</value></data>

@@ -74,19 +74,16 @@ public class RecipesController : Controller
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateList(int id, string? listName, ListType listType, int[]? selectedIngredientIds)
+    public async Task<IActionResult> CreateList(int id, string? listName, ListType listType)
     {
         var recipe = await FindOwnedRecipeAsync(id);
         if (recipe == null)
             return NotFound();
 
-        var selected = recipe.Ingredients
-            .Where(i => selectedIngredientIds != null && selectedIngredientIds.Contains(i.RecipeIngredientID))
-            .OrderBy(i => i.SortOrder)
-            .ToList();
+        var selected = recipe.Ingredients.OrderBy(i => i.SortOrder).ToList();
         if (selected.Count == 0)
         {
-            TempData["RecipeError"] = "Select at least one ingredient.";
+            TempData["RecipeError"] = "This recipe has no ingredients.";
             return RedirectToAction(nameof(Details), new { id });
         }
 
