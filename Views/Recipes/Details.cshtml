@@ -1,0 +1,56 @@
+@model ListManager.Models.Recipe
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<h1 class="display-6">@Model.Title</h1>
+
+@if (!string.IsNullOrEmpty(Model.SourceUrl) && Uri.TryCreate(Model.SourceUrl, UriKind.Absolute, out var source)
+    && (source.Scheme == Uri.UriSchemeHttp || source.Scheme == Uri.UriSchemeHttps))
+{
+    <p><a href="@source" target="_blank" rel="noopener noreferrer">@source.Host</a></p>
+}
+
+@if (TempData["RecipeError"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<form asp-action="CreateList" asp-route-id="@Model.RecipeID" method="post">
+    @Html.AntiForgeryToken()
+    <h2 class="h5">@SharedLocalizer["Recipes.Ingredients"]</h2>
+    <ul class="list-unstyled">
+        @foreach (var ingredient in Model.Ingredients)
+        {
+            <li class="form-check">
+                <input class="form-check-input" type="checkbox" name="selectedIngredientIds" value="@ingredient.RecipeIngredientID" id="ing-@ingredient.RecipeIngredientID" checked />
+                <label class="form-check-label" for="ing-@ingredient.RecipeIngredientID">@ingredient.Text</label>
+            </li>
+        }
+    </ul>
+
+    <div class="row g-2 align-items-end mb-3">
+        <div class="col-md-6">
+            <label class="form-label" for="listName">@SharedLocalizer["Lists.Fields.ListName"]</label>
+            <input type="text" id="listName" name="listName" class="form-control" maxlength="100" value="@Model.Title" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="listType">@SharedLocalizer["Lists.Fields.ListType"]</label>
+            <select id="listType" name="listType" class="form-select">
+                @foreach (var type in Enum.GetValues<ListManager.Models.ListType>())
+                {
+                    <option value="@type" selected="@(type == ListManager.Models.ListType.Shopping)">@type</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">@SharedLocalizer["Recipes.CreateList"]</button>
+        </div>
+    </div>
+</form>
+
+<form asp-action="Delete" asp-route-id="@Model.RecipeID" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-outline-danger btn-sm">@SharedLocalizer["Recipes.Delete"]</button>
+</form>
