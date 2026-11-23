@@ -181,4 +181,5 @@
   <data name="Lists.Empty.Body" xml:space="preserve"><value>Crea tu primera lista para organizarte y aprovechar Listrary.</value></data>
   <data name="Circles.Empty.Title" xml:space="preserve"><value>Aún no hay círculos</value></data>
   <data name="Circles.Empty.Body" xml:space="preserve"><value>Crea un círculo para compartir listas con familiares y amigos.</value></data>
+  <data name="ListItems.Empty.Title" xml:space="preserve"><value>Aún no hay elementos</value></data>
 </root>
