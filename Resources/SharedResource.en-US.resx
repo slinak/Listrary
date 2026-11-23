@@ -26,6 +26,14 @@
   <data name="Recipes.Ingredients" xml:space="preserve"><value>Ingredients</value></data>
   <data name="Recipes.CreateList" xml:space="preserve"><value>Create list from selected</value></data>
   <data name="Recipes.Delete" xml:space="preserve"><value>Delete recipe</value></data>
+  <data name="Recipes.Screenshot.Title" xml:space="preserve"><value>Create a list from a screenshot</value></data>
+  <data name="Recipes.Screenshot.Help" xml:space="preserve"><value>Choose or paste (Ctrl+V) a screenshot of an ingredient list. Review the text below before creating the list.</value></data>
+  <data name="Recipes.Screenshot.TextPlaceholder" xml:space="preserve"><value>One ingredient per line</value></data>
+  <data name="Recipes.Screenshot.CreateList" xml:space="preserve"><value>Create list</value></data>
+  <data name="Recipes.Screenshot.Reading" xml:space="preserve"><value>Reading screenshot...</value></data>
+  <data name="Recipes.Screenshot.Done" xml:space="preserve"><value>Done. Edit the text if needed.</value></data>
+  <data name="Recipes.Screenshot.Failed" xml:space="preserve"><value>Couldn't read that image. Try another screenshot.</value></data>
+  <data name="Recipes.Screenshot.Unavailable" xml:space="preserve"><value>Text recognition could not be loaded. Check your connection.</value></data>
   <data name="Account.Menu" xml:space="preserve"><value>Account</value></data>
   <data name="Account.Login" xml:space="preserve"><value>Login</value></data>
   <data name="Account.Register" xml:space="preserve"><value>Register</value></data>

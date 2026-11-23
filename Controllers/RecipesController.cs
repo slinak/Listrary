@@ -115,6 +115,58 @@ public class RecipesController : Controller
         return RedirectToAction("Manage", "Lists", new { id = list.ListID });
     }
 
+    // Ingredients come from OCR text the user has reviewed in the browser.
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateListFromText(string? ingredientsText, string? listName, ListType listType)
+    {
+        var lines = (ingredientsText ?? string.Empty)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Trim().TrimStart('-', '*', '•', '·', '☐', '□', '[', ']', ' ').Trim())
+            .Where(line => line.Length > 0)
+            .Select(line => line.Length > 500 ? line[..500] : line)
+            .Take(200)
+            .ToList();
+        if (lines.Count == 0)
+        {
+            TempData["RecipeError"] = "No ingredients were found. Try a clearer screenshot or edit the text.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var name = string.IsNullOrWhiteSpace(listName) ? "Ingredients" : listName.Trim();
+        if (name.Length > 100)
+            name = name[..100];
+
+        _context.Recipes.Add(new Recipe
+        {
+            OwnerID = CurrentUserId,
+            Title = name,
+            Ingredients = lines.Select((text, index) => new RecipeIngredient { Text = text, SortOrder = index }).ToList()
+        });
+
+        var now = DateTime.Now;
+        var list = new List
+        {
+            ListName = name,
+            OwnerID = CurrentUserId,
+            ListType = listType,
+            CreatedDate = now,
+            LastUpdatedDate = now,
+            Items = lines.Select((text, index) => new ListItem
+            {
+                ItemName = text.Length > 150 ? text[..150] : text,
+                ItemDetails = text.Length > 150 ? text : null,
+                SortOrder = index,
+                CreatedDate = now,
+                LastUpdatedDate = now,
+                AddedDate = now
+            }).ToList()
+        };
+        _context.Lists.Add(list);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("Manage", "Lists", new { id = list.ListID });
+    }
+
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {

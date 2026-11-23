@@ -22,6 +22,68 @@
     </div>
 </form>
 
+<h2 class="h5">@SharedLocalizer["Recipes.Screenshot.Title"]</h2>
+<form asp-action="CreateListFromText" method="post" class="mb-4" id="screenshot-form">
+    @Html.AntiForgeryToken()
+    <div class="mb-2">
+        <input type="file" id="screenshot-file" class="form-control" accept="image/*" />
+        <small class="text-muted">@SharedLocalizer["Recipes.Screenshot.Help"]</small>
+    </div>
+    <div id="ocr-status" class="small text-muted mb-2" role="status"></div>
+    <textarea name="ingredientsText" id="ingredients-text" class="form-control mb-2" rows="8" placeholder="@SharedLocalizer["Recipes.Screenshot.TextPlaceholder"]"></textarea>
+    <div class="row g-2 align-items-end">
+        <div class="col-md-6">
+            <input type="text" name="listName" class="form-control" maxlength="100" placeholder="@SharedLocalizer["Lists.Fields.ListName"]" />
+        </div>
+        <div class="col-md-3">
+            <select name="listType" class="form-select">
+                @foreach (var type in Enum.GetValues<ListManager.Models.ListType>())
+                {
+                    <option value="@type" selected="@(type == ListManager.Models.ListType.Shopping)">@type</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">@SharedLocalizer["Recipes.Screenshot.CreateList"]</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" crossorigin="anonymous"></script>
+    <script>
+        (function () {
+            const fileInput = document.getElementById('screenshot-file');
+            const textArea = document.getElementById('ingredients-text');
+            const status = document.getElementById('ocr-status');
+
+            async function recognize(file) {
+                if (!file || !file.type.startsWith('image/'))
+                    return;
+                if (typeof Tesseract === 'undefined') {
+                    status.textContent = '@SharedLocalizer["Recipes.Screenshot.Unavailable"]';
+                    return;
+                }
+                status.textContent = '@SharedLocalizer["Recipes.Screenshot.Reading"]';
+                try {
+                    const result = await Tesseract.recognize(file, 'eng');
+                    textArea.value = result.data.text.trim();
+                    status.textContent = '@SharedLocalizer["Recipes.Screenshot.Done"]';
+                } catch (e) {
+                    status.textContent = '@SharedLocalizer["Recipes.Screenshot.Failed"]';
+                }
+            }
+
+            fileInput.addEventListener('change', () => recognize(fileInput.files[0]));
+            document.addEventListener('paste', e => {
+                const item = Array.from(e.clipboardData?.items ?? []).find(i => i.type.startsWith('image/'));
+                if (item)
+                    recognize(item.getAsFile());
+            });
+        })();
+    </script>
+}
+
 @if (Model.Count == 0)
 {
     <p class="text-muted">@SharedLocalizer["Recipes.Empty"]</p>
