@@ -38,4 +38,8 @@ public class RecipeIngredient
     public string Text { get; set; } = string.Empty;
 
     public int SortOrder { get; set; }
+
+    // Optional sub-heading such as "Kebabs" or "Chimichurri" for multi-part recipes.
+    [StringLength(100)]
+    public string? Section { get; set; }
 }

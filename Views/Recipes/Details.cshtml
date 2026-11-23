@@ -27,12 +27,19 @@
 }
 
 <h2 class="h5">@SharedLocalizer["Recipes.Ingredients"]</h2>
-<ul class="list-unstyled">
-    @foreach (var ingredient in Model.Ingredients)
+@foreach (var group in Model.Ingredients.GroupBy(i => i.Section))
+{
+    if (!string.IsNullOrEmpty(group.Key))
     {
-        <li>@ingredient.Text</li>
+        <h3 class="h6 mt-3">@group.Key</h3>
     }
-</ul>
+    <ul class="list-unstyled">
+        @foreach (var ingredient in group)
+        {
+            <li>@ingredient.Text</li>
+        }
+    </ul>
+}
 
 @if (!string.IsNullOrWhiteSpace(Model.Instructions))
 {
