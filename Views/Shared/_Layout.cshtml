@@ -54,6 +54,7 @@
                                 <a class="nav-link @(currentController == "Recipes" ? "active" : "")" aria-current="@(currentController == "Recipes" ? "page" : null)" asp-area="" asp-controller="Recipes" asp-action="Index">@SharedLocalizer["Nav.Recipes"]</a>
                             </li>
                         }
+                    </ul>
                     @await Html.PartialAsync("_LoginPartial")
                 </div>
             </div>
