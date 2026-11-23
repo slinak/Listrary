@@ -19,8 +19,20 @@ public class ApplicationDbContext : DbContext
     public DbSet<CircleMember> CircleMembers => Set<CircleMember>();
     public DbSet<CircleInvitation> CircleInvitations => Set<CircleInvitation>();
 
+    public DbSet<Recipe> Recipes => Set<Recipe>();
+    public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Recipe>()
+            .HasMany(recipe => recipe.Ingredients)
+            .WithOne(ingredient => ingredient.Recipe!)
+            .HasForeignKey(ingredient => ingredient.RecipeID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Recipe>()
+            .HasIndex(recipe => recipe.OwnerID);
+
         modelBuilder.Entity<List>()
             .HasMany(list => list.Items)
             .WithOne(item => item.List!)

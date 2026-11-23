@@ -17,6 +17,15 @@
   <data name="Nav.Toggle" xml:space="preserve"><value>Toggle navigation</value></data>
   <data name="Nav.Lists" xml:space="preserve"><value>Lists</value></data>
   <data name="Nav.Circles" xml:space="preserve"><value>Circles</value></data>
+  <data name="Nav.Recipes" xml:space="preserve"><value>Recipes</value></data>
+  <data name="Recipes.Title" xml:space="preserve"><value>Recipes</value></data>
+  <data name="Recipes.UrlPlaceholder" xml:space="preserve"><value>Paste a recipe URL</value></data>
+  <data name="Recipes.UrlHelp" xml:space="preserve"><value>The recipe is saved to your account so you can make lists from it any time.</value></data>
+  <data name="Recipes.Import" xml:space="preserve"><value>Import recipe</value></data>
+  <data name="Recipes.Empty" xml:space="preserve"><value>No saved recipes yet.</value></data>
+  <data name="Recipes.Ingredients" xml:space="preserve"><value>Ingredients</value></data>
+  <data name="Recipes.CreateList" xml:space="preserve"><value>Create list from selected</value></data>
+  <data name="Recipes.Delete" xml:space="preserve"><value>Delete recipe</value></data>
   <data name="Account.Menu" xml:space="preserve"><value>Account</value></data>
   <data name="Account.Login" xml:space="preserve"><value>Login</value></data>
   <data name="Account.Register" xml:space="preserve"><value>Register</value></data>

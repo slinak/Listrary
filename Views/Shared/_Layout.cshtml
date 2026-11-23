@@ -50,8 +50,10 @@
                             <li class="nav-item">
                                 <a class="nav-link @(currentController == "Circles" ? "active" : "")" aria-current="@(currentController == "Circles" ? "page" : null)" asp-area="" asp-controller="Circles" asp-action="Index">@SharedLocalizer["Nav.Circles"]</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Recipes" ? "active" : "")" aria-current="@(currentController == "Recipes" ? "page" : null)" asp-area="" asp-controller="Recipes" asp-action="Index">@SharedLocalizer["Nav.Recipes"]</a>
+                            </li>
                         }
-                    </ul>
                     @await Html.PartialAsync("_LoginPartial")
                 </div>
             </div>

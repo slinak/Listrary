@@ -284,6 +284,63 @@ namespace ListManager.Migrations
                     b.ToTable("ListShares");
                 });
 
+            modelBuilder.Entity("ListManager.Models.Recipe", b =>
+                {
+                    b.Property<int>("RecipeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecipeID"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OwnerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SourceUrl")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("RecipeID");
+
+                    b.HasIndex("OwnerID");
+
+                    b.ToTable("Recipes");
+                });
+
+            modelBuilder.Entity("ListManager.Models.RecipeIngredient", b =>
+                {
+                    b.Property<int>("RecipeIngredientID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecipeIngredientID"));
+
+                    b.Property<int>("RecipeID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("RecipeIngredientID");
+
+                    b.HasIndex("RecipeID");
+
+                    b.ToTable("RecipeIngredients");
+                });
+
             modelBuilder.Entity("ListManager.Models.StoreLocationOption", b =>
                 {
                     b.Property<int>("StoreLocationOptionID")
@@ -397,6 +454,17 @@ namespace ListManager.Migrations
                     b.Navigation("List");
                 });
 
+            modelBuilder.Entity("ListManager.Models.RecipeIngredient", b =>
+                {
+                    b.HasOne("ListManager.Models.Recipe", "Recipe")
+                        .WithMany("Ingredients")
+                        .HasForeignKey("RecipeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
+                });
+
             modelBuilder.Entity("ListManager.Models.StoreLocationOption", b =>
                 {
                     b.HasOne("ListManager.Models.List", "List")
@@ -424,6 +492,11 @@ namespace ListManager.Migrations
                     b.Navigation("Shares");
 
                     b.Navigation("StoreLocationOptions");
+                });
+
+            modelBuilder.Entity("ListManager.Models.Recipe", b =>
+                {
+                    b.Navigation("Ingredients");
                 });
 
             modelBuilder.Entity("ListManager.Models.StoreLocationOption", b =>

@@ -34,6 +34,19 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 builder.Services.AddScoped<IListItemService, ListItemService>();
 
+builder.Services.AddHttpClient(RecipeImportService.HttpClientName, client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(15);
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; Listrary/1.0)");
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+    {
+        ConnectCallback = RecipeImportService.ConnectPublicOnlyAsync,
+        MaxAutomaticRedirections = 3,
+        AutomaticDecompression = System.Net.DecompressionMethods.All
+    });
+builder.Services.AddScoped<IRecipeImportService, RecipeImportService>();
+
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
