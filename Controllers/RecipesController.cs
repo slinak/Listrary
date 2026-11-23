@@ -48,7 +48,7 @@ public class RecipesController : Controller
         if (!result.Succeeded)
         {
             TempData["RecipeError"] = result.Error;
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Create));
         }
 
         var recipe = new Recipe
@@ -115,58 +115,40 @@ public class RecipesController : Controller
         return RedirectToAction("Manage", "Lists", new { id = list.ListID });
     }
 
-    // Ingredients come from OCR text the user has reviewed in the browser.
+    [HttpGet]
+    public IActionResult Create() => View(new RecipeFormModel());
+
+    // Ingredients and instructions may come from OCR text the user has reviewed in the browser.
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateListFromText(string? ingredientsText, string? listName, ListType listType)
+    public async Task<IActionResult> Create(RecipeFormModel model)
     {
-        var lines = (ingredientsText ?? string.Empty)
+        var name = model.Name?.Trim();
+        if (string.IsNullOrEmpty(name))
+            ModelState.AddModelError(nameof(model.Name), "Recipe name is required.");
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var lines = (model.IngredientsText ?? string.Empty)
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Trim().TrimStart('-', '*', '•', '·', '☐', '□', '[', ']', ' ').Trim())
+            .Select(line => line.Trim().TrimStart('-', '*', '\u2022', '\u00B7', '\u2610', '\u25A1', '[', ']', ' ').Trim())
             .Where(line => line.Length > 0)
             .Select(line => line.Length > 500 ? line[..500] : line)
             .Take(200)
             .ToList();
-        if (lines.Count == 0)
-        {
-            TempData["RecipeError"] = "No ingredients were found. Try a clearer screenshot or edit the text.";
-            return RedirectToAction(nameof(Index));
-        }
+        var instructions = model.Instructions?.Trim();
 
-        var name = string.IsNullOrWhiteSpace(listName) ? "Ingredients" : listName.Trim();
-        if (name.Length > 100)
-            name = name[..100];
-
-        _context.Recipes.Add(new Recipe
+        var recipe = new Recipe
         {
             OwnerID = CurrentUserId,
-            Title = name,
+            Title = name!,
+            Instructions = string.IsNullOrEmpty(instructions) ? null : instructions,
             Ingredients = lines.Select((text, index) => new RecipeIngredient { Text = text, SortOrder = index }).ToList()
-        });
-
-        var now = DateTime.Now;
-        var list = new List
-        {
-            ListName = name,
-            OwnerID = CurrentUserId,
-            ListType = listType,
-            CreatedDate = now,
-            LastUpdatedDate = now,
-            Items = lines.Select((text, index) => new ListItem
-            {
-                ItemName = text.Length > 150 ? text[..150] : text,
-                ItemDetails = text.Length > 150 ? text : null,
-                SortOrder = index,
-                CreatedDate = now,
-                LastUpdatedDate = now,
-                AddedDate = now
-            }).ToList()
         };
-        _context.Lists.Add(list);
+        _context.Recipes.Add(recipe);
         await _context.SaveChangesAsync();
 
-        return RedirectToAction("Manage", "Lists", new { id = list.ListID });
+        return RedirectToAction(nameof(Details), new { id = recipe.RecipeID });
     }
-
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
