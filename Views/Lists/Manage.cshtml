@@ -3,34 +3,22 @@
 
 @{
     ViewData["Title"] = SharedLocalizer["ListItems.Manage.Title"].Value;
-    var hasCompletedItems = Model.Items != null && Model.Items.Any(item => item.IsCompleted);
+    var items = Model.Items?.ToList() ?? new List<ListManager.Models.ListItem>();
+    var hasCompletedItems = items.Any(item => item.IsCompleted);
     var isShoppingList = Model.ListModel.ListType == ListManager.Models.ListType.Shopping;
-
-    string ToAnchorSlug(string value)
+    var showStoreLocation = isShoppingList && items.Any(i => !string.IsNullOrWhiteSpace(i.StoreLocation));
+    var isOwner = User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.ListModel.OwnerID;
+    var totalItems = items.Count;
+    var doneItems = items.Count(i => i.IsCompleted);
+    var donePercent = totalItems == 0 ? 0 : (int)Math.Round(100.0 * doneItems / totalItems);
+    var (iconClass, badgeClass) = Model.ListModel.ListType switch
     {
-        var builder = new System.Text.StringBuilder();
-
-        foreach (var character in value)
-        {
-            if (char.IsLetterOrDigit(character))
-            {
-                builder.Append(char.ToLowerInvariant(character));
-            }
-            else if (builder.Length == 0 || builder[builder.Length - 1] != '-')
-            {
-                builder.Append('-');
-            }
-        }
-
-        return builder.ToString().Trim('-');
-    }
-
-    string GetStoreLocationGroupKey(string? storeLocation)
-    {
-        return string.IsNullOrWhiteSpace(storeLocation)
-            ? "__no_location__"
-            : storeLocation.Trim().ToLowerInvariant();
-    }
+        ListManager.Models.ListType.Shopping => ("list-icon-shopping", "badge-listtype-shopping"),
+        ListManager.Models.ListType.ToDo => ("list-icon-todo", "badge-listtype-todo"),
+        ListManager.Models.ListType.WishList => ("list-icon-wishlist", "badge-listtype-wishlist"),
+        _ => ("list-icon-default", "badge-listtype-default")
+    };
+    var openAddForm = !items.Any() || !string.IsNullOrWhiteSpace(Model.NewItem.ItemName) || !string.IsNullOrWhiteSpace(Model.NewItem.ItemDetails);
 
     string GetStoreLocationGroupLabel(string? storeLocation)
     {
@@ -39,313 +27,121 @@
             : storeLocation.Trim();
     }
 
-    string GetStoreLocationSectionId(string? storeLocation)
+    // Active items grouped by store location (first-appearance order); lists without locations get one headerless group.
+    var activeGroups = items
+        .Where(i => !i.IsCompleted)
+        .GroupBy(i => showStoreLocation ? GetStoreLocationGroupLabel(i.StoreLocation).ToLowerInvariant() : string.Empty)
+        .Select(g => (Label: showStoreLocation ? GetStoreLocationGroupLabel(g.First().StoreLocation) : string.Empty, Items: g.ToList(), IsCompleted: false))
+        .ToList();
+    var sections = new List<(string Label, List<ListManager.Models.ListItem> Items, bool IsCompleted)>(activeGroups.Select(g => (g.Label, g.Items, g.IsCompleted)));
+    if (hasCompletedItems)
     {
-        var slug = ToAnchorSlug(GetStoreLocationGroupLabel(storeLocation));
-        return string.IsNullOrWhiteSpace(slug) ? "group-no-store-location" : $"group-{slug}";
+        sections.Add((SharedLocalizer["ListItems.CompletedItems"].Value, items.Where(i => i.IsCompleted).ToList(), true));
     }
+    var sectionIndex = 0;
 }
 
-<div class="row">
-        @if (TempData["StoreLocationError"] is string storeLocationError && !string.IsNullOrWhiteSpace(storeLocationError))
-        {
-            <div class="alert alert-danger mb-3" role="alert">@storeLocationError</div>
-        }
-        @if (TempData["StoreLocationWarning"] is string storeLocationWarning && !string.IsNullOrWhiteSpace(storeLocationWarning))
-        {
-            <div class="alert alert-warning mb-3" role="alert">@storeLocationWarning</div>
-        }
+<div>
+    @if (TempData["StoreLocationError"] is string storeLocationError && !string.IsNullOrWhiteSpace(storeLocationError))
+    {
+        <div class="alert alert-danger mb-3" role="alert">@storeLocationError</div>
+    }
+    @if (TempData["StoreLocationWarning"] is string storeLocationWarning && !string.IsNullOrWhiteSpace(storeLocationWarning))
+    {
+        <div class="alert alert-warning mb-3" role="alert">@storeLocationWarning</div>
+    }
 
-        <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-                <h2 class="mb-0">@Model.ListModel.ListName</h2>
-                @if (Model.Items != null && Model.Items.Any())
-                {
-                    var totalItems = Model.Items.Count();
-                    var doneItems = Model.Items.Count(i => i.IsCompleted);
-                    var donePercent = (int)Math.Round(100.0 * doneItems / totalItems);
-                    <div class="mt-2" style="min-width:12rem">
-                        <div class="progress list-progress" role="progressbar" aria-valuenow="@donePercent" aria-valuemin="0" aria-valuemax="100">
+    <div class="card list-header-card mb-3">
+        <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3 min-w-0">
+                <span class="list-icon list-icon-lg @iconClass"><partial name="_ListTypeIcon" model="Model.ListModel.ListType" /></span>
+                <div class="min-w-0">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <h2 class="mb-0 text-break">@Model.ListModel.ListName</h2>
+                        <span class="badge rounded-pill @badgeClass">@Model.ListModel.ListType</span>
+                        @if (Model.ListModel.StrictStoreLocations)
+                        {
+                            <span class="badge rounded-pill badge-theme-neutral">@SharedLocalizer["StoreLocations.StrictEnabled"]</span>
+                        }
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <div class="progress list-progress flex-grow-1 mb-0" style="min-width:10rem" role="progressbar" aria-valuenow="@donePercent" aria-valuemin="0" aria-valuemax="100">
                             <div class="progress-bar" style="width:@donePercent%"></div>
                         </div>
-                        <small class="text-body-secondary">@SharedLocalizer["Lists.Progress", doneItems, totalItems]</small>
+                        <small class="text-body-secondary text-nowrap">@SharedLocalizer["Lists.Progress", doneItems, totalItems]</small>
                     </div>
-                }
-                @if (Model.ListModel.StrictStoreLocations)
-                {
-                    <span class="badge bg-secondary mt-2">@SharedLocalizer["StoreLocations.StrictEnabled"]</span>
-                }
+                </div>
             </div>
-            <div class="text-end">
-                @if (Model.CanEdit && hasCompletedItems)
-                {
-                    @using (Html.BeginForm("MarkAllIncomplete", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
-                    {
-                        @Html.Hidden("listID", Model.ListModel.ListID)
-                        @Html.Hidden("shareToken", Model.ShareToken)
-                        <button type="submit" class="btn btn-outline-warning btn-sm">@SharedLocalizer["ListItems.MarkAllIncomplete"]</button>
-                    }
-                }
+            <div class="d-flex align-items-center gap-2">
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
-                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@SharedLocalizer["Common.BackToLists"]</a>
+                    <a asp-action="Index" class="btn btn-outline-primary">@SharedLocalizer["Common.BackToLists"]</a>
                 }
-                @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.ListModel.OwnerID)
+                @if (isOwner)
                 {
-                    <button type="button" class="btn btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#shareListModal">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share me-2" viewBox="0 0 16 16" aria-hidden="true">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareListModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16" aria-hidden="true">
                             <path d="M13.5 1a1.5 1.5 0 1 0-1.415 2.096L6.9 6.12a1.5 1.5 0 0 0 0 3.76l5.185 3.024A1.5 1.5 0 1 0 13.5 15a1.5 1.5 0 0 0-1.415-2.096L7.9 9.88a.5.5 0 0 1 0-.76l4.185-2.44A1.5 1.5 0 0 0 13.5 1z"/>
                         </svg>
                         @SharedLocalizer["Shares.ShareList"]
                     </button>
                 }
+                @if (Model.CanEdit && hasCompletedItems)
+                {
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@SharedLocalizer["Common.MoreActions"]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/></svg>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                @using (Html.BeginForm("MarkAllIncomplete", "ListItem", FormMethod.Post))
+                                {
+                                    @Html.Hidden("listID", Model.ListModel.ListID)
+                                    @Html.Hidden("shareToken", Model.ShareToken)
+                                    <button type="submit" class="dropdown-item">@SharedLocalizer["ListItems.MarkAllIncomplete"]</button>
+                                }
+                            </li>
+                        </ul>
+                    </div>
+                }
             </div>
         </div>
+    </div>
 
-        @if (Model.Items != null && Model.Items.Any())
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        @if (items.Any())
         {
-            var showStoreLocation = isShoppingList && Model.Items.Any(i => !string.IsNullOrWhiteSpace(i.StoreLocation));
-            var mobileSectionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var mobileSections = new List<(string Id, string Label, bool IsCompleted)>();
-
-            foreach (var item in Model.Items)
-            {
-                if (item.IsCompleted)
-                {
-                    const string completedSectionId = "group-completed";
-                    if (mobileSectionIds.Add(completedSectionId))
-                    {
-                        mobileSections.Add((completedSectionId, "Completed Items", true));
-                    }
-
-                    continue;
-                }
-
-                var sectionId = GetStoreLocationSectionId(item.StoreLocation);
-                if (mobileSectionIds.Add(sectionId))
-                {
-                    mobileSections.Add((sectionId, GetStoreLocationGroupLabel(item.StoreLocation), false));
-                }
-            }
-
-            <div class="d-none d-md-block">
-                <table class="table table-bordered table-striped align-middle">
-                    <colgroup>
-                        <col style="width: 25%" />
-                        <col style="width: 25%" />
-                        @if (showStoreLocation)
-                        {
-                            <col style="width: 20%" />
-                        }
-                        <col style="width: 15%" />
-                        <col style="width: 30%" />
-                    </colgroup>
-                    <thead>
-                        <tr class="tableHeadRow">
-                            <th>Item</th>
-                            <th>Details</th>
-                            @if (showStoreLocation)
-                            {
-                                <th>Store Location</th>
-                            }
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="tableBody">
-                        @{
-                            var previousIncompleteGroupKey = string.Empty;
-                            var completedHeaderShown = false;
-                        }
-                        @foreach (var item in Model.Items)
-                        {
-                            if (!item.IsCompleted)
-                            {
-                                var currentGroupKey = GetStoreLocationGroupKey(item.StoreLocation);
-                                if (currentGroupKey != previousIncompleteGroupKey)
-                                {
-                                    previousIncompleteGroupKey = currentGroupKey;
-                                    <tr class="location-group-row">
-                                        <td colspan="@(showStoreLocation ? 5 : 4)">
-                                            <span class="location-group-label">@GetStoreLocationGroupLabel(item.StoreLocation)</span>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                            else if (!completedHeaderShown)
-                            {
-                                completedHeaderShown = true;
-                                <tr class="location-group-row completed-group-row">
-                                    <td colspan="@(showStoreLocation ? 5 : 4)">
-                                            <span class="location-group-label">@SharedLocalizer["ListItems.CompletedItems"]</span>
-                                    </td>
-                                </tr>
-                            }
-
-                            <tr>
-                                <td class="fw-semibold">@item.ItemName</td>
-                                <td>@item.ItemDetails</td>
-                                @if (showStoreLocation)
-                                {
-                                    <td>
-                                        @if (!string.IsNullOrWhiteSpace(item.StoreLocation))
-                                        {
-                                            <span class="badge rounded-pill badge-theme-neutral">@item.StoreLocation</span>
-                                        }
-                                    </td>
-                                }
-                                <td>
-                                    <span class="badge rounded-pill @(item.IsCompleted ? "badge-status-completed" : "badge-status-active")">
-                                        @(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["ListItems.Status.Active"].Value)
-                                    </span>
-                                </td>
-                                <td>
-                                    @if (Model.CanEdit)
-                                    {
-                                        <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                            @using (Html.BeginForm("Toggle", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
-                                            {
-                                                @Html.Hidden("listID", Model.ListModel.ListID)
-                                                @Html.Hidden("listItemID", item.ListItemID)
-                                                @Html.Hidden("shareToken", Model.ShareToken)
-                                                <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-outline-success" : "btn-outline-warning")">@(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["Common.Complete"].Value)</button>
-                                            }
-                                            <button type="button" class="btn btn-sm btn-outline-danger delete-list-item-btn"
-                                                    data-list-id="@Model.ListModel.ListID"
-                                                    data-list-item-id="@item.ListItemID"
-                                                    data-list-item-name="@item.ItemName">@SharedLocalizer["Common.Delete"]</button>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">@SharedLocalizer["Common.ViewOnly"]</span>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="d-md-none">
-                @if (mobileSections.Any())
-                {
-                    <div class="mobile-group-jump mb-3">
-                        <div class="small text-muted mb-1">@SharedLocalizer["StoreLocations.JumpToSection"]</div>
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach (var navSection in mobileSections)
-                            {
-                                <a href="#@navSection.Id" class="btn btn-sm @(navSection.IsCompleted ? "btn-outline-success" : "btn-outline-primary") rounded-pill">@navSection.Label</a>
-                            }
-                        </div>
-                    </div>
-                }
-
-                @{
-                    var previousIncompleteGroupKeyMobile = string.Empty;
-                    var completedHeaderShownMobile = false;
-                }
-                @foreach (var item in Model.Items)
-                {
-                    if (!item.IsCompleted)
-                    {
-                        var currentGroupKeyMobile = GetStoreLocationGroupKey(item.StoreLocation);
-                        if (currentGroupKeyMobile != previousIncompleteGroupKeyMobile)
-                        {
-                            previousIncompleteGroupKeyMobile = currentGroupKeyMobile;
-                            <div class="location-group-mobile" id="@GetStoreLocationSectionId(item.StoreLocation)">@GetStoreLocationGroupLabel(item.StoreLocation)</div>
-                        }
-                    }
-                    else if (!completedHeaderShownMobile)
-                    {
-                        completedHeaderShownMobile = true;
-                        <div class="location-group-mobile completed-group-mobile" id="group-completed">@SharedLocalizer["ListItems.CompletedItems"]</div>
-                    }
-
-                    <div class="card list-mobile-card mb-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                                <h6 class="mb-0 fw-semibold">@item.ItemName</h6>
-                                <span class="badge rounded-pill @(item.IsCompleted ? "badge-status-completed" : "badge-status-active")">
-                                    @(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["ListItems.Status.Active"].Value)
-                                </span>
-                            </div>
-                            @if (!string.IsNullOrWhiteSpace(item.ItemDetails))
-                            {
-                                <p class="mb-2 text-muted">@item.ItemDetails</p>
-                            }
-                            @if (showStoreLocation && !string.IsNullOrWhiteSpace(item.StoreLocation))
-                            {
-                                <div class="mb-3">
-                                    <span class="badge rounded-pill badge-theme-neutral">@item.StoreLocation</span>
-                                </div>
-                            }
-                            <div>
-                                @if (Model.CanEdit)
-                                {
-                                    <div class="d-flex flex-wrap gap-2">
-                                        @using (Html.BeginForm("Toggle", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
-                                        {
-                                            @Html.Hidden("listID", Model.ListModel.ListID)
-                                            @Html.Hidden("listItemID", item.ListItemID)
-                                            @Html.Hidden("shareToken", Model.ShareToken)
-                                            <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-outline-success" : "btn-outline-warning")">@(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["Common.Complete"].Value)</button>
-                                        }
-                                        <button type="button" class="btn btn-sm btn-outline-danger delete-list-item-btn"
-                                                data-list-id="@Model.ListModel.ListID"
-                                                data-list-item-id="@item.ListItemID"
-                                                data-list-item-name="@item.ItemName">@SharedLocalizer["Common.Delete"]</button>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">@SharedLocalizer["Common.ViewOnly"]</span>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <div class="modal fade" id="deleteListItemModal" tabindex="-1" aria-labelledby="deleteListItemModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="deleteListItemModalLabel">@SharedLocalizer["Common.ConfirmDelete"]</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form asp-action="Delete" asp-controller="ListItem" method="post" id="deleteListItemForm">
-                            <div class="modal-body">
-                                <p>@SharedLocalizer["ListItems.DeletePrompt"] <strong id="deleteListItemName"></strong>?</p>
-                                @Html.Hidden("listID", Model.ListModel.ListID, new { id = "deleteListItemListId" })
-                                @Html.Hidden("listItemID", "", new { id = "deleteListItemId" })
-                                @Html.Hidden("shareToken", Model.ShareToken)
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["Common.Cancel"]</button>
-                                <button type="submit" class="btn btn-danger">@SharedLocalizer["Common.Delete"]</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+            <input type="search" id="itemSearch" class="form-control list-search" placeholder="@SharedLocalizer["ListItems.Search.Placeholder"]" aria-label="@SharedLocalizer["ListItems.Search.Placeholder"]" />
+            <div class="d-flex flex-wrap gap-2" role="group">
+                <button type="button" class="btn btn-sm rounded-pill filter-pill active" data-item-filter="all">@SharedLocalizer["Common.All"]</button>
+                <button type="button" class="btn btn-sm rounded-pill filter-pill" data-item-filter="active">@SharedLocalizer["ListItems.Status.Active"]</button>
+                <button type="button" class="btn btn-sm rounded-pill filter-pill" data-item-filter="completed">@SharedLocalizer["ListItems.Status.Completed"]</button>
             </div>
         }
-        else
+        @if (Model.CanEdit)
         {
-            <div class="alert alert-info">@SharedLocalizer["ListItems.EmptyState"]</div>
+            <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="collapse" data-bs-target="#addItemPanel" aria-expanded="@(openAddForm ? "true" : "false")" aria-controls="addItemPanel">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5V7.5H14a.5.5 0 0 1 0 1H8.5V14a.5.5 0 0 1-1 0V8.5H2a.5.5 0 0 1 0-1h5.5V1.5A.5.5 0 0 1 8 1z"/>
+                </svg>
+                @SharedLocalizer["ListItems.AddButton"]
+            </button>
         }
-        <div class="card mt-4">
-            <div class="card-body">
-                <h4 class="card-title">@SharedLocalizer["ListItems.AddHeading"]</h4>
-                @if (Model.CanEdit)
-                {
+    </div>
+
+    @if (Model.CanEdit)
+    {
+        <div class="collapse @(openAddForm ? "show" : "")" id="addItemPanel">
+            <div class="card list-card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">@SharedLocalizer["ListItems.AddHeading"]</h5>
                     @using (Html.BeginForm("Create", "ListItem", FormMethod.Post))
                     {
                         @Html.Hidden("listID", Model.ListModel.ListID)
                         @Html.Hidden("shareToken", Model.ShareToken)
                         <div class="form-group">
                             <label for="ItemName">@SharedLocalizer["ListItems.Fields.ItemName"]</label>
-                            @Html.TextBox("ItemName", Model.NewItem.ItemName, new { @class = "form-control", placeholder = SharedLocalizer["ListItems.Placeholders.Name"].Value, autofocus = "autofocus", @list = "itemSuggestions" })
+                            @Html.TextBox("ItemName", Model.NewItem.ItemName, new { @class = "form-control", placeholder = SharedLocalizer["ListItems.Placeholders.Name"].Value, @list = "itemSuggestions" })
                             <datalist id="itemSuggestions"></datalist>
                         </div>
                         <div class="form-group mt-2">
@@ -366,70 +162,177 @@
                         }
                         <button type="submit" class="btn btn-success mt-3">@SharedLocalizer["ListItems.AddButton"]</button>
                     }
-                }
-                else
-                {
-                    <div class="alert alert-secondary">@SharedLocalizer["ListItems.ViewOnlyMessage"]</div>
-                }
-            </div>
-        </div>
-
-        <!-- Share List Modal (contains the same share form formerly inline) -->
-        <div class="modal fade" id="shareListModal" tabindex="-1" aria-labelledby="shareListModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="shareListModalLabel">@SharedLocalizer["Shares.ShareList"]</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form asp-action="Share" asp-controller="Lists" method="post" class="row gy-2 gx-2 align-items-end">
-                            @Html.Hidden("id", Model.ListModel.ListID)
-                            <div class="col-md-6">
-                                <label class="form-label" for="permission">@SharedLocalizer["Shares.Permission"]</label>
-                                <select class="form-select" id="permission" name="permission">
-                                    <option value="View">@SharedLocalizer["Common.ViewOnly"]</option>
-                                    <option value="Edit">Edit</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary mt-1">@SharedLocalizer["Shares.GenerateLink"]</button>
-                            </div>
-                        </form>
-
-                        @if (!string.IsNullOrEmpty(Model.GeneratedShareLink))
-                        {
-                            <div class="alert alert-success mt-3" role="alert">
-                                @SharedLocalizer["Shares.LinkCreated"]
-                                <div><a href="@Model.GeneratedShareLink" target="_blank">@Model.GeneratedShareLink</a></div>
-                            </div>
-                        }
-
-                        @if (Model.ActiveShares != null && Model.ActiveShares.Any())
-                        {
-                            <div class="mt-3">
-                                <h6>@SharedLocalizer["Shares.ActiveLinks"]</h6>
-                                <ul class="list-group">
-                                    @foreach (var share in Model.ActiveShares)
-                                    {
-                                        <li class="list-group-item">
-                                            <strong>@share.Permission</strong> link: <code>@Url.Action("Manage", "Lists", new { id = share.ListID, shareToken = share.Token }, Context.Request.Scheme)</code>
-                                            @if (!string.IsNullOrEmpty(share.RecipientID))
-                                            {
-                                                <div><small>Accepted by: @share.RecipientID</small></div>
-                                            }
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                        }
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["Common.Close"]</button>
-                    </div>
                 </div>
             </div>
         </div>
+    }
+    else
+    {
+        <div class="alert alert-secondary">@SharedLocalizer["ListItems.ViewOnlyMessage"]</div>
+    }
+
+    @if (!items.Any())
+    {
+        <div class="empty-state text-center p-5">
+            <h4>@SharedLocalizer["ListItems.Empty.Title"]</h4>
+            <p class="text-body-secondary mb-0">@SharedLocalizer["ListItems.EmptyState"]</p>
+        </div>
+    }
+
+    @foreach (var group in sections)
+    {
+        var sectionId = $"itemSection{sectionIndex++}";
+        <section class="list-group-section item-section mb-4" data-section-completed="        @group.IsCompleted.ToString().ToLowerInvariant()">
+                    @if (!string.IsNullOrEmpty(group.Label))
+            {
+                <div class="list-section-header">
+                    <button class="btn list-section-toggle d-flex align-items-center gap-2 fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#@sectionId" aria-expanded="true" aria-controls="@sectionId">
+                        <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/></svg>
+                        <span>@group.Label</span>
+                        <span class="text-body-secondary fw-normal">(@group.Items.Count)</span>
+                    </button>
+                </div>
+            }
+            <div class="collapse show" id="@sectionId">
+                <div class="d-flex flex-column gap-2">
+                    @foreach (var item in group.Items)
+                    {
+                        <div class="card item-row @(item.IsCompleted ? "item-row-completed" : "")" data-item-status="@(item.IsCompleted ? "completed" : "active")" data-item-name="@item.ItemName">
+                            <div class="card-body d-flex align-items-center gap-3 py-2">
+                                @if (Model.CanEdit)
+                                {
+                                    @using (Html.BeginForm("Toggle", "ListItem", FormMethod.Post, new { @class = "d-inline" }))
+                                    {
+                                        @Html.Hidden("listID", Model.ListModel.ListID)
+                                        @Html.Hidden("listItemID", item.ListItemID)
+                                        @Html.Hidden("shareToken", Model.ShareToken)
+                                        <button type="submit" class="item-check @(item.IsCompleted ? "checked" : "")" aria-label="@(item.IsCompleted ? SharedLocalizer["ListItems.Status.Completed"].Value : SharedLocalizer["Common.Complete"].Value)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>
+                                        </button>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="item-check @(item.IsCompleted ? "checked" : "")" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>
+                                    </span>
+                                }
+                                <div class="flex-grow-1 min-w-0 item-text">
+                                    <div class="fw-semibold text-break">@item.ItemName</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.ItemDetails))
+                                    {
+                                        <div class="small text-body-secondary text-break">@item.ItemDetails</div>
+                                    }
+                                </div>
+                                @if (showStoreLocation && !string.IsNullOrWhiteSpace(item.StoreLocation) && group.IsCompleted)
+                                {
+                                    <span class="badge rounded-pill badge-theme-neutral d-none d-sm-inline">@item.StoreLocation</span>
+                                }
+                                @if (Model.CanEdit)
+                                {
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-link text-body-secondary p-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@SharedLocalizer["Common.MoreActions"]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/></svg>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <button type="button" class="dropdown-item text-danger delete-list-item-btn"
+                                                        data-list-id="@Model.ListModel.ListID"
+                                                        data-list-item-id="@item.ListItemID"
+                                                        data-list-item-name="@item.ItemName">@SharedLocalizer["Common.Delete"]</button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+
+    <p id="itemNoMatches" class="text-center text-body-secondary d-none">@SharedLocalizer["Lists.NoMatches"]</p>
+
+    <div class="modal fade" id="deleteListItemModal" tabindex="-1" aria-labelledby="deleteListItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteListItemModalLabel">@SharedLocalizer["Common.ConfirmDelete"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="Delete" asp-controller="ListItem" method="post" id="deleteListItemForm">
+                    <div class="modal-body">
+                        <p>@SharedLocalizer["ListItems.DeletePrompt"] <strong id="deleteListItemName"></strong>?</p>
+                        @Html.Hidden("listID", Model.ListModel.ListID, new { id = "deleteListItemListId" })
+                        @Html.Hidden("listItemID", "", new { id = "deleteListItemId" })
+                        @Html.Hidden("shareToken", Model.ShareToken)
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["Common.Cancel"]</button>
+                        <button type="submit" class="btn btn-danger">@SharedLocalizer["Common.Delete"]</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share List Modal (contains the same share form formerly inline) -->
+    <div class="modal fade" id="shareListModal" tabindex="-1" aria-labelledby="shareListModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareListModalLabel">@SharedLocalizer["Shares.ShareList"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="Share" asp-controller="Lists" method="post" class="row gy-2 gx-2 align-items-end">
+                        @Html.Hidden("id", Model.ListModel.ListID)
+                        <div class="col-md-6">
+                            <label class="form-label" for="permission">@SharedLocalizer["Shares.Permission"]</label>
+                            <select class="form-select" id="permission" name="permission">
+                                <option value="View">@SharedLocalizer["Common.ViewOnly"]</option>
+                                <option value="Edit">Edit</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary mt-1">@SharedLocalizer["Shares.GenerateLink"]</button>
+                        </div>
+                    </form>
+
+                    @if (!string.IsNullOrEmpty(Model.GeneratedShareLink))
+                    {
+                        <div class="alert alert-success mt-3" role="alert">
+                            @SharedLocalizer["Shares.LinkCreated"]
+                            <div><a href="@Model.GeneratedShareLink" target="_blank">@Model.GeneratedShareLink</a></div>
+                        </div>
+                    }
+
+                    @if (Model.ActiveShares != null && Model.ActiveShares.Any())
+                    {
+                        <div class="mt-3">
+                            <h6>@SharedLocalizer["Shares.ActiveLinks"]</h6>
+                            <ul class="list-group">
+                                @foreach (var share in Model.ActiveShares)
+                                {
+                                    <li class="list-group-item">
+                                        <strong>@share.Permission</strong> link: <code>@Url.Action("Manage", "Lists", new { id = share.ListID, shareToken = share.Token }, Context.Request.Scheme)</code>
+                                        @if (!string.IsNullOrEmpty(share.RecipientID))
+                                        {
+                                            <div><small>Accepted by: @share.RecipientID</small></div>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["Common.Close"]</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -457,6 +360,47 @@
                     var shareModal = new bootstrap.Modal(shareModalEl);
                     shareModal.show();
                 }
+            }
+
+            // Item search and status filter
+            var itemSearch = document.getElementById('itemSearch');
+            var itemPills = document.querySelectorAll('[data-item-filter]');
+            var itemNoMatches = document.getElementById('itemNoMatches');
+            var activeStatus = 'all';
+
+            function applyItemFilters() {
+                var term = itemSearch ? itemSearch.value.trim().toLowerCase() : '';
+                var anyVisible = false;
+                document.querySelectorAll('.item-row').forEach(function (row) {
+                    var matches = (activeStatus === 'all' || row.getAttribute('data-item-status') === activeStatus) &&
+                        (!term || (row.getAttribute('data-item-name') || '').toLowerCase().indexOf(term) !== -1);
+                    row.classList.toggle('d-none', !matches);
+                    anyVisible = anyVisible || matches;
+                });
+                var filtering = term || activeStatus !== 'all';
+                document.querySelectorAll('.item-section').forEach(function (section) {
+                    var hasVisible = section.querySelector('.item-row:not(.d-none)');
+                    section.classList.toggle('d-none', !!filtering && !hasVisible);
+                });
+                if (itemNoMatches) itemNoMatches.classList.toggle('d-none', anyVisible || !document.querySelector('.item-row'));
+            }
+
+            if (itemSearch) itemSearch.addEventListener('input', applyItemFilters);
+            itemPills.forEach(function (pill) {
+                pill.addEventListener('click', function () {
+                    activeStatus = pill.getAttribute('data-item-filter');
+                    itemPills.forEach(function (p) { p.classList.toggle('active', p === pill); });
+                    applyItemFilters();
+                });
+            });
+
+            // Focus the name field when the add panel opens
+            var addPanel = document.getElementById('addItemPanel');
+            if (addPanel) {
+                addPanel.addEventListener('shown.bs.collapse', function () {
+                    var nameInput = document.getElementById('ItemName');
+                    if (nameInput) nameInput.focus();
+                });
             }
 
             // Item name autocomplete
