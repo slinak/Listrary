@@ -446,6 +446,21 @@ button.item-check:hover {
   color: #fff;
 }
 
+/* ── Recipe Details ── */
+.recipe-section-card {
+  border-color: var(--app-surface-muted-border);
+  border-radius: 0.65rem;
+  overflow: hidden;
+}
+
+.recipe-section-card .card-header {
+  background: var(--app-surface-muted-bg);
+}
+
+.recipe-section-card .list-group-item {
+  padding: 0.45rem 1rem;
+}
+
 /* ── Top navigation ── */
 .app-navbar {
   background-color: #fff;
