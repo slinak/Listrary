@@ -1,0 +1,12 @@
+@* Screenshot input for one recipe text box; wired up by wwwroot/js/recipe-ocr.js. *@
+<div class="border border-2 rounded p-2 mb-2 small text-muted" style="border-style: dashed !important" tabindex="0" data-ocr-zone>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-ocr-paste>@SharedLocalizer["Recipes.Screenshot.PasteButton"]</button>
+        <label class="btn btn-sm btn-outline-secondary mb-0">
+            @SharedLocalizer["Recipes.Screenshot.ChooseButton"]
+            <input type="file" accept="image/*" class="d-none" data-ocr-file />
+        </label>
+        <span>@SharedLocalizer["Recipes.Screenshot.ZoneHint"]</span>
+    </div>
+    <div class="mt-1" role="status" aria-live="polite" data-ocr-status></div>
+</div>

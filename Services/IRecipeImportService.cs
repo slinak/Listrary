@@ -1,16 +1,15 @@
 namespace ListManager.Services;
 
-public record RecipeImportResult(string? Title, IReadOnlyList<string> Ingredients, string? Error)
+public record RecipeImportResult(string? Title, IReadOnlyList<string> Ingredients, string? Instructions, string? Error)
 {
     public bool Succeeded => Error == null;
 
-    public static RecipeImportResult Failure(string error) => new(null, Array.Empty<string>(), error);
+    public static RecipeImportResult Failure(string error) => new(null, Array.Empty<string>(), null, error);
 }
 
 /// <summary>
-/// Extracts a recipe title and ingredient list from a recipe source. The URL
-/// implementation is the first source; an image/screenshot source can be added later
-/// by producing the same <see cref="RecipeImportResult"/>.
+/// Extracts a recipe title, ingredient list and instructions from a recipe web page.
+/// Screenshots are read in the browser (see wwwroot/js/recipe-ocr.js).
 /// </summary>
 public interface IRecipeImportService
 {

@@ -38,24 +38,29 @@ public class RecipesController : Controller
     public async Task<IActionResult> Import(string? url, CancellationToken cancellationToken)
     {
         var trimmedUrl = url?.Trim();
-        var existing = string.IsNullOrEmpty(trimmedUrl)
-            ? null
-            : await _context.Recipes.FirstOrDefaultAsync(r => r.OwnerID == CurrentUserId && r.SourceUrl == trimmedUrl, cancellationToken);
+        if (string.IsNullOrEmpty(trimmedUrl) || !Uri.TryCreate(trimmedUrl, UriKind.Absolute, out var uri))
+            return ImportFailed(trimmedUrl, RecipeImportService.InvalidUrlMessage);
+
+        // Same page with a different #fragment is the same recipe.
+        var sourceUrl = uri.GetLeftPart(UriPartial.Query);
+        if (sourceUrl.Length > 2000)
+            sourceUrl = sourceUrl[..2000];
+
+        var existing = await _context.Recipes
+            .FirstOrDefaultAsync(r => r.OwnerID == CurrentUserId && (r.SourceUrl == sourceUrl || r.SourceUrl == trimmedUrl), cancellationToken);
         if (existing != null)
             return RedirectToAction(nameof(Details), new { id = existing.RecipeID });
 
         var result = await _importService.ImportFromUrlAsync(trimmedUrl, cancellationToken);
         if (!result.Succeeded)
-        {
-            TempData["RecipeError"] = result.Error;
-            return RedirectToAction(nameof(Create));
-        }
+            return ImportFailed(trimmedUrl, result.Error!);
 
         var recipe = new Recipe
         {
             OwnerID = CurrentUserId,
-            Title = result.Title ?? new Uri(trimmedUrl!).Host,
-            SourceUrl = trimmedUrl!.Length > 2000 ? null : trimmedUrl,
+            Title = result.Title ?? uri.Host,
+            SourceUrl = sourceUrl,
+            Instructions = result.Instructions,
             Ingredients = result.Ingredients
                 .Select((text, index) => new RecipeIngredient { Text = text, SortOrder = index })
                 .ToList()
@@ -64,6 +69,13 @@ public class RecipesController : Controller
         await _context.SaveChangesAsync(cancellationToken);
 
         return RedirectToAction(nameof(Details), new { id = recipe.RecipeID });
+    }
+
+    private IActionResult ImportFailed(string? url, string error)
+    {
+        TempData["RecipeError"] = error;
+        TempData["RecipeUrl"] = url;
+        return RedirectToAction(nameof(Create));
     }
 
     [HttpGet]

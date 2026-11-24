@@ -40,6 +40,13 @@
   <data name="Recipes.Screenshot.Done" xml:space="preserve"><value>Listo. Edita el texto si es necesario.</value></data>
   <data name="Recipes.Screenshot.Failed" xml:space="preserve"><value>No se pudo leer la imagen. Prueba con otra captura.</value></data>
   <data name="Recipes.Screenshot.Unavailable" xml:space="preserve"><value>No se pudo cargar el reconocimiento de texto. Revisa tu conexión.</value></data>
+  <data name="Recipes.Screenshot.NoText" xml:space="preserve"><value>No se encontró texto en la imagen. Prueba con una captura más clara o más cercana.</value></data>
+  <data name="Recipes.Screenshot.NotImage" xml:space="preserve"><value>Ese archivo no es una imagen. Elige una captura o una foto.</value></data>
+  <data name="Recipes.Screenshot.NoImage" xml:space="preserve"><value>No hay ninguna imagen en el portapapeles. Copia o haz una captura primero.</value></data>
+  <data name="Recipes.Screenshot.ClipboardDenied" xml:space="preserve"><value>No se pudo leer el portapapeles. Haz clic en este cuadro y pulsa Ctrl+V.</value></data>
+  <data name="Recipes.Screenshot.PasteButton" xml:space="preserve"><value>Pegar captura</value></data>
+  <data name="Recipes.Screenshot.ChooseButton" xml:space="preserve"><value>Elegir imagen</value></data>
+  <data name="Recipes.Screenshot.ZoneHint" xml:space="preserve"><value>o haz clic aquí y pulsa Ctrl+V, o suelta una imagen aquí.</value></data>
   <data name="Account.Menu" xml:space="preserve"><value>Cuenta</value></data>
   <data name="Account.Login" xml:space="preserve"><value>Iniciar sesión</value></data>
   <data name="Account.Register" xml:space="preserve"><value>Registrarse</value></data>

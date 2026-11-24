@@ -11,20 +11,33 @@
     <div class="alert alert-danger">@error</div>
 }
 
-<form asp-action="Import" method="post" class="row g-2 mb-4">
+<form asp-action="Import" method="post" class="row g-2 mb-4" id="recipe-import-form">
     @Html.AntiForgeryToken()
     <div class="col-md-9">
-        <input type="url" name="url" class="form-control" required placeholder="@SharedLocalizer["Recipes.UrlPlaceholder"]" />
+        <input type="url" name="url" class="form-control" required value="@(TempData["RecipeUrl"] as string)" placeholder="@SharedLocalizer["Recipes.UrlPlaceholder"]" />
         <small class="text-muted">@SharedLocalizer["Recipes.UrlHelp"]</small>
     </div>
     <div class="col-md-3">
-        <button type="submit" class="btn btn-outline-primary">@SharedLocalizer["Recipes.Import"]</button>
+        <button type="submit" class="btn btn-outline-primary">
+            <span class="spinner-border spinner-border-sm me-1 d-none" role="status" aria-hidden="true"></span>
+            @SharedLocalizer["Recipes.Import"]
+        </button>
     </div>
 </form>
 
 <hr />
 
-<form asp-action="Create" method="post">
+<form asp-action="Create" method="post" data-recipe-ocr data-messages="@Json.Serialize(new
+{
+    reading = SharedLocalizer["Recipes.Screenshot.Reading"].Value,
+    done = SharedLocalizer["Recipes.Screenshot.Done"].Value,
+    failed = SharedLocalizer["Recipes.Screenshot.Failed"].Value,
+    unavailable = SharedLocalizer["Recipes.Screenshot.Unavailable"].Value,
+    noText = SharedLocalizer["Recipes.Screenshot.NoText"].Value,
+    notImage = SharedLocalizer["Recipes.Screenshot.NotImage"].Value,
+    noImage = SharedLocalizer["Recipes.Screenshot.NoImage"].Value,
+    clipboardDenied = SharedLocalizer["Recipes.Screenshot.ClipboardDenied"].Value
+})">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -34,18 +47,16 @@
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3" data-ocr-section="IngredientsText">
         <label asp-for="IngredientsText" class="form-label">@SharedLocalizer["Recipes.Ingredients"]</label>
-        <input type="file" class="form-control mb-2 ocr-file" accept="image/*" data-target="IngredientsText" data-status="ocr-status-ingredients" />
-        <div id="ocr-status-ingredients" class="small text-muted mb-2" role="status"></div>
+        <partial name="_RecipeScreenshotInput" />
         <textarea asp-for="IngredientsText" class="form-control" rows="8" placeholder="@SharedLocalizer["Recipes.Screenshot.TextPlaceholder"]"></textarea>
         <small class="text-muted">@SharedLocalizer["Recipes.Screenshot.Help"]</small>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3" data-ocr-section="Instructions">
         <label asp-for="Instructions" class="form-label">@SharedLocalizer["Recipes.Instructions"]</label>
-        <input type="file" class="form-control mb-2 ocr-file" accept="image/*" data-target="Instructions" data-status="ocr-status-instructions" />
-        <div id="ocr-status-instructions" class="small text-muted mb-2" role="status"></div>
+        <partial name="_RecipeScreenshotInput" />
         <textarea asp-for="Instructions" class="form-control" rows="10" placeholder="@SharedLocalizer["Recipes.Instructions.Placeholder"]"></textarea>
         <small class="text-muted">@SharedLocalizer["Recipes.Instructions.Help"]</small>
     </div>
@@ -56,42 +67,14 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js" crossorigin="anonymous"></script>
+    <script src="~/js/recipe-ocr.js" asp-append-version="true"></script>
     <script>
-        (function () {
-            let lastFocused = document.getElementById('IngredientsText');
-            document.querySelectorAll('textarea').forEach(t => t.addEventListener('focus', () => lastFocused = t));
-
-            async function recognize(file, textArea, status) {
-                if (!file || !file.type.startsWith('image/'))
-                    return;
-                if (typeof Tesseract === 'undefined') {
-                    status.textContent = '@SharedLocalizer["Recipes.Screenshot.Unavailable"]';
-                    return;
-                }
-                status.textContent = '@SharedLocalizer["Recipes.Screenshot.Reading"]';
-                try {
-                    const result = await Tesseract.recognize(file, 'eng');
-                    textArea.value = result.data.text.trim();
-                    status.textContent = '@SharedLocalizer["Recipes.Screenshot.Done"]';
-                } catch (e) {
-                    status.textContent = '@SharedLocalizer["Recipes.Screenshot.Failed"]';
-                }
-            }
-
-            document.querySelectorAll('.ocr-file').forEach(input => {
-                input.addEventListener('change', () =>
-                    recognize(input.files[0], document.getElementById(input.dataset.target), document.getElementById(input.dataset.status)));
-            });
-
-            // Pasted screenshots fill whichever text box was last focused.
-            document.addEventListener('paste', e => {
-                const item = Array.from(e.clipboardData?.items ?? []).find(i => i.type.startsWith('image/'));
-                if (!item)
-                    return;
-                const status = document.getElementById(lastFocused.id === 'Instructions' ? 'ocr-status-instructions' : 'ocr-status-ingredients');
-                recognize(item.getAsFile(), lastFocused, status);
-            });
-        })();
+        // Importing can take several seconds; show that something is happening.
+        document.getElementById('recipe-import-form').addEventListener('submit', function (e) {
+            var button = e.target.querySelector('button[type=submit]');
+            button.disabled = true;
+            button.querySelector('.spinner-border').classList.remove('d-none');
+        });
     </script>
 }

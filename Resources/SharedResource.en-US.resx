@@ -40,6 +40,13 @@
   <data name="Recipes.Screenshot.Done" xml:space="preserve"><value>Done. Edit the text if needed.</value></data>
   <data name="Recipes.Screenshot.Failed" xml:space="preserve"><value>Couldn't read that image. Try another screenshot.</value></data>
   <data name="Recipes.Screenshot.Unavailable" xml:space="preserve"><value>Text recognition could not be loaded. Check your connection.</value></data>
+  <data name="Recipes.Screenshot.NoText" xml:space="preserve"><value>No text was found in that image. Try a clearer or closer screenshot.</value></data>
+  <data name="Recipes.Screenshot.NotImage" xml:space="preserve"><value>That file isn't an image. Choose a screenshot or photo.</value></data>
+  <data name="Recipes.Screenshot.NoImage" xml:space="preserve"><value>There's no image on the clipboard. Copy or take a screenshot first.</value></data>
+  <data name="Recipes.Screenshot.ClipboardDenied" xml:space="preserve"><value>Couldn't read the clipboard. Click in this box and press Ctrl+V instead.</value></data>
+  <data name="Recipes.Screenshot.PasteButton" xml:space="preserve"><value>Paste screenshot</value></data>
+  <data name="Recipes.Screenshot.ChooseButton" xml:space="preserve"><value>Choose image</value></data>
+  <data name="Recipes.Screenshot.ZoneHint" xml:space="preserve"><value>or click here and press Ctrl+V, or drop an image here.</value></data>
   <data name="Account.Menu" xml:space="preserve"><value>Account</value></data>
   <data name="Account.Login" xml:space="preserve"><value>Login</value></data>
   <data name="Account.Register" xml:space="preserve"><value>Register</value></data>

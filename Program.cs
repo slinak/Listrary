@@ -38,11 +38,13 @@ builder.Services.AddHttpClient(RecipeImportService.HttpClientName, client =>
     {
         client.Timeout = TimeSpan.FromSeconds(15);
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; Listrary/1.0)");
+        client.DefaultRequestHeaders.Accept.ParseAdd("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
     })
     .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
     {
         ConnectCallback = RecipeImportService.ConnectPublicOnlyAsync,
-        MaxAutomaticRedirections = 3,
+        MaxAutomaticRedirections = 5,
         AutomaticDecompression = System.Net.DecompressionMethods.All
     });
 builder.Services.AddScoped<IRecipeImportService, RecipeImportService>();
