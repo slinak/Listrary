@@ -21,8 +21,8 @@
   <data name="Recipes.Create.Title" xml:space="preserve"><value>Agregar una receta</value></data>
   <data name="Recipes.Fields.Name" xml:space="preserve"><value>Nombre de la receta</value></data>
   <data name="Recipes.Instructions" xml:space="preserve"><value>Instrucciones</value></data>
-  <data name="Recipes.Instructions.Placeholder" xml:space="preserve"><value>Escribe los pasos o agrega una captura arriba</value></data>
-  <data name="Recipes.Instructions.Help" xml:space="preserve"><value>Escribe las instrucciones, o elige o pega (Ctrl+V) una captura para rellenarlas. Revisa el texto antes de guardar.</value></data>
+  <data name="Recipes.Instructions.Placeholder" xml:space="preserve"><value>Escribe o pega los pasos</value></data>
+  <data name="Recipes.Instructions.Help" xml:space="preserve"><value>También puedes pulsar Ctrl+V con una captura copiada, o soltar una imagen aquí.</value></data>
   <data name="Recipes.Empty.Body" xml:space="preserve"><value>Agrega una receta para empezar.</value></data>
   <data name="Recipes.Title" xml:space="preserve"><value>Recetas</value></data>
   <data name="Recipes.UrlPlaceholder" xml:space="preserve"><value>Pega la URL de una receta</value></data>
@@ -33,7 +33,7 @@
   <data name="Recipes.CreateList" xml:space="preserve"><value>Crear lista con la selección</value></data>
   <data name="Recipes.Delete" xml:space="preserve"><value>Eliminar receta</value></data>
   <data name="Recipes.Screenshot.Title" xml:space="preserve"><value>Crear una lista desde texto o una captura</value></data>
-  <data name="Recipes.Screenshot.Help" xml:space="preserve"><value>Pega o escribe los ingredientes abajo (uno por línea), o elige o pega (Ctrl+V) una captura para rellenarlos automáticamente. Revisa el texto antes de crear la lista.</value></data>
+  <data name="Recipes.Screenshot.Help" xml:space="preserve"><value>Un ingrediente por línea. También puedes pulsar Ctrl+V con una captura copiada, o soltar una imagen aquí.</value></data>
   <data name="Recipes.Screenshot.TextPlaceholder" xml:space="preserve"><value>Un ingrediente por línea</value></data>
   <data name="Recipes.Screenshot.CreateList" xml:space="preserve"><value>Crear lista</value></data>
   <data name="Recipes.Screenshot.Reading" xml:space="preserve"><value>Leyendo la captura...</value></data>
@@ -44,9 +44,8 @@
   <data name="Recipes.Screenshot.NotImage" xml:space="preserve"><value>Ese archivo no es una imagen. Elige una captura o una foto.</value></data>
   <data name="Recipes.Screenshot.NoImage" xml:space="preserve"><value>No hay ninguna imagen en el portapapeles. Copia o haz una captura primero.</value></data>
   <data name="Recipes.Screenshot.ClipboardDenied" xml:space="preserve"><value>No se pudo leer el portapapeles. Haz clic en este cuadro y pulsa Ctrl+V.</value></data>
-  <data name="Recipes.Screenshot.PasteButton" xml:space="preserve"><value>Pegar captura</value></data>
+  <data name="Recipes.Screenshot.PasteButton" xml:space="preserve"><value>Pegar del portapapeles</value></data>
   <data name="Recipes.Screenshot.ChooseButton" xml:space="preserve"><value>Elegir imagen</value></data>
-  <data name="Recipes.Screenshot.ZoneHint" xml:space="preserve"><value>o haz clic aquí y pulsa Ctrl+V, o suelta una imagen aquí.</value></data>
   <data name="Account.Menu" xml:space="preserve"><value>Cuenta</value></data>
   <data name="Account.Login" xml:space="preserve"><value>Iniciar sesión</value></data>
   <data name="Account.Register" xml:space="preserve"><value>Registrarse</value></data>
@@ -212,4 +211,10 @@
   <data name="Circles.Empty.Title" xml:space="preserve"><value>Aún no hay círculos</value></data>
   <data name="Circles.Empty.Body" xml:space="preserve"><value>Crea un círculo para compartir listas con familiares y amigos.</value></data>
   <data name="ListItems.Empty.Title" xml:space="preserve"><value>Aún no hay elementos</value></data>
+  <data name="Recipes.Create.Help" xml:space="preserve"><value>Rellénala tú mismo, o deja que la rellenemos desde un sitio web o una captura.</value></data>
+  <data name="Recipes.Import.ScreenshotHint" xml:space="preserve"><value>¿La receta está en una foto o una app? Usa Agregar desde captura junto a cada cuadro.</value></data>
+  <data name="Common.Optional" xml:space="preserve"><value>(opcional)</value></data>
+  <data name="Lists.Create.Help" xml:space="preserve"><value>Ponle nombre a tu lista y elige un tipo. Puedes compartirla con un círculo ahora o más tarde.</value></data>
+  <data name="Recipes.Screenshot.AddButton" xml:space="preserve"><value>Agregar desde captura</value></data>
+  <data name="Recipes.Import.Label" xml:space="preserve"><value>Rellenar desde un sitio web</value></data>
 </root>

@@ -498,3 +498,57 @@ button.item-check:hover {
 @media (max-width: 575.98px) {
   .app-navbar .nav-link.active::after { display: none; }
 }
+
+/* ── Create/edit form pages (Lists, Circles, Recipes) ── */
+.form-card {
+  max-width: 720px;
+  margin: 1.5rem auto;
+}
+
+.form-card .card-title {
+  font-weight: 500;
+}
+
+.form-card-subtle {
+  background: var(--app-surface-muted-bg);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.form-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.form-label-row .form-label {
+  margin-bottom: 0;
+}
+
+.ocr-status:empty {
+  display: none;
+}
+
+.list-type-option .btn-check:checked + .form-check-label {
+  border-color: var(--app-primary-color);
+  background: rgba(37, 140, 251, 0.08);
+}
+
+.list-type-option .form-check-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.list-type-option .btn-check:focus-visible + .form-check-label {
+  box-shadow: 0 0 0 0.25rem rgba(37, 140, 251, 0.35);
+}

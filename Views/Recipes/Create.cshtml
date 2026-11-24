@@ -4,66 +4,78 @@
     ViewData["Title"] = SharedLocalizer["Recipes.Create.Title"].Value;
 }
 
-<h1 class="display-6 mb-3">@SharedLocalizer["Recipes.Create.Title"]</h1>
+<div class="card form-card">
+    <div class="card-body p-4">
+        <h2 class="card-title">@SharedLocalizer["Recipes.Create.Title"]</h2>
+        <p class="text-muted mb-4">@SharedLocalizer["Recipes.Create.Help"]</p>
 
-@if (TempData["RecipeError"] is string error)
-{
-    <div class="alert alert-danger">@error</div>
-}
+        @if (TempData["RecipeError"] is string error)
+        {
+            <div class="alert alert-danger">@error</div>
+        }
 
-<form asp-action="Import" method="post" class="row g-2 mb-4" id="recipe-import-form">
-    @Html.AntiForgeryToken()
-    <div class="col-md-9">
-        <input type="url" name="url" class="form-control" required value="@(TempData["RecipeUrl"] as string)" placeholder="@SharedLocalizer["Recipes.UrlPlaceholder"]" />
-        <small class="text-muted">@SharedLocalizer["Recipes.UrlHelp"]</small>
+        <form asp-action="Import" method="post" class="form-card-subtle mb-4" id="recipe-import-form">
+            <label for="recipe-url" class="form-label">@SharedLocalizer["Recipes.Import.Label"]</label>
+            <div class="d-flex flex-wrap gap-2">
+                <input type="url" id="recipe-url" name="url" class="form-control flex-grow-1 w-auto" style="min-width: 15rem" required
+                       value="@(TempData["RecipeUrl"] as string)" placeholder="@SharedLocalizer["Recipes.UrlPlaceholder"]" />
+                <button type="submit" class="btn btn-outline-primary">
+                    <span class="spinner-border spinner-border-sm me-1 d-none" aria-hidden="true"></span>
+                    @SharedLocalizer["Recipes.Import"]
+                </button>
+            </div>
+            <div class="form-text">@SharedLocalizer["Recipes.Import.ScreenshotHint"]</div>
+        </form>
+
+        <form asp-action="Create" method="post" data-recipe-ocr data-messages="@Json.Serialize(new
+        {
+            reading = SharedLocalizer["Recipes.Screenshot.Reading"].Value,
+            done = SharedLocalizer["Recipes.Screenshot.Done"].Value,
+            failed = SharedLocalizer["Recipes.Screenshot.Failed"].Value,
+            unavailable = SharedLocalizer["Recipes.Screenshot.Unavailable"].Value,
+            noText = SharedLocalizer["Recipes.Screenshot.NoText"].Value,
+            notImage = SharedLocalizer["Recipes.Screenshot.NotImage"].Value,
+            noImage = SharedLocalizer["Recipes.Screenshot.NoImage"].Value,
+            clipboardDenied = SharedLocalizer["Recipes.Screenshot.ClipboardDenied"].Value
+        })">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">@SharedLocalizer["Recipes.Fields.Name"]</label>
+                <input asp-for="Name" class="form-control" maxlength="200" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3" data-ocr-section="IngredientsText">
+                <div class="form-label-row">
+                    <label asp-for="IngredientsText" class="form-label">@SharedLocalizer["Recipes.Ingredients"]</label>
+                    <partial name="_RecipeScreenshotInput" />
+                </div>
+                <div class="ocr-status small mb-2" role="status" aria-live="polite" data-ocr-status></div>
+                <textarea asp-for="IngredientsText" class="form-control" rows="7" data-ocr-zone placeholder="@SharedLocalizer["Recipes.Screenshot.TextPlaceholder"]"></textarea>
+                <div class="form-text">@SharedLocalizer["Recipes.Screenshot.Help"]</div>
+            </div>
+
+            <div class="mb-4" data-ocr-section="Instructions">
+                <div class="form-label-row">
+                    <label asp-for="Instructions" class="form-label">
+                        @SharedLocalizer["Recipes.Instructions"]
+                        <span class="fw-normal text-muted">@SharedLocalizer["Common.Optional"]</span>
+                    </label>
+                    <partial name="_RecipeScreenshotInput" />
+                </div>
+                <div class="ocr-status small mb-2" role="status" aria-live="polite" data-ocr-status></div>
+                <textarea asp-for="Instructions" class="form-control" rows="7" data-ocr-zone placeholder="@SharedLocalizer["Recipes.Instructions.Placeholder"]"></textarea>
+                <div class="form-text">@SharedLocalizer["Recipes.Instructions.Help"]</div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">@SharedLocalizer["Common.Create"]</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">@SharedLocalizer["Common.Cancel"]</a>
+            </div>
+        </form>
     </div>
-    <div class="col-md-3">
-        <button type="submit" class="btn btn-outline-primary">
-            <span class="spinner-border spinner-border-sm me-1 d-none" role="status" aria-hidden="true"></span>
-            @SharedLocalizer["Recipes.Import"]
-        </button>
-    </div>
-</form>
-
-<hr />
-
-<form asp-action="Create" method="post" data-recipe-ocr data-messages="@Json.Serialize(new
-{
-    reading = SharedLocalizer["Recipes.Screenshot.Reading"].Value,
-    done = SharedLocalizer["Recipes.Screenshot.Done"].Value,
-    failed = SharedLocalizer["Recipes.Screenshot.Failed"].Value,
-    unavailable = SharedLocalizer["Recipes.Screenshot.Unavailable"].Value,
-    noText = SharedLocalizer["Recipes.Screenshot.NoText"].Value,
-    notImage = SharedLocalizer["Recipes.Screenshot.NotImage"].Value,
-    noImage = SharedLocalizer["Recipes.Screenshot.NoImage"].Value,
-    clipboardDenied = SharedLocalizer["Recipes.Screenshot.ClipboardDenied"].Value
-})">
-    @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label">@SharedLocalizer["Recipes.Fields.Name"]</label>
-        <input asp-for="Name" class="form-control" maxlength="200" required />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3" data-ocr-section="IngredientsText">
-        <label asp-for="IngredientsText" class="form-label">@SharedLocalizer["Recipes.Ingredients"]</label>
-        <partial name="_RecipeScreenshotInput" />
-        <textarea asp-for="IngredientsText" class="form-control" rows="8" placeholder="@SharedLocalizer["Recipes.Screenshot.TextPlaceholder"]"></textarea>
-        <small class="text-muted">@SharedLocalizer["Recipes.Screenshot.Help"]</small>
-    </div>
-
-    <div class="mb-3" data-ocr-section="Instructions">
-        <label asp-for="Instructions" class="form-label">@SharedLocalizer["Recipes.Instructions"]</label>
-        <partial name="_RecipeScreenshotInput" />
-        <textarea asp-for="Instructions" class="form-control" rows="10" placeholder="@SharedLocalizer["Recipes.Instructions.Placeholder"]"></textarea>
-        <small class="text-muted">@SharedLocalizer["Recipes.Instructions.Help"]</small>
-    </div>
-
-    <button type="submit" class="btn btn-primary">@SharedLocalizer["Common.Create"]</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">@SharedLocalizer["Common.Cancel"]</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

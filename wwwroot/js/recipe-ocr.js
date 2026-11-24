@@ -196,7 +196,7 @@
         var pasteButton = section.querySelector('[data-ocr-paste]');
         if (pasteButton) {
             if (!navigator.clipboard || !navigator.clipboard.read) {
-                pasteButton.hidden = true;
+                (pasteButton.closest('li') || pasteButton).hidden = true;
             } else {
                 pasteButton.addEventListener('click', function () {
                     activeSection = section;

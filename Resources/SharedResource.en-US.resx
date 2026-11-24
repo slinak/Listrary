@@ -21,8 +21,8 @@
   <data name="Recipes.Create.Title" xml:space="preserve"><value>Add a Recipe</value></data>
   <data name="Recipes.Fields.Name" xml:space="preserve"><value>Recipe name</value></data>
   <data name="Recipes.Instructions" xml:space="preserve"><value>Instructions</value></data>
-  <data name="Recipes.Instructions.Placeholder" xml:space="preserve"><value>Type the steps, or add a screenshot above</value></data>
-  <data name="Recipes.Instructions.Help" xml:space="preserve"><value>Type the instructions, or choose or paste (Ctrl+V) a screenshot to fill them in. Review the text before saving.</value></data>
+  <data name="Recipes.Instructions.Placeholder" xml:space="preserve"><value>Type or paste the steps</value></data>
+  <data name="Recipes.Instructions.Help" xml:space="preserve"><value>You can also press Ctrl+V with a screenshot copied, or drop an image here.</value></data>
   <data name="Recipes.Empty.Body" xml:space="preserve"><value>Add a recipe to get started.</value></data>
   <data name="Recipes.Title" xml:space="preserve"><value>Recipes</value></data>
   <data name="Recipes.UrlPlaceholder" xml:space="preserve"><value>Paste a recipe URL</value></data>
@@ -33,7 +33,7 @@
   <data name="Recipes.CreateList" xml:space="preserve"><value>Create list from selected</value></data>
   <data name="Recipes.Delete" xml:space="preserve"><value>Delete recipe</value></data>
   <data name="Recipes.Screenshot.Title" xml:space="preserve"><value>Create a list from text or a screenshot</value></data>
-  <data name="Recipes.Screenshot.Help" xml:space="preserve"><value>Paste or type ingredients below (one per line), or choose or paste (Ctrl+V) a screenshot to fill them in automatically. Review the text before creating the list.</value></data>
+  <data name="Recipes.Screenshot.Help" xml:space="preserve"><value>One ingredient per line. You can also press Ctrl+V with a screenshot copied, or drop an image here.</value></data>
   <data name="Recipes.Screenshot.TextPlaceholder" xml:space="preserve"><value>One ingredient per line</value></data>
   <data name="Recipes.Screenshot.CreateList" xml:space="preserve"><value>Create list</value></data>
   <data name="Recipes.Screenshot.Reading" xml:space="preserve"><value>Reading screenshot...</value></data>
@@ -44,9 +44,8 @@
   <data name="Recipes.Screenshot.NotImage" xml:space="preserve"><value>That file isn't an image. Choose a screenshot or photo.</value></data>
   <data name="Recipes.Screenshot.NoImage" xml:space="preserve"><value>There's no image on the clipboard. Copy or take a screenshot first.</value></data>
   <data name="Recipes.Screenshot.ClipboardDenied" xml:space="preserve"><value>Couldn't read the clipboard. Click in this box and press Ctrl+V instead.</value></data>
-  <data name="Recipes.Screenshot.PasteButton" xml:space="preserve"><value>Paste screenshot</value></data>
+  <data name="Recipes.Screenshot.PasteButton" xml:space="preserve"><value>Paste from clipboard</value></data>
   <data name="Recipes.Screenshot.ChooseButton" xml:space="preserve"><value>Choose image</value></data>
-  <data name="Recipes.Screenshot.ZoneHint" xml:space="preserve"><value>or click here and press Ctrl+V, or drop an image here.</value></data>
   <data name="Account.Menu" xml:space="preserve"><value>Account</value></data>
   <data name="Account.Login" xml:space="preserve"><value>Login</value></data>
   <data name="Account.Register" xml:space="preserve"><value>Register</value></data>
@@ -211,4 +210,10 @@
   <data name="Circles.Empty.Title" xml:space="preserve"><value>No circles yet</value></data>
   <data name="Circles.Empty.Body" xml:space="preserve"><value>Create a circle to share lists with family and friends.</value></data>
   <data name="ListItems.Empty.Title" xml:space="preserve"><value>No items yet</value></data>
+  <data name="Recipes.Create.Help" xml:space="preserve"><value>Fill it in yourself, or let us fill it in from a website or a screenshot.</value></data>
+  <data name="Recipes.Import.ScreenshotHint" xml:space="preserve"><value>Recipe in a photo or an app? Use Add from screenshot next to each box below.</value></data>
+  <data name="Common.Optional" xml:space="preserve"><value>(optional)</value></data>
+  <data name="Lists.Create.Help" xml:space="preserve"><value>Name your list and pick a type. You can share it with a circle now or later.</value></data>
+  <data name="Recipes.Screenshot.AddButton" xml:space="preserve"><value>Add from screenshot</value></data>
+  <data name="Recipes.Import.Label" xml:space="preserve"><value>Fill in from a website</value></data>
 </root>
