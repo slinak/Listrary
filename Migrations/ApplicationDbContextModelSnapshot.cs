@@ -349,6 +349,32 @@ namespace ListManager.Migrations
                     b.ToTable("RecipeIngredients");
                 });
 
+            modelBuilder.Entity("ListManager.Models.RecipeTag", b =>
+                {
+                    b.Property<int>("RecipeTagID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecipeTagID"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("RecipeID")
+                        .HasColumnType("int");
+
+                    b.HasKey("RecipeTagID");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("RecipeID", "Name")
+                        .IsUnique();
+
+                    b.ToTable("RecipeTags");
+                });
+
             modelBuilder.Entity("ListManager.Models.StoreLocationOption", b =>
                 {
                     b.Property<int>("StoreLocationOptionID")
@@ -473,6 +499,17 @@ namespace ListManager.Migrations
                     b.Navigation("Recipe");
                 });
 
+            modelBuilder.Entity("ListManager.Models.RecipeTag", b =>
+                {
+                    b.HasOne("ListManager.Models.Recipe", "Recipe")
+                        .WithMany("Tags")
+                        .HasForeignKey("RecipeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
+                });
+
             modelBuilder.Entity("ListManager.Models.StoreLocationOption", b =>
                 {
                     b.HasOne("ListManager.Models.List", "List")
@@ -505,6 +542,8 @@ namespace ListManager.Migrations
             modelBuilder.Entity("ListManager.Models.Recipe", b =>
                 {
                     b.Navigation("Ingredients");
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("ListManager.Models.StoreLocationOption", b =>

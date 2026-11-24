@@ -46,6 +46,15 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
+            <div class="mb-3">
+                <label asp-for="Tags" class="form-label">
+                    @SharedLocalizer["Recipes.Tags"]
+                    <span class="fw-normal text-muted">@SharedLocalizer["Common.Optional"]</span>
+                </label>
+                <input asp-for="Tags" class="form-control" maxlength="1000" placeholder="@SharedLocalizer["Recipes.Tags.Placeholder"]" />
+                <div class="form-text">@SharedLocalizer["Recipes.Tags.Help"]</div>
+            </div>
+
             <div class="mb-3" data-ocr-section="IngredientsText">
                 <div class="form-label-row">
                     <label asp-for="IngredientsText" class="form-label">@SharedLocalizer["Recipes.Ingredients"]</label>

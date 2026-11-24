@@ -23,14 +23,75 @@ public class RecipesController : Controller
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? tag)
     {
-        var recipes = await _context.Recipes
+        var allTags = await _context.RecipeTags
+            .Where(t => t.Recipe!.OwnerID == CurrentUserId)
+            .Select(t => t.Name)
+            .ToListAsync();
+        ViewBag.AllTags = allTags
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(t => t, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var query = _context.Recipes
             .Include(r => r.Ingredients)
-            .Where(r => r.OwnerID == CurrentUserId)
+            .Include(r => r.Tags.OrderBy(t => t.Name))
+            .AsSplitQuery()
+            .Where(r => r.OwnerID == CurrentUserId);
+
+        var selectedTag = RecipeTag.Parse(tag).FirstOrDefault();
+        ViewBag.SelectedTag = selectedTag;
+        if (selectedTag != null)
+        {
+            var normalized = selectedTag.ToUpper();
+            query = query.Where(r => r.Tags.Any(t => t.Name.ToUpper() == normalized));
+        }
+
+        var recipes = await query
             .OrderByDescending(r => r.CreatedDate)
             .ToListAsync();
         return View(recipes);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddTags(int id, string? tags)
+    {
+        var recipe = await FindOwnedRecipeAsync(id);
+        if (recipe == null)
+            return NotFound();
+
+        AddNewTags(recipe, RecipeTag.Parse(tags));
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveTag(int id, int tagId)
+    {
+        var tag = await _context.RecipeTags
+            .FirstOrDefaultAsync(t => t.RecipeTagID == tagId && t.RecipeID == id && t.Recipe!.OwnerID == CurrentUserId);
+        if (tag != null)
+        {
+            _context.RecipeTags.Remove(tag);
+            await _context.SaveChangesAsync();
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    // Skips names the recipe already has (ignoring case) and caps the total per recipe.
+    private static void AddNewTags(Recipe recipe, IEnumerable<string> names)
+    {
+        foreach (var name in names)
+        {
+            if (recipe.Tags.Count >= 30)
+                break;
+            if (recipe.Tags.Any(t => string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)))
+                continue;
+            recipe.Tags.Add(new RecipeTag { Name = name });
+        }
     }
 
     // Imported recipes are always saved to the current user's recipe collection.
@@ -177,6 +238,7 @@ public class RecipesController : Controller
             Instructions = string.IsNullOrEmpty(instructions) ? null : instructions,
             Ingredients = ingredients
         };
+        AddNewTags(recipe, RecipeTag.Parse(model.Tags));
         _context.Recipes.Add(recipe);
         await _context.SaveChangesAsync();
 
@@ -198,5 +260,7 @@ public class RecipesController : Controller
     private Task<Recipe?> FindOwnedRecipeAsync(int id) =>
         _context.Recipes
             .Include(r => r.Ingredients.OrderBy(i => i.SortOrder))
+            .Include(r => r.Tags.OrderBy(t => t.Name))
+            .AsSplitQuery()
             .FirstOrDefaultAsync(r => r.RecipeID == id && r.OwnerID == CurrentUserId);
 }

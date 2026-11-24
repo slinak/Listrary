@@ -59,6 +59,25 @@
             </div>
         </div>
 
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            @foreach (var tag in Model.Tags)
+            {
+                <span class="badge rounded-pill badge-theme-neutral d-inline-flex align-items-center gap-1 recipe-tag">
+                    <a asp-action="Index" asp-route-tag="@tag.Name" class="text-reset text-decoration-none">@tag.Name</a>
+                    <form asp-action="RemoveTag" asp-route-id="@Model.RecipeID" asp-route-tagId="@tag.RecipeTagID" method="post" class="d-inline m-0">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-close recipe-tag-remove" aria-label="@SharedLocalizer["Recipes.Tags.Remove"] @tag.Name" title="@SharedLocalizer["Recipes.Tags.Remove"]"></button>
+                    </form>
+                </span>
+            }
+            <form asp-action="AddTags" asp-route-id="@Model.RecipeID" method="post" class="d-flex gap-1 m-0">
+                @Html.AntiForgeryToken()
+                <input type="text" name="tags" class="form-control form-control-sm" style="width: 12rem" maxlength="1000"
+                       placeholder="@SharedLocalizer["Recipes.Tags.AddPlaceholder"]" aria-label="@SharedLocalizer["Recipes.Tags.Add"]" required />
+                <button type="submit" class="btn btn-outline-secondary btn-sm text-nowrap">@SharedLocalizer["Recipes.Tags.Add"]</button>
+            </form>
+        </div>
+
         @if (ingredientGroups.Any())
         {
             <div class="row @gridColumns g-3 align-items-start">

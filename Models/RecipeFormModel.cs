@@ -12,4 +12,8 @@ public class RecipeFormModel
 
     [StringLength(20000)]
     public string? Instructions { get; set; }
+
+    // Comma-separated, e.g. "Chicken, Mexican".
+    [StringLength(1000)]
+    public string? Tags { get; set; }
 }

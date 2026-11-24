@@ -21,6 +21,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Recipe> Recipes => Set<Recipe>();
     public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
+    public DbSet<RecipeTag> RecipeTags => Set<RecipeTag>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,6 +30,19 @@ public class ApplicationDbContext : DbContext
             .WithOne(ingredient => ingredient.Recipe!)
             .HasForeignKey(ingredient => ingredient.RecipeID)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Recipe>()
+            .HasMany(recipe => recipe.Tags)
+            .WithOne(tag => tag.Recipe!)
+            .HasForeignKey(tag => tag.RecipeID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RecipeTag>()
+            .HasIndex(tag => new { tag.RecipeID, tag.Name })
+            .IsUnique();
+
+        modelBuilder.Entity<RecipeTag>()
+            .HasIndex(tag => tag.Name);
 
         modelBuilder.Entity<Recipe>()
             .HasIndex(recipe => recipe.OwnerID);

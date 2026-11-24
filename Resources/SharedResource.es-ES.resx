@@ -218,4 +218,14 @@
   <data name="Recipes.Screenshot.AddButton" xml:space="preserve"><value>Agregar desde captura</value></data>
   <data name="Recipes.Import.Label" xml:space="preserve"><value>Rellenar desde un sitio web</value></data>
   <data name="Recipes.BackToRecipes" xml:space="preserve"><value>Volver a recetas</value></data>
+  <data name="Recipes.Tags" xml:space="preserve"><value>Etiquetas</value></data>
+  <data name="Recipes.Tags.Placeholder" xml:space="preserve"><value>p. ej. Pollo, Mexicana, Entre semana</value></data>
+  <data name="Recipes.Tags.Help" xml:space="preserve"><value>Separa las etiquetas con comas. Úsalas para la proteína, la cocina, la ocasión o lo que quieras.</value></data>
+  <data name="Recipes.Tags.Add" xml:space="preserve"><value>Agregar etiqueta</value></data>
+  <data name="Recipes.Tags.AddPlaceholder" xml:space="preserve"><value>Agrega etiquetas separadas por comas</value></data>
+  <data name="Recipes.Tags.Remove" xml:space="preserve"><value>Quitar etiqueta</value></data>
+  <data name="Recipes.Tags.Search" xml:space="preserve"><value>Buscar por etiqueta</value></data>
+  <data name="Recipes.Tags.SearchPlaceholder" xml:space="preserve"><value>Buscar recetas por etiqueta</value></data>
+  <data name="Recipes.Tags.Clear" xml:space="preserve"><value>Mostrar todas las recetas</value></data>
+  <data name="Recipes.Tags.NoMatches" xml:space="preserve"><value>Ninguna receta tiene la etiqueta "{0}".</value></data>
 </root>

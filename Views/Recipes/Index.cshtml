@@ -19,7 +19,38 @@
     <div class="alert alert-danger">@error</div>
 }
 
-@if (Model.Count == 0)
+@{
+    var allTags = ViewBag.AllTags as List<string> ?? new List<string>();
+    var selectedTag = ViewBag.SelectedTag as string;
+}
+
+@if (allTags.Count > 0 || selectedTag != null)
+{
+    <form asp-action="Index" method="get" class="d-flex flex-wrap gap-2 mb-3" role="search">
+        <input type="search" name="tag" list="recipe-tag-options" class="form-control flex-grow-1 w-auto" style="min-width: 12rem; max-width: 24rem"
+               value="@selectedTag" placeholder="@SharedLocalizer["Recipes.Tags.SearchPlaceholder"]" aria-label="@SharedLocalizer["Recipes.Tags.Search"]" />
+        <datalist id="recipe-tag-options">
+            @foreach (var tag in allTags)
+            {
+                <option value="@tag"></option>
+            }
+        </datalist>
+        <button type="submit" class="btn btn-outline-primary">@SharedLocalizer["Recipes.Tags.Search"]</button>
+        @if (selectedTag != null)
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary">@SharedLocalizer["Recipes.Tags.Clear"]</a>
+        }
+    </form>
+}
+
+@if (selectedTag != null && Model.Count == 0)
+{
+    <div class="empty-state text-center p-5 mb-4">
+        <h4>@string.Format(SharedLocalizer["Recipes.Tags.NoMatches"].Value, selectedTag)</h4>
+        <a asp-action="Index" class="btn btn-outline-secondary">@SharedLocalizer["Recipes.Tags.Clear"]</a>
+    </div>
+}
+else if (Model.Count == 0)
 {
     <div class="empty-state text-center p-5 mb-4">
         <h4>@SharedLocalizer["Recipes.Empty"]</h4>
@@ -38,6 +69,16 @@ else
                         <h5 class="card-title mb-3 text-truncate">
                             <a asp-action="Details" asp-route-id="@recipe.RecipeID" class="stretched-link text-decoration-none list-card-link">@recipe.Title</a>
                         </h5>
+                        @if (recipe.Tags.Any())
+                        {
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                @foreach (var tag in recipe.Tags)
+                                {
+                                    <a asp-action="Index" asp-route-tag="@tag.Name"
+                                       class="badge rounded-pill badge-theme-neutral text-decoration-none position-relative recipe-tag-link">@tag.Name</a>
+                                }
+                            </div>
+                        }
                         <div class="mt-auto small text-body-secondary d-flex justify-content-between">
                             <span>@recipe.Ingredients.Count @SharedLocalizer[recipe.Ingredients.Count == 1 ? "Common.ItemSingular" : "Common.ItemPlural"]</span>
                             <time datetime="@recipe.CreatedDate.ToString("o")" data-relative-time>@recipe.CreatedDate.ToString("MMM d, yyyy")</time>

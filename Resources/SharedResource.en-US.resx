@@ -217,4 +217,14 @@
   <data name="Recipes.Screenshot.AddButton" xml:space="preserve"><value>Add from screenshot</value></data>
   <data name="Recipes.Import.Label" xml:space="preserve"><value>Fill in from a website</value></data>
   <data name="Recipes.BackToRecipes" xml:space="preserve"><value>Back to Recipes</value></data>
+  <data name="Recipes.Tags" xml:space="preserve"><value>Tags</value></data>
+  <data name="Recipes.Tags.Placeholder" xml:space="preserve"><value>e.g. Chicken, Mexican, Weeknight</value></data>
+  <data name="Recipes.Tags.Help" xml:space="preserve"><value>Separate tags with commas. Use them for the protein, cuisine, occasion or anything else.</value></data>
+  <data name="Recipes.Tags.Add" xml:space="preserve"><value>Add tag</value></data>
+  <data name="Recipes.Tags.AddPlaceholder" xml:space="preserve"><value>Add tags, comma separated</value></data>
+  <data name="Recipes.Tags.Remove" xml:space="preserve"><value>Remove tag</value></data>
+  <data name="Recipes.Tags.Search" xml:space="preserve"><value>Search by tag</value></data>
+  <data name="Recipes.Tags.SearchPlaceholder" xml:space="preserve"><value>Search recipes by tag</value></data>
+  <data name="Recipes.Tags.Clear" xml:space="preserve"><value>Show all recipes</value></data>
+  <data name="Recipes.Tags.NoMatches" xml:space="preserve"><value>No recipes are tagged "{0}".</value></data>
 </root>
