@@ -503,6 +503,11 @@ button.item-check:hover {
   background-size: 0.5em;
 }
 
+/* Tag chips on the recipe form; hidden until the first tag is added. */
+.tag-chips:empty {
+  display: none !important;
+}
+
 /* Sit above the card's stretched link so tags filter instead of opening the recipe. */
 .recipe-tag-link {
   z-index: 2;

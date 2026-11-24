@@ -200,13 +200,73 @@ public class RecipesController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var lines = (model.IngredientsText ?? string.Empty)
+        var instructions = model.Instructions?.Trim();
+        var recipe = new Recipe
+        {
+            OwnerID = CurrentUserId,
+            Title = name!,
+            Instructions = string.IsNullOrEmpty(instructions) ? null : instructions,
+            Ingredients = ParseIngredients(model.IngredientsText)
+        };
+        AddNewTags(recipe, RecipeTag.Parse(model.Tags));
+        _context.Recipes.Add(recipe);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Details), new { id = recipe.RecipeID });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var recipe = await FindOwnedRecipeAsync(id);
+        if (recipe == null)
+            return NotFound();
+
+        ViewBag.RecipeID = recipe.RecipeID;
+        return View(new RecipeFormModel
+        {
+            Name = recipe.Title,
+            IngredientsText = FormatIngredients(recipe.Ingredients),
+            Instructions = recipe.Instructions
+        });
+    }
+
+    // Replaces the recipe's name, ingredients and instructions. Tags are edited on the Details page.
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, RecipeFormModel model)
+    {
+        var recipe = await FindOwnedRecipeAsync(id);
+        if (recipe == null)
+            return NotFound();
+
+        var name = model.Name?.Trim();
+        if (string.IsNullOrEmpty(name))
+            ModelState.AddModelError(nameof(model.Name), "Recipe name is required.");
+        if (!ModelState.IsValid)
+        {
+            ViewBag.RecipeID = recipe.RecipeID;
+            return View(model);
+        }
+
+        var instructions = model.Instructions?.Trim();
+        recipe.Title = name!;
+        recipe.Instructions = string.IsNullOrEmpty(instructions) ? null : instructions;
+        _context.RecipeIngredients.RemoveRange(recipe.Ingredients);
+        foreach (var ingredient in ParseIngredients(model.IngredientsText))
+            recipe.Ingredients.Add(ingredient);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    // One ingredient per line. A line ending in a colon (e.g. "Kebabs:") starts a new ingredient section.
+    private static List<RecipeIngredient> ParseIngredients(string? ingredientsText)
+    {
+        var lines = (ingredientsText ?? string.Empty)
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(line => line.Trim())
-            .Where(line => line.Length > 0)
-            .ToList();
+            .Where(line => line.Length > 0);
 
-        // A line ending in a colon (e.g. "Kebabs:") starts a new ingredient section.
         var ingredients = new List<RecipeIngredient>();
         string? currentSection = null;
         foreach (var line in lines)
@@ -231,20 +291,27 @@ public class RecipesController : Controller
                 SortOrder = ingredients.Count
             });
         }
-        var instructions = model.Instructions?.Trim();
+        return ingredients;
+    }
 
-        var recipe = new Recipe
+    // The reverse of ParseIngredients, so editing round-trips sections as "Heading:" lines.
+    private static string FormatIngredients(IEnumerable<RecipeIngredient> ingredients)
+    {
+        var lines = new List<string>();
+        string? currentSection = null;
+        foreach (var ingredient in ingredients.OrderBy(i => i.SortOrder))
         {
-            OwnerID = CurrentUserId,
-            Title = name!,
-            Instructions = string.IsNullOrEmpty(instructions) ? null : instructions,
-            Ingredients = ingredients
-        };
-        AddNewTags(recipe, RecipeTag.Parse(model.Tags));
-        _context.Recipes.Add(recipe);
-        await _context.SaveChangesAsync();
-
-        return RedirectToAction(nameof(Details), new { id = recipe.RecipeID });
+            var section = string.IsNullOrWhiteSpace(ingredient.Section) ? null : ingredient.Section.Trim();
+            if (section != null && !string.Equals(section, currentSection, StringComparison.Ordinal))
+            {
+                if (lines.Count > 0)
+                    lines.Add(string.Empty);
+                lines.Add(section.TrimEnd(':') + ":");
+            }
+            currentSection = section;
+            lines.Add(ingredient.Text.EndsWith(':') ? ingredient.Text.TrimEnd(':') : ingredient.Text);
+        }
+        return string.Join("\n", lines);
     }
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)

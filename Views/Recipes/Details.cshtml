@@ -71,6 +71,7 @@
                     <partial name="_Icon" model="@("dots")" />
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@Model.RecipeID">@SharedLocalizer["Recipes.Edit"]</a></li>
                     <li><button type="button" class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#addTagsPanel">@SharedLocalizer["Recipes.Tags.Add"]</button></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>

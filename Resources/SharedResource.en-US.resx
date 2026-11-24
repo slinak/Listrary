@@ -19,6 +19,9 @@
   <data name="Nav.Circles" xml:space="preserve"><value>Circles</value></data>
   <data name="Nav.Recipes" xml:space="preserve"><value>Recipes</value></data>
   <data name="Recipes.Create.Title" xml:space="preserve"><value>Add a Recipe</value></data>
+  <data name="Recipes.Edit" xml:space="preserve"><value>Edit recipe</value></data>
+  <data name="Recipes.Edit.Title" xml:space="preserve"><value>Edit Recipe</value></data>
+  <data name="Recipes.Edit.Help" xml:space="preserve"><value>Change the ingredients and steps. A line ending in a colon, like "Sauce:", starts a new ingredient section.</value></data>
   <data name="Recipes.Fields.Name" xml:space="preserve"><value>Recipe name</value></data>
   <data name="Recipes.Instructions" xml:space="preserve"><value>Instructions</value></data>
   <data name="Recipes.Instructions.Placeholder" xml:space="preserve"><value>Type or paste the steps</value></data>
@@ -219,7 +222,7 @@
   <data name="Recipes.BackToRecipes" xml:space="preserve"><value>Back to Recipes</value></data>
   <data name="Recipes.Tags" xml:space="preserve"><value>Tags</value></data>
   <data name="Recipes.Tags.Placeholder" xml:space="preserve"><value>e.g. Chicken, Mexican, Weeknight</value></data>
-  <data name="Recipes.Tags.Help" xml:space="preserve"><value>Separate tags with commas. Use them for the protein, cuisine, occasion or anything else.</value></data>
+  <data name="Recipes.Tags.Help" xml:space="preserve"><value>Press Enter or type a comma after each tag. Use them for the protein, cuisine, occasion or anything else.</value></data>
   <data name="Recipes.Tags.Add" xml:space="preserve"><value>Add tag</value></data>
   <data name="Recipes.Tags.AddPlaceholder" xml:space="preserve"><value>Add tags, comma separated</value></data>
   <data name="Recipes.Tags.Remove" xml:space="preserve"><value>Remove tag</value></data>

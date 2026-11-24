@@ -1,0 +1,77 @@
+@model ListManager.Models.RecipeFormModel
+@*
+    Shared by Create and Edit. ViewData:
+      FormAction  - "Create" or "Edit"
+      RecipeID    - set when editing
+      ShowTags    - true to show the tag input (Create only; Details manages tags afterwards)
+      SubmitLabel - text for the submit button
+      CancelUrl   - where Cancel goes
+*@
+@{
+    var formAction = ViewData["FormAction"] as string ?? "Create";
+    var recipeId = ViewData["RecipeID"] as int?;
+    var showTags = ViewData["ShowTags"] as bool? ?? false;
+}
+
+<form asp-action="@formAction" asp-route-id="@recipeId" method="post" data-recipe-ocr data-messages="@Json.Serialize(new
+{
+    reading = SharedLocalizer["Recipes.Screenshot.Reading"].Value,
+    done = SharedLocalizer["Recipes.Screenshot.Done"].Value,
+    failed = SharedLocalizer["Recipes.Screenshot.Failed"].Value,
+    unavailable = SharedLocalizer["Recipes.Screenshot.Unavailable"].Value,
+    noText = SharedLocalizer["Recipes.Screenshot.NoText"].Value,
+    notImage = SharedLocalizer["Recipes.Screenshot.NotImage"].Value,
+    noImage = SharedLocalizer["Recipes.Screenshot.NoImage"].Value,
+    clipboardDenied = SharedLocalizer["Recipes.Screenshot.ClipboardDenied"].Value
+})">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">@SharedLocalizer["Recipes.Fields.Name"]</label>
+        <input asp-for="Name" class="form-control" maxlength="200" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    @if (showTags)
+    {
+        <div class="mb-3" data-tag-input data-remove-label="@SharedLocalizer["Recipes.Tags.Remove"]">
+            <label for="TagsEntry" class="form-label">
+                @SharedLocalizer["Recipes.Tags"]
+                <span class="fw-normal text-muted">@SharedLocalizer["Common.Optional"]</span>
+            </label>
+            <input asp-for="Tags" type="hidden" data-tag-value />
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2 tag-chips" data-tag-chips></div>
+            <input type="text" id="TagsEntry" class="form-control" maxlength="@ListManager.Models.RecipeTag.MaxLength" autocomplete="off"
+                   enterkeyhint="enter" placeholder="@SharedLocalizer["Recipes.Tags.Placeholder"]" data-tag-entry />
+            <div class="form-text">@SharedLocalizer["Recipes.Tags.Help"]</div>
+        </div>
+    }
+
+    <div class="mb-3" data-ocr-section="IngredientsText">
+        <div class="form-label-row">
+            <label asp-for="IngredientsText" class="form-label">@SharedLocalizer["Recipes.Ingredients"]</label>
+            <partial name="_RecipeScreenshotInput" />
+        </div>
+        <div class="ocr-status small mb-2" role="status" aria-live="polite" data-ocr-status></div>
+        <textarea asp-for="IngredientsText" class="form-control" rows="@(formAction == "Edit" ? 12 : 7)" data-ocr-zone placeholder="@SharedLocalizer["Recipes.Screenshot.TextPlaceholder"]"></textarea>
+        <div class="form-text">@SharedLocalizer["Recipes.Screenshot.Help"]</div>
+    </div>
+
+    <div class="mb-4" data-ocr-section="Instructions">
+        <div class="form-label-row">
+            <label asp-for="Instructions" class="form-label">
+                @SharedLocalizer["Recipes.Instructions"]
+                <span class="fw-normal text-muted">@SharedLocalizer["Common.Optional"]</span>
+            </label>
+            <partial name="_RecipeScreenshotInput" />
+        </div>
+        <div class="ocr-status small mb-2" role="status" aria-live="polite" data-ocr-status></div>
+        <textarea asp-for="Instructions" class="form-control" rows="@(formAction == "Edit" ? 12 : 7)" data-ocr-zone placeholder="@SharedLocalizer["Recipes.Instructions.Placeholder"]"></textarea>
+        <div class="form-text">@SharedLocalizer["Recipes.Instructions.Help"]</div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">@ViewData["SubmitLabel"]</button>
+        <a href="@ViewData["CancelUrl"]" class="btn btn-outline-secondary">@SharedLocalizer["Common.Cancel"]</a>
+    </div>
+</form>

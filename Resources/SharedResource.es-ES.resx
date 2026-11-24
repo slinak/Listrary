@@ -19,6 +19,9 @@
   <data name="Nav.Circles" xml:space="preserve"><value>Círculos</value></data>
   <data name="Nav.Recipes" xml:space="preserve"><value>Recetas</value></data>
   <data name="Recipes.Create.Title" xml:space="preserve"><value>Agregar una receta</value></data>
+  <data name="Recipes.Edit" xml:space="preserve"><value>Editar receta</value></data>
+  <data name="Recipes.Edit.Title" xml:space="preserve"><value>Editar receta</value></data>
+  <data name="Recipes.Edit.Help" xml:space="preserve"><value>Cambia los ingredientes y los pasos. Una línea que termina en dos puntos, como "Salsa:", inicia una nueva sección de ingredientes.</value></data>
   <data name="Recipes.Fields.Name" xml:space="preserve"><value>Nombre de la receta</value></data>
   <data name="Recipes.Instructions" xml:space="preserve"><value>Instrucciones</value></data>
   <data name="Recipes.Instructions.Placeholder" xml:space="preserve"><value>Escribe o pega los pasos</value></data>
@@ -220,7 +223,7 @@
   <data name="Recipes.BackToRecipes" xml:space="preserve"><value>Volver a recetas</value></data>
   <data name="Recipes.Tags" xml:space="preserve"><value>Etiquetas</value></data>
   <data name="Recipes.Tags.Placeholder" xml:space="preserve"><value>p. ej. Pollo, Mexicana, Entre semana</value></data>
-  <data name="Recipes.Tags.Help" xml:space="preserve"><value>Separa las etiquetas con comas. Úsalas para la proteína, la cocina, la ocasión o lo que quieras.</value></data>
+  <data name="Recipes.Tags.Help" xml:space="preserve"><value>Pulsa Intro o escribe una coma después de cada etiqueta. Úsalas para la proteína, la cocina, la ocasión o lo que quieras.</value></data>
   <data name="Recipes.Tags.Add" xml:space="preserve"><value>Agregar etiqueta</value></data>
   <data name="Recipes.Tags.AddPlaceholder" xml:space="preserve"><value>Agrega etiquetas separadas por comas</value></data>
   <data name="Recipes.Tags.Remove" xml:space="preserve"><value>Quitar etiqueta</value></data>

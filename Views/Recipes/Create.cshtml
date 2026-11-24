@@ -27,62 +27,13 @@
             <div class="form-text">@SharedLocalizer["Recipes.Import.ScreenshotHint"]</div>
         </form>
 
-        <form asp-action="Create" method="post" data-recipe-ocr data-messages="@Json.Serialize(new
+        <partial name="_RecipeForm" view-data="@(new ViewDataDictionary(ViewData)
         {
-            reading = SharedLocalizer["Recipes.Screenshot.Reading"].Value,
-            done = SharedLocalizer["Recipes.Screenshot.Done"].Value,
-            failed = SharedLocalizer["Recipes.Screenshot.Failed"].Value,
-            unavailable = SharedLocalizer["Recipes.Screenshot.Unavailable"].Value,
-            noText = SharedLocalizer["Recipes.Screenshot.NoText"].Value,
-            notImage = SharedLocalizer["Recipes.Screenshot.NotImage"].Value,
-            noImage = SharedLocalizer["Recipes.Screenshot.NoImage"].Value,
-            clipboardDenied = SharedLocalizer["Recipes.Screenshot.ClipboardDenied"].Value
-        })">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label">@SharedLocalizer["Recipes.Fields.Name"]</label>
-                <input asp-for="Name" class="form-control" maxlength="200" required />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Tags" class="form-label">
-                    @SharedLocalizer["Recipes.Tags"]
-                    <span class="fw-normal text-muted">@SharedLocalizer["Common.Optional"]</span>
-                </label>
-                <input asp-for="Tags" class="form-control" maxlength="1000" placeholder="@SharedLocalizer["Recipes.Tags.Placeholder"]" />
-                <div class="form-text">@SharedLocalizer["Recipes.Tags.Help"]</div>
-            </div>
-
-            <div class="mb-3" data-ocr-section="IngredientsText">
-                <div class="form-label-row">
-                    <label asp-for="IngredientsText" class="form-label">@SharedLocalizer["Recipes.Ingredients"]</label>
-                    <partial name="_RecipeScreenshotInput" />
-                </div>
-                <div class="ocr-status small mb-2" role="status" aria-live="polite" data-ocr-status></div>
-                <textarea asp-for="IngredientsText" class="form-control" rows="7" data-ocr-zone placeholder="@SharedLocalizer["Recipes.Screenshot.TextPlaceholder"]"></textarea>
-                <div class="form-text">@SharedLocalizer["Recipes.Screenshot.Help"]</div>
-            </div>
-
-            <div class="mb-4" data-ocr-section="Instructions">
-                <div class="form-label-row">
-                    <label asp-for="Instructions" class="form-label">
-                        @SharedLocalizer["Recipes.Instructions"]
-                        <span class="fw-normal text-muted">@SharedLocalizer["Common.Optional"]</span>
-                    </label>
-                    <partial name="_RecipeScreenshotInput" />
-                </div>
-                <div class="ocr-status small mb-2" role="status" aria-live="polite" data-ocr-status></div>
-                <textarea asp-for="Instructions" class="form-control" rows="7" data-ocr-zone placeholder="@SharedLocalizer["Recipes.Instructions.Placeholder"]"></textarea>
-                <div class="form-text">@SharedLocalizer["Recipes.Instructions.Help"]</div>
-            </div>
-
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">@SharedLocalizer["Common.Create"]</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">@SharedLocalizer["Common.Cancel"]</a>
-            </div>
-        </form>
+            ["FormAction"] = "Create",
+            ["ShowTags"] = true,
+            ["SubmitLabel"] = SharedLocalizer["Common.Create"].Value,
+            ["CancelUrl"] = Url.Action("Index")
+        })" />
     </div>
 </div>
 
@@ -90,6 +41,7 @@
     <partial name="_ValidationScriptsPartial" />
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js" crossorigin="anonymous"></script>
     <script src="~/js/recipe-ocr.js" asp-append-version="true"></script>
+    <script src="~/js/recipe-tags.js" asp-append-version="true"></script>
     <script>
         // Importing can take several seconds; show that something is happening.
         document.getElementById('recipe-import-form').addEventListener('submit', function (e) {
