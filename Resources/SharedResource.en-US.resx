@@ -216,10 +216,4 @@
   <data name="Lists.Create.Help" xml:space="preserve"><value>Name your list and pick a type. You can share it with a circle now or later.</value></data>
   <data name="Recipes.Screenshot.AddButton" xml:space="preserve"><value>Add from screenshot</value></data>
   <data name="Recipes.Import.Label" xml:space="preserve"><value>Fill in from a website</value></data>
-  <data name="Recipes.BackToRecipes" xml:space="preserve"><value>Back to Recipes</value></data>
-  <data name="Recipes.SectionCount" xml:space="preserve"><value>{0} sections</value></data>
-  <data name="Recipes.IngredientCount" xml:space="preserve"><value>{0} ingredients</value></data>
-  <data name="Recipes.Ingredients.Amount" xml:space="preserve"><value>Amount</value></data>
-  <data name="Recipes.Ingredients.Ingredient" xml:space="preserve"><value>Ingredient</value></data>
-  <data name="Recipes.Ingredients.Notes" xml:space="preserve"><value>Notes</value></data>
 </root>
