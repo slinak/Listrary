@@ -446,6 +446,15 @@ button.item-check:hover {
   color: #fff;
 }
 
+/* ── Recipe Details ── */
+.recipe-ingredients-table .recipe-amount {
+  width: 1%;
+  white-space: nowrap;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding-right: 1rem;
+}
+
 /* ── Top navigation ── */
 .app-navbar {
   background-color: #fff;

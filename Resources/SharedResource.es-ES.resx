@@ -217,4 +217,10 @@
   <data name="Lists.Create.Help" xml:space="preserve"><value>Ponle nombre a tu lista y elige un tipo. Puedes compartirla con un círculo ahora o más tarde.</value></data>
   <data name="Recipes.Screenshot.AddButton" xml:space="preserve"><value>Agregar desde captura</value></data>
   <data name="Recipes.Import.Label" xml:space="preserve"><value>Rellenar desde un sitio web</value></data>
+  <data name="Recipes.BackToRecipes" xml:space="preserve"><value>Volver a recetas</value></data>
+  <data name="Recipes.SectionCount" xml:space="preserve"><value>{0} secciones</value></data>
+  <data name="Recipes.IngredientCount" xml:space="preserve"><value>{0} ingredientes</value></data>
+  <data name="Recipes.Ingredients.Amount" xml:space="preserve"><value>Cantidad</value></data>
+  <data name="Recipes.Ingredients.Ingredient" xml:space="preserve"><value>Ingrediente</value></data>
+  <data name="Recipes.Ingredients.Notes" xml:space="preserve"><value>Notas</value></data>
 </root>

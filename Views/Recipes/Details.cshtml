@@ -3,23 +3,12 @@
 
 @{
     ViewData["Title"] = Model.Title;
-}
-
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h1 class="display-6 mb-0">@Model.Title</h1>
-    <div class="d-flex flex-wrap gap-2">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createListModal">@SharedLocalizer["Recipes.CreateList"]</button>
-        <form asp-action="Delete" asp-route-id="@Model.RecipeID" method="post" class="m-0">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="btn btn-outline-danger">@SharedLocalizer["Recipes.Delete"]</button>
-        </form>
-    </div>
-</div>
-
-@if (!string.IsNullOrEmpty(Model.SourceUrl) && Uri.TryCreate(Model.SourceUrl, UriKind.Absolute, out var source)
-    && (source.Scheme == Uri.UriSchemeHttp || source.Scheme == Uri.UriSchemeHttps))
-{
-    <p><a href="@source" target="_blank" rel="noopener noreferrer">@source.Host</a></p>
+    var sections = Model.Ingredients
+        .GroupBy(i => string.IsNullOrWhiteSpace(i.Section) ? null : i.Section.Trim())
+        .Select(g => (Heading: g.Key == null ? null : RecipeIngredientParser.FormatSection(g.Key),
+                      Items: g.Select(i => RecipeIngredientParser.Parse(i.Text)).ToList()))
+        .ToList();
+    var namedSectionCount = sections.Count(s => s.Heading != null);
 }
 
 @if (TempData["RecipeError"] is string error)
@@ -27,31 +16,102 @@
     <div class="alert alert-danger">@error</div>
 }
 
-<h2 class="h5">@SharedLocalizer["Recipes.Ingredients"]</h2>
-@foreach (var group in Model.Ingredients.GroupBy(i => i.Section))
-{
-    if (!string.IsNullOrEmpty(group.Key))
-    {
-        <h3 class="h6 mt-3">@group.Key</h3>
-    }
-    <ul class="list-unstyled">
-        @foreach (var ingredient in group)
-        {
-            <li>@ingredient.Text</li>
-        }
-    </ul>
-}
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+            <div class="min-w-0">
+                <h2 class="card-title text-break">@Model.Title</h2>
+                <div class="d-flex flex-wrap align-items-center gap-2 small">
+                    @if (namedSectionCount > 1)
+                    {
+                        <span class="badge text-bg-info">@SharedLocalizer["Recipes.SectionCount", namedSectionCount]</span>
+                    }
+                    <span class="text-body-secondary">@SharedLocalizer["Recipes.IngredientCount", Model.Ingredients.Count]</span>
+                    @if (!string.IsNullOrEmpty(Model.SourceUrl) && Uri.TryCreate(Model.SourceUrl, UriKind.Absolute, out var source)
+                        && (source.Scheme == Uri.UriSchemeHttp || source.Scheme == Uri.UriSchemeHttps))
+                    {
+                        <a href="@source" target="_blank" rel="noopener noreferrer">@source.Host</a>
+                    }
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@SharedLocalizer["Recipes.BackToRecipes"]</a>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createListModal">@SharedLocalizer["Recipes.CreateList"]</button>
+                <form asp-action="Delete" asp-route-id="@Model.RecipeID" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger btn-sm">@SharedLocalizer["Recipes.Delete"]</button>
+                </form>
+            </div>
+        </div>
 
-@if (!string.IsNullOrWhiteSpace(Model.Instructions))
-{
-    <h2 class="h5">@SharedLocalizer["Recipes.Instructions"]</h2>
-    <ol class="ps-3">
-        @foreach (var step in RecipeInstructionParser.Parse(Model.Instructions))
+        @if (namedSectionCount == 0)
         {
-            <li class="mb-2">@step</li>
+            <h4 class="mt-4">@SharedLocalizer["Recipes.Ingredients"]</h4>
         }
-    </ol>
-}
+        @foreach (var group in sections)
+        {
+            var showAmount = group.Items.Any(i => i.Amount != null);
+            var showNotes = group.Items.Any(i => i.Note != null);
+            if (group.Heading != null)
+            {
+                <h4 class="mt-4 d-flex align-items-center gap-2">
+                    <span class="text-break">@group.Heading</span>
+                    <span class="badge rounded-pill badge-theme-neutral fs-6 fw-normal">@group.Items.Count</span>
+                </h4>
+            }
+            <div class="table-responsive">
+                <table class="table table-sm recipe-ingredients-table mb-0">
+                    <thead>
+                        <tr>
+                            @if (showAmount)
+                            {
+                                <th scope="col">@SharedLocalizer["Recipes.Ingredients.Amount"]</th>
+                            }
+                            <th scope="col">@SharedLocalizer["Recipes.Ingredients.Ingredient"]</th>
+                            @if (showNotes)
+                            {
+                                <th scope="col" class="d-none d-sm-table-cell">@SharedLocalizer["Recipes.Ingredients.Notes"]</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in group.Items)
+                        {
+                            <tr>
+                                @if (showAmount)
+                                {
+                                    <td class="recipe-amount">@(item.Amount ?? "—")</td>
+                                }
+                                <td class="text-break">
+                                    @item.Name
+                                    @if (item.Note != null)
+                                    {
+                                        <div class="small text-body-secondary d-sm-none">@item.Note</div>
+                                    }
+                                </td>
+                                @if (showNotes)
+                                {
+                                    <td class="small text-body-secondary d-none d-sm-table-cell text-break">@item.Note</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Instructions))
+        {
+            <h4 class="mt-4">@SharedLocalizer["Recipes.Instructions"]</h4>
+            <ol class="ps-3 mb-0">
+                @foreach (var step in RecipeInstructionParser.Parse(Model.Instructions))
+                {
+                    <li class="mb-2">@step</li>
+                }
+            </ol>
+        }
+    </div>
+</div>
 
 <div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
     <div class="modal-dialog">
