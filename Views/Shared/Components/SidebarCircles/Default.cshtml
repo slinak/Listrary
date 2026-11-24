@@ -1,0 +1,18 @@
+@model IEnumerable<ListManager.ViewComponents.SidebarCircle>
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentId = ViewContext.RouteData.Values["id"]?.ToString();
+}
+
+@if (Model.Any())
+{
+    <div class="app-sidebar-heading">@SharedLocalizer["Nav.Circles"]</div>
+    @foreach (var circle in Model)
+    {
+        var active = currentController == "Circles" && currentId == circle.Id.ToString();
+        <a class="app-sidebar-link @(active ? "active" : "")" aria-current="@(active ? "page" : null)" asp-controller="Circles" asp-action="Manage" asp-route-id="@circle.Id">
+            <span class="app-sidebar-dot" aria-hidden="true"></span>
+            <span class="text-truncate">@circle.Name</span>
+        </a>
+    }
+}

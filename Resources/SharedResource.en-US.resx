@@ -227,4 +227,37 @@
   <data name="Recipes.Tags.SearchPlaceholder" xml:space="preserve"><value>Search recipes by tag</value></data>
   <data name="Recipes.Tags.Clear" xml:space="preserve"><value>Show all recipes</value></data>
   <data name="Recipes.Tags.NoMatches" xml:space="preserve"><value>No recipes are tagged "{0}".</value></data>
+  <data name="Nav.Main" xml:space="preserve"><value>Main navigation</value></data>
+  <data name="Lists.MoreToGo" xml:space="preserve"><value>+{0} more to go</value></data>
+  <data name="Lists.AllDone" xml:space="preserve"><value>Everything is checked off.</value></data>
+  <data name="Circles.You" xml:space="preserve"><value>You</value></data>
+  <data name="Circles.YouShort" xml:space="preserve"><value>You</value></data>
+  <data name="Circles.MemberCountSingular" xml:space="preserve"><value>{0} member</value></data>
+  <data name="Circles.MemberCountPlural" xml:space="preserve"><value>{0} members</value></data>
+  <data name="Circles.Search.Placeholder" xml:space="preserve"><value>Search circles...</value></data>
+  <data name="Circles.Filter.Owned" xml:space="preserve"><value>Owned by you</value></data>
+  <data name="Circles.Filter.Joined" xml:space="preserve"><value>Joined</value></data>
+  <data name="Circles.Role.Owner" xml:space="preserve"><value>Owner</value></data>
+  <data name="Circles.Role.Member" xml:space="preserve"><value>Member</value></data>
+  <data name="Circles.MoreLists" xml:space="preserve"><value>+{0} more lists</value></data>
+  <data name="Circles.NoMatches" xml:space="preserve"><value>No circles match your search.</value></data>
+  <data name="Circles.Invited" xml:space="preserve"><value>Invited</value></data>
+  <data name="Circles.Created" xml:space="preserve"><value>Created</value></data>
+  <data name="Circles.Joined" xml:space="preserve"><value>Joined</value></data>
+  <data name="Circles.Sent" xml:space="preserve"><value>Sent</value></data>
+  <data name="Circles.DeletePrompt" xml:space="preserve"><value>Its members and invitations will be removed, and its lists will be kept. Delete the circle</value></data>
+  <data name="Circles.LeaveCircle" xml:space="preserve"><value>Leave circle</value></data>
+  <data name="Circles.RemoveMember" xml:space="preserve"><value>Remove from circle</value></data>
+  <data name="Circles.CopyInviteLink" xml:space="preserve"><value>Copy invite link</value></data>
+  <data name="Circles.LinkCopied" xml:space="preserve"><value>Link copied</value></data>
+  <data name="Circles.CancelInvite" xml:space="preserve"><value>Cancel invitation</value></data>
+  <data name="Recipes.Search.Placeholder" xml:space="preserve"><value>Search recipes or tags...</value></data>
+  <data name="Recipes.Source.Manual" xml:space="preserve"><value>Added by you</value></data>
+  <data name="Recipes.DeletePrompt" xml:space="preserve"><value>Are you sure you want to delete the recipe</value></data>
+  <data name="Recipes.Stats.Ingredients" xml:space="preserve"><value>ingredients</value></data>
+  <data name="Recipes.Stats.Steps" xml:space="preserve"><value>steps</value></data>
+  <data name="Recipes.Stats.Sections" xml:space="preserve"><value>sections</value></data>
+  <data name="Recipes.MakeShoppingList" xml:space="preserve"><value>Make shopping list</value></data>
+  <data name="Recipes.NoMatches" xml:space="preserve"><value>No recipes match your search.</value></data>
+  <data name="Recipes.Ingredient.Toggle" xml:space="preserve"><value>Mark ingredient as ready</value></data>
 </root>

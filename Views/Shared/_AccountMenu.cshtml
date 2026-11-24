@@ -1,0 +1,35 @@
+@using Microsoft.AspNetCore.Localization
+@model string
+@* Signed-in account menu. Model is the dropdown direction: "dropup" (sidebar) or "dropdown" (mobile top bar). *@
+@{
+    var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.UICulture.Name ?? "en-US";
+    var menuId = $"accountMenu-{Model}";
+}
+
+<div class="@Model app-account">
+    <button class="btn app-account-toggle d-flex align-items-center gap-2 w-100" type="button" id="@menuId" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="app-account-icon"><partial name="_Icon" model="@("person")" /></span>
+        <span class="text-truncate app-account-name">@User.Identity?.Name</span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="@menuId">
+        <li><span class="dropdown-item-text small text-body-secondary">@User.Identity?.Name</span></li>
+        <li><hr class="dropdown-divider"></li>
+        <li class="px-3 py-2">
+            <form asp-controller="Localization" asp-action="SetLanguage" method="post">
+                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                <label for="languageSelect-@Model" class="form-label small mb-1">@SharedLocalizer["Language.Label"]</label>
+                <select id="languageSelect-@Model" name="culture" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="en-US" selected="@(currentCulture == "en-US")">@SharedLocalizer["Language.en-US"]</option>
+                </select>
+            </form>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <button class="dropdown-item dark-mode-toggle" type="button">
+                <span class="dark-mode-label" data-light-label="@SharedLocalizer["Theme.LightMode"]" data-dark-label="@SharedLocalizer["Theme.DarkMode"]"></span>
+            </button>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">@SharedLocalizer["Account.Logout"]</a></li>
+    </ul>
+</div>

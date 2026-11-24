@@ -1,16 +1,17 @@
+@using ListManager.Services
 @model List<ListManager.Models.Recipe>
 
 @{
     ViewData["Title"] = SharedLocalizer["Recipes.Title"].Value;
+    var pillTags = ViewBag.PillTags as List<string> ?? new List<string>();
+    var selectedTag = ViewBag.SelectedTag as string;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="display-4 mb-0">@SharedLocalizer["Recipes.Title"]</h1>
-    <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg me-2" viewBox="0 0 16 16" aria-hidden="true">
-            <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5V7.5H14a.5.5 0 0 1 0 1H8.5V14a.5.5 0 0 1-1 0V8.5H2a.5.5 0 0 1 0-1h5.5V1.5A.5.5 0 0 1 8 1z"/>
-        </svg>
-        @SharedLocalizer["Recipes.Create.Title"]
+<div class="page-header">
+    <h1 class="page-title">@SharedLocalizer["Recipes.Title"]<span class="page-count">@Model.Count</span></h1>
+    <a asp-action="Create" class="btn btn-primary page-primary-action" aria-label="@SharedLocalizer["Recipes.Create.Title"]">
+        <partial name="_Icon" model="@("plus")" />
+        <span class="page-primary-label">@SharedLocalizer["Recipes.Create.Title"]</span>
     </a>
 </div>
 
@@ -19,38 +20,7 @@
     <div class="alert alert-danger">@error</div>
 }
 
-@{
-    var allTags = ViewBag.AllTags as List<string> ?? new List<string>();
-    var selectedTag = ViewBag.SelectedTag as string;
-}
-
-@if (allTags.Count > 0 || selectedTag != null)
-{
-    <form asp-action="Index" method="get" class="d-flex flex-wrap gap-2 mb-3" role="search">
-        <input type="search" name="tag" list="recipe-tag-options" class="form-control flex-grow-1 w-auto" style="min-width: 12rem; max-width: 24rem"
-               value="@selectedTag" placeholder="@SharedLocalizer["Recipes.Tags.SearchPlaceholder"]" aria-label="@SharedLocalizer["Recipes.Tags.Search"]" />
-        <datalist id="recipe-tag-options">
-            @foreach (var tag in allTags)
-            {
-                <option value="@tag"></option>
-            }
-        </datalist>
-        <button type="submit" class="btn btn-outline-primary">@SharedLocalizer["Recipes.Tags.Search"]</button>
-        @if (selectedTag != null)
-        {
-            <a asp-action="Index" class="btn btn-outline-secondary">@SharedLocalizer["Recipes.Tags.Clear"]</a>
-        }
-    </form>
-}
-
-@if (selectedTag != null && Model.Count == 0)
-{
-    <div class="empty-state text-center p-5 mb-4">
-        <h4>@string.Format(SharedLocalizer["Recipes.Tags.NoMatches"].Value, selectedTag)</h4>
-        <a asp-action="Index" class="btn btn-outline-secondary">@SharedLocalizer["Recipes.Tags.Clear"]</a>
-    </div>
-}
-else if (Model.Count == 0)
+@if (Model.Count == 0)
 {
     <div class="empty-state text-center p-5 mb-4">
         <h4>@SharedLocalizer["Recipes.Empty"]</h4>
@@ -60,32 +30,96 @@ else if (Model.Count == 0)
 }
 else
 {
-    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
-        @foreach (var recipe in Model)
+    <div class="page-toolbar">
+        <input type="search" id="entitySearch" class="form-control list-search" placeholder="@SharedLocalizer["Recipes.Search.Placeholder"]" aria-label="@SharedLocalizer["Recipes.Search.Placeholder"]" />
+        @if (pillTags.Any())
         {
-            <div class="col">
-                <div class="card list-card h-100 position-relative">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title mb-3 text-truncate">
-                            <a asp-action="Details" asp-route-id="@recipe.RecipeID" class="stretched-link text-decoration-none list-card-link">@recipe.Title</a>
-                        </h5>
-                        @if (recipe.Tags.Any())
-                        {
-                            <div class="d-flex flex-wrap gap-1 mb-3">
-                                @foreach (var tag in recipe.Tags)
-                                {
-                                    <a asp-action="Index" asp-route-tag="@tag.Name"
-                                       class="badge rounded-pill badge-theme-neutral text-decoration-none position-relative recipe-tag-link">@tag.Name</a>
-                                }
-                            </div>
-                        }
-                        <div class="mt-auto small text-body-secondary d-flex justify-content-between">
-                            <span>@recipe.Ingredients.Count @SharedLocalizer[recipe.Ingredients.Count == 1 ? "Common.ItemSingular" : "Common.ItemPlural"]</span>
-                            <time datetime="@recipe.CreatedDate.ToString("o")" data-relative-time>@recipe.CreatedDate.ToString("MMM d, yyyy")</time>
-                        </div>
-                    </div>
-                </div>
+            <div class="d-flex flex-wrap gap-2 filter-pills" role="group" aria-label="@SharedLocalizer["Recipes.Tags"]">
+                <button type="button" class="btn btn-sm rounded-pill filter-pill @(selectedTag == null ? "active" : "")" aria-pressed="@(selectedTag == null ? "true" : "false")" data-entity-filter="all">@SharedLocalizer["Common.All"]</button>
+                @foreach (var tag in pillTags)
+                {
+                    var isSelected = string.Equals(tag, selectedTag, StringComparison.OrdinalIgnoreCase);
+                    <button type="button" class="btn btn-sm rounded-pill filter-pill @(isSelected ? "active" : "")" aria-pressed="@(isSelected ? "true" : "false")" data-entity-filter="@tag">@tag</button>
+                }
             </div>
         }
     </div>
+
+    <section class="list-group-section">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+            @foreach (var recipe in Model)
+            {
+                var tagNames = recipe.Tags.Select(t => t.Name).ToList();
+                var steps = RecipeInstructionParser.Parse(recipe.Instructions).Count;
+                var sections = recipe.Ingredients.Select(i => i.Section?.Trim() ?? string.Empty).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+                Uri.TryCreate(recipe.SourceUrl, UriKind.Absolute, out var source);
+                <div class="col entity-col" data-filter-name="@recipe.Title @string.Join(" ", tagNames)" data-filter-tags="@string.Join("|", tagNames)">
+                    <div class="card list-card h-100 position-relative">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="list-icon list-icon-recipe" aria-hidden="true"><partial name="_Icon" model="@("recipes")" /></span>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h5 class="card-title mb-1 text-truncate">
+                                        <a asp-action="Details" asp-route-id="@recipe.RecipeID" class="stretched-link text-decoration-none list-card-link">@recipe.Title</a>
+                                    </h5>
+                                    <span class="badge rounded-pill @(source != null ? "badge-tint-coral" : "badge-theme-neutral")">@(source?.Host.Replace("www.", "") ?? SharedLocalizer["Recipes.Source.Manual"].Value)</span>
+                                </div>
+                                <div class="dropdown list-card-menu">
+                                    <button class="btn btn-sm btn-link text-body-secondary p-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@SharedLocalizer["Common.MoreActions"]">
+                                        <partial name="_Icon" model="@("dots")" />
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <button type="button" class="dropdown-item text-danger confirm-delete-btn"
+                                                    data-delete-url="@Url.Action("Delete", "Recipes", new { id = recipe.RecipeID })"
+                                                    data-delete-prompt="@SharedLocalizer["Recipes.DeletePrompt"]"
+                                                    data-delete-name="@recipe.Title">@SharedLocalizer["Common.Delete"]</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="card-stats">
+                                <span><strong>@recipe.Ingredients.Count</strong>@SharedLocalizer["Recipes.Stats.Ingredients"]</span>
+                                <span><strong>@steps</strong>@SharedLocalizer["Recipes.Stats.Steps"]</span>
+                                @if (sections > 1)
+                                {
+                                    <span><strong>@sections</strong>@SharedLocalizer["Recipes.Stats.Sections"]</span>
+                                }
+                            </div>
+
+                            @if (tagNames.Any())
+                            {
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var tag in tagNames)
+                                    {
+                                        <a asp-action="Index" asp-route-tag="@tag" class="badge rounded-pill badge-theme-neutral text-decoration-none position-relative recipe-tag-link">@tag</a>
+                                    }
+                                </div>
+                            }
+
+                            <div class="mt-auto card-quick-action d-flex justify-content-between align-items-center gap-2">
+                                @if (recipe.Ingredients.Any())
+                                {
+                                    <form asp-action="CreateList" asp-route-id="@recipe.RecipeID" method="post" class="m-0">
+                                        <input type="hidden" name="listName" value="@recipe.Title" />
+                                        <input type="hidden" name="listType" value="Shopping" />
+                                        <button type="submit" class="btn btn-link d-inline-flex align-items-center gap-1">
+                                            <partial name="_Icon" model="@("cart")" /> @SharedLocalizer["Recipes.MakeShoppingList"]
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span></span>
+                                }
+                                <time class="small text-body-secondary text-nowrap" datetime="@recipe.CreatedDate.ToString("o")" data-relative-time>@recipe.CreatedDate.ToString("MMM d, yyyy")</time>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+    <p id="entityNoMatches" class="text-center text-body-secondary d-none mt-3">@SharedLocalizer["Recipes.NoMatches"]</p>
 }

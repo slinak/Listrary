@@ -50,12 +50,25 @@ public class CirclesController : Controller
 
         var viewModel = new CirclesIndexViewModel
         {
-            Circles = circles,
+            Circles = circles.Select(BuildSummary).ToList(),
             PendingInvitations = pendingInvites
         };
 
         return View(viewModel);
     }
+
+    private CircleSummaryViewModel BuildSummary(Circle circle) => new()
+    {
+        Circle = circle,
+        IsOwner = CirclesHelper.isCircleOwner(circle, CurrentUserId),
+        Lists = _context.Lists
+            .Include(l => l.Items)
+            .Where(l => l.CircleID == circle.CircleID)
+            .OrderByDescending(l => l.LastUpdatedDate)
+            .AsEnumerable()
+            .Select(ListViewItemModel.FromList)
+            .ToList()
+    };
 
     [HttpPost]
     public IActionResult AcceptInvite(int invitationId)
@@ -159,7 +172,7 @@ public class CirclesController : Controller
         if (!CirclesHelper.isCircleMember(circle, CurrentUserId))
             return Forbid();
 
-        return View(circle);
+        return View(BuildSummary(circle));
     }
 
     [HttpPost]

@@ -19,6 +19,27 @@
   --app-listtype-wishlist-color: #ffffff;
   --app-listtype-default-bg: #6c757d;
   --app-listtype-default-color: #ffffff;
+
+  /* Tinted fills for icon tiles and badges (light background, dark text of the same hue). */
+  --tint-blue-bg: #e3effc;
+  --tint-blue-fg: #0c4a8a;
+  --tint-amber-bg: #fbf0d9;
+  --tint-amber-fg: #6b4a00;
+  --tint-green-bg: #e3f3e8;
+  --tint-green-fg: #145c34;
+  --tint-purple-bg: #eeebfc;
+  --tint-purple-fg: #4433a0;
+  --tint-coral-bg: #fcebe4;
+  --tint-coral-fg: #8a3414;
+
+  /* One accent per area: Lists, Circles, Recipes. */
+  --accent-lists: #1c7ed6;
+  --accent-circles: #6f5bd6;
+  --accent-recipes: #d0562a;
+
+  --app-surface-bg: #ffffff;
+  --app-sidebar-width: 15rem;
+  --app-tabbar-height: 3.75rem;
 }
 
 body {
@@ -193,6 +214,23 @@ body {
   --app-listtype-wishlist-color: #e7f8ef;
   --app-listtype-default-bg: #495057;
   --app-listtype-default-color: #f8f9fa;
+
+  --tint-blue-bg: #13314f;
+  --tint-blue-fg: #b9dcff;
+  --tint-amber-bg: #3f3210;
+  --tint-amber-fg: #fbe3a6;
+  --tint-green-bg: #163a26;
+  --tint-green-fg: #b6e8c8;
+  --tint-purple-bg: #2c2557;
+  --tint-purple-fg: #d4ccff;
+  --tint-coral-bg: #4a2316;
+  --tint-coral-fg: #ffc9b3;
+
+  --accent-lists: #5aabff;
+  --accent-circles: #a99bff;
+  --accent-recipes: #ff9a70;
+
+  --app-surface-bg: #212529;
 }
 
 [data-bs-theme="dark"] body {
@@ -352,15 +390,18 @@ body {
   flex: 0 0 2.5rem;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 50%;
-  color: #fff;
+  border-radius: 0.7rem;
+  font-size: 1.25rem;
 }
 
-.list-icon-shopping { background: #1c7ed6; }
-.list-icon-todo { background: #c99a06; }
-.list-icon-wishlist { background: #198754; }
-.list-icon-default,
-.list-icon-circle { background: #6c757d; }
+.list-icon svg:not(.app-icon) { width: 1em; height: 1em; }
+
+.list-icon-shopping { background: var(--tint-blue-bg); color: var(--tint-blue-fg); }
+.list-icon-todo { background: var(--tint-amber-bg); color: var(--tint-amber-fg); }
+.list-icon-wishlist { background: var(--tint-green-bg); color: var(--tint-green-fg); }
+.list-icon-default { background: var(--app-surface-muted-bg); color: var(--app-muted-text-color); }
+.list-icon-circle { background: var(--tint-purple-bg); color: var(--tint-purple-fg); }
+.list-icon-recipe { background: var(--tint-coral-bg); color: var(--tint-coral-fg); }
 
 .list-progress { height: 0.4rem; margin-bottom: 0.35rem; }
 
@@ -406,9 +447,11 @@ body {
 }
 
 .list-icon-lg {
-  flex: 0 0 3.5rem;
-  width: 3.5rem;
-  height: 3.5rem;
+  flex: 0 0 3.25rem;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 0.85rem;
+  font-size: 1.6rem;
 }
 
 .item-row {
@@ -593,3 +636,283 @@ button.item-check:hover {
 .list-type-option .btn-check:focus-visible + .form-check-label {
   box-shadow: 0 0 0 0.25rem rgba(37, 140, 251, 0.35);
 }
+
+/* ══ Unified app shell: sidebar (desktop), top bar + tab bar (phones) ══ */
+.app-icon { flex: none; }
+
+.app-shell .app-main { min-height: 100vh; display: flex; flex-direction: column; }
+.app-main .footer { position: static; line-height: 3rem; margin-top: auto; border-top: 1px solid var(--app-surface-muted-border); }
+.app-shell { margin-bottom: 0; }
+.app-container { padding-top: 1.5rem; }
+
+.app-accent-lists { --accent: var(--accent-lists); }
+.app-accent-circles { --accent: var(--accent-circles); }
+.app-accent-recipes { --accent: var(--accent-recipes); }
+body[data-section="lists"] { --section-accent: var(--accent-lists); }
+body[data-section="circles"] { --section-accent: var(--accent-circles); }
+body[data-section="recipes"] { --section-accent: var(--accent-recipes); }
+
+.app-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--app-sidebar-width);
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 0.75rem;
+  background: var(--app-surface-bg);
+  border-right: 1px solid var(--app-surface-muted-border);
+  overflow-y: auto;
+  z-index: 1020;
+}
+
+@media (min-width: 768px) {
+  .app-shell .app-main { margin-left: var(--app-sidebar-width); }
+}
+
+.app-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 0.5rem 1rem;
+  color: var(--app-text-color);
+  text-decoration: none;
+}
+
+.app-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.55rem;
+  color: var(--app-text-color);
+  text-decoration: none;
+  font-weight: 500;
+  min-width: 0;
+}
+
+.app-sidebar-link:hover { background: var(--app-surface-muted-bg); color: var(--app-text-color); }
+.app-sidebar-link.active { background: var(--app-surface-muted-bg); color: var(--accent, var(--accent-circles)); }
+.app-sidebar-icon { display: inline-flex; font-size: 1.1rem; color: var(--accent); }
+
+.app-sidebar-circles .app-sidebar-link { font-weight: 400; font-size: 0.9rem; padding: 0.35rem 0.65rem; }
+.app-sidebar-heading { font-size: 0.75rem; color: var(--app-muted-text-color); padding: 1.25rem 0.65rem 0.35rem; }
+.app-sidebar-dot { flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--accent-circles); }
+
+.app-account-toggle {
+  border: 0;
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.6rem;
+  color: var(--app-text-color);
+  text-align: left;
+  min-width: 0;
+}
+
+.app-account-toggle:hover { background: var(--app-surface-muted-bg); }
+.app-account-icon { display: inline-flex; font-size: 1.35rem; color: var(--app-muted-text-color); }
+.app-account-name { font-size: 0.85rem; }
+
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--app-surface-bg);
+  border-bottom: 1px solid var(--app-surface-muted-border);
+}
+
+.app-topbar a { color: var(--app-text-color); }
+.app-topbar .app-account-name { display: none; }
+.app-topbar .dropdown-menu { right: 0; left: auto; }
+
+.app-tabbar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 1030;
+  display: flex;
+  height: calc(var(--app-tabbar-height) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--app-surface-bg);
+  border-top: 1px solid var(--app-surface-muted-border);
+}
+
+.app-tabbar-link {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  font-size: 0.72rem;
+  color: var(--app-muted-text-color);
+  text-decoration: none;
+}
+
+.app-tabbar-link .app-icon { font-size: 1.3rem; }
+.app-tabbar-link.active { color: var(--section-accent, var(--app-primary-color)); font-weight: 600; }
+
+@media (max-width: 767.98px) {
+  .app-shell .app-main { padding-bottom: calc(var(--app-tabbar-height) + env(safe-area-inset-bottom)); }
+  .app-container { padding-top: 1rem; }
+}
+
+/* ══ Page header and toolbar (index pages) ══ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.page-title { font-size: 1.85rem; font-weight: 600; margin: 0; }
+.page-count { font-size: 1rem; font-weight: 400; color: var(--app-muted-text-color); margin-left: 0.4rem; }
+.page-primary-action { display: inline-flex; align-items: center; gap: 0.5rem; }
+
+/* On phones the page's main "New ..." action becomes a floating button above the tab bar. */
+@media (max-width: 767.98px) {
+  .app-shell .page-primary-action {
+    position: fixed;
+    right: 1rem;
+    bottom: calc(var(--app-tabbar-height) + env(safe-area-inset-bottom) + 1rem);
+    z-index: 1030;
+    width: 3.5rem;
+    height: 3.5rem;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+
+  .app-shell .page-primary-action .page-primary-label { display: none; }
+  .page-title { font-size: 1.5rem; }
+}
+
+.page-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; }
+.page-toolbar .list-search { flex: 1 1 14rem; }
+
+@media (max-width: 575.98px) {
+  .page-toolbar .filter-pills { flex-wrap: nowrap !important; overflow-x: auto; width: 100%; padding-bottom: 0.15rem; }
+  .page-toolbar .filter-pill { white-space: nowrap; }
+}
+
+/* ══ Entity cards (lists, circles, recipes) ══ */
+.list-card .card-body { gap: 0.85rem; }
+.card-section { position: relative; }
+
+.card-preview { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; }
+.card-preview li { display: flex; align-items: center; gap: 0.5rem; min-width: 0; padding: 0.1rem 0; }
+.card-preview li > span:not(.preview-dot):not(.list-icon) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-preview .more { color: var(--app-muted-text-color); font-size: 0.8rem; }
+.preview-dot { flex: none; width: 0.7rem; height: 0.7rem; border-radius: 50%; border: 1.5px solid var(--app-surface-muted-border); }
+.card-preview .list-icon { flex: 0 0 1.4rem; width: 1.4rem; height: 1.4rem; border-radius: 0.4rem; font-size: 0.75rem; }
+.card-preview .preview-count { margin-left: auto; color: var(--app-muted-text-color); font-size: 0.8rem; flex: none; }
+
+.card-stats { display: flex; gap: 1.25rem; font-size: 0.8rem; color: var(--app-muted-text-color); }
+.card-stats strong { display: block; font-size: 1.15rem; font-weight: 600; color: var(--app-text-color); line-height: 1.2; }
+
+.card-quick-action {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--app-surface-muted-border);
+  padding-top: 0.6rem;
+}
+
+.card-quick-action .btn-link { padding: 0; font-size: 0.85rem; text-decoration: none; color: var(--accent-recipes); }
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--app-surface-muted-bg);
+  color: var(--app-muted-text-color);
+}
+
+.avatar-stack { display: inline-flex; padding-left: 0.35rem; }
+.avatar-stack .avatar { width: 1.6rem; height: 1.6rem; font-size: 0.65rem; margin-left: -0.35rem; border: 2px solid var(--app-surface-bg); }
+.avatar-1 { background: var(--tint-blue-bg); color: var(--tint-blue-fg); }
+.avatar-2 { background: var(--tint-coral-bg); color: var(--tint-coral-fg); }
+.avatar-3 { background: var(--tint-green-bg); color: var(--tint-green-fg); }
+.avatar-4 { background: var(--tint-amber-bg); color: var(--tint-amber-fg); }
+.avatar-0 { background: var(--tint-purple-bg); color: var(--tint-purple-fg); }
+
+.badge-tint-purple { background: var(--tint-purple-bg); color: var(--tint-purple-fg); }
+.badge-tint-coral { background: var(--tint-coral-bg); color: var(--tint-coral-fg); }
+.badge-tint-amber { background: var(--tint-amber-bg); color: var(--tint-amber-fg); }
+
+/* Phones: cards turn into compact rows; previews are only on the detail pages. */
+@media (max-width: 575.98px) {
+  .list-card .card-body { padding: 0.75rem 0.85rem; gap: 0.5rem; }
+  .list-card .card-preview,
+  .list-card .card-stats,
+  .list-card .card-quick-action { display: none !important; }
+  .list-card:hover { transform: none; }
+}
+
+/* ══ Detail pages (list, circle, recipe) ══ */
+.app-breadcrumb { font-size: 0.85rem; margin-bottom: 0.6rem; color: var(--app-muted-text-color); }
+.app-breadcrumb a { text-decoration: none; }
+.app-breadcrumb .sep { margin: 0 0.35rem; }
+
+.detail-header {
+  border-radius: 0.85rem;
+  border: 1px solid var(--app-surface-muted-border);
+  margin-bottom: 1rem;
+}
+
+.detail-title { font-size: 1.5rem; font-weight: 600; margin: 0; }
+.detail-meta { font-size: 0.875rem; color: var(--app-muted-text-color); }
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.6rem;
+}
+
+.section-heading .count { font-weight: 400; color: var(--app-muted-text-color); }
+.section-heading .section-action { margin-left: auto; font-weight: 400; }
+
+.row-link { color: inherit; text-decoration: none; }
+.row-link:hover .item-title { color: var(--app-primary-color); }
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 1.75rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--tint-coral-bg);
+  color: var(--tint-coral-fg);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Recipe page: ingredients beside steps on desktop, a switch between them on phones. */
+.recipe-switch { display: none; }
+
+@media (max-width: 767.98px) {
+  .recipe-switch { display: flex; }
+  [data-recipe-view="ingredients"] .recipe-pane-steps,
+  [data-recipe-view="steps"] .recipe-pane-ingredients { display: none; }
+}
+
+.tag-chip { font-size: 0.8rem; font-weight: 500; }
+
+[data-bs-theme="dark"] .app-sidebar,
+[data-bs-theme="dark"] .app-topbar,
+[data-bs-theme="dark"] .app-tabbar { border-color: #2e3338; }

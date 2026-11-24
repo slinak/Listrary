@@ -25,30 +25,32 @@ public class RecipesController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(string? tag)
     {
+        // Filtering happens in the browser; ?tag= only picks the starting filter pill.
         var allTags = await _context.RecipeTags
             .Where(t => t.Recipe!.OwnerID == CurrentUserId)
             .Select(t => t.Name)
             .ToListAsync();
-        ViewBag.AllTags = allTags
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(t => t, StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        var selectedTag = RecipeTag.Parse(tag).FirstOrDefault();
 
-        var query = _context.Recipes
+        // The most-used tags become filter pills; the search box finds the rest.
+        var pillTags = allTags
+            .GroupBy(t => t, StringComparer.OrdinalIgnoreCase)
+            .OrderByDescending(g => g.Count())
+            .ThenBy(g => g.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.Key)
+            .Take(8)
+            .ToList();
+        if (selectedTag != null && !pillTags.Contains(selectedTag, StringComparer.OrdinalIgnoreCase))
+            pillTags.Add(selectedTag);
+
+        ViewBag.PillTags = pillTags;
+        ViewBag.SelectedTag = selectedTag;
+
+        var recipes = await _context.Recipes
             .Include(r => r.Ingredients)
             .Include(r => r.Tags.OrderBy(t => t.Name))
             .AsSplitQuery()
-            .Where(r => r.OwnerID == CurrentUserId);
-
-        var selectedTag = RecipeTag.Parse(tag).FirstOrDefault();
-        ViewBag.SelectedTag = selectedTag;
-        if (selectedTag != null)
-        {
-            var normalized = selectedTag.ToUpper();
-            query = query.Where(r => r.Tags.Any(t => t.Name.ToUpper() == normalized));
-        }
-
-        var recipes = await query
+            .Where(r => r.OwnerID == CurrentUserId)
             .OrderByDescending(r => r.CreatedDate)
             .ToListAsync();
         return View(recipes);

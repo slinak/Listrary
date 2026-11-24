@@ -1,134 +1,257 @@
-@model ListManager.Models.Circle
+@model ListManager.Models.CircleSummaryViewModel
+@using ListManager.Models
 
 @{
-    ViewData["Title"] = SharedLocalizer["Circles.Manage.Title"].Value;
+    var circle = Model.Circle;
+    ViewData["Title"] = circle.Name;
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var lists = Model.Lists.ToList();
+    var members = circle.Members.OrderByDescending(m => m.UserID == circle.OwnerID).ThenBy(m => m.JoinedDate).ToList();
+    var pendingInvites = circle.Invitations.Where(i => !i.Accepted).OrderBy(i => i.CreatedDate).ToList();
+    var isMember = members.Any(m => m.UserID == currentUserId);
+    var openInvite = TempData["StatusMessage"] == null && !pendingInvites.Any() && members.Count <= 1;
+    string IconClass(ListType? type) => type switch
+    {
+        ListType.Shopping => "list-icon-shopping",
+        ListType.ToDo => "list-icon-todo",
+        ListType.WishList => "list-icon-wishlist",
+        _ => "list-icon-default"
+    };
 }
+
+<nav class="app-breadcrumb" aria-label="breadcrumb">
+    <a asp-action="Index">@SharedLocalizer["Nav.Circles"]</a>
+    <span class="sep" aria-hidden="true">›</span>
+    <span aria-current="page">@circle.Name</span>
+</nav>
 
 @if (TempData["StatusMessage"] != null)
 {
-    <div class="alert alert-success" role="alert">
-        @TempData["StatusMessage"]
-    </div>
+    <div class="alert alert-success" role="alert">@TempData["StatusMessage"]</div>
 }
 
-<div class="card">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <h2 class="card-title">@SharedLocalizer["Circles.Manage.Heading", Model.Name]</h2>
-                <p class="mb-1"><span class="badge text-bg-info">@SharedLocalizer["Circles.Owner"]</span> @Model.OwnerID</p>
-            </div>
-            <div class="text-end">
-                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@SharedLocalizer["Circles.BackToCircles"]</a>
-                @if (Model.OwnerID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
-                {
-                    <form asp-action="Delete" method="post" class="d-inline ms-2" onsubmit="return confirm('@SharedLocalizer["Circles.DeleteConfirm"]');">
-                        <input type="hidden" name="circleId" value="@Model.CircleID" />
-                        <button class="btn btn-sm btn-danger">@SharedLocalizer["Circles.DeleteCircle"]</button>
-                    </form>
-                }
+<div class="card detail-header">
+    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3 min-w-0">
+            <span class="list-icon list-icon-lg list-icon-circle" aria-hidden="true"><partial name="_Icon" model="@("circles")" /></span>
+            <div class="min-w-0">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <h1 class="detail-title text-break">@circle.Name</h1>
+                    <span class="badge rounded-pill @(Model.IsOwner ? "badge-tint-purple" : "badge-theme-neutral")">@SharedLocalizer[Model.IsOwner ? "Circles.Role.Owner" : "Circles.Role.Member"]</span>
+                </div>
+                <div class="detail-meta mt-1">
+                    @SharedLocalizer[members.Count == 1 ? "Circles.MemberCountSingular" : "Circles.MemberCountPlural", members.Count]
+                    · @lists.Count @SharedLocalizer[lists.Count == 1 ? "Common.ListSingular" : "Common.ListPlural"]
+                    · @SharedLocalizer["Circles.Created"] @circle.CreatedDate.ToString("MMM yyyy")
+                </div>
             </div>
         </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-controller="Lists" asp-action="Create" asp-route-circleId="@circle.CircleID" class="btn btn-primary">
+                <partial name="_Icon" model="@("plus")" /> <span class="ms-1">@SharedLocalizer["Lists.Create.Title"]</span>
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@SharedLocalizer["Common.MoreActions"]">
+                    <partial name="_Icon" model="@("dots")" />
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><button type="button" class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#invitePanel">@SharedLocalizer["Circles.Invite"]</button></li>
+                    @if (Model.IsOwner)
+                    {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <button type="button" class="dropdown-item text-danger confirm-delete-btn"
+                                    data-delete-url="@Url.Action("Delete", "Circles", new { circleId = circle.CircleID })"
+                                    data-delete-prompt="@SharedLocalizer["Circles.DeletePrompt"]"
+                                    data-delete-name="@circle.Name">@SharedLocalizer["Circles.DeleteCircle"]</button>
+                        </li>
+                    }
+                    else if (isMember)
+                    {
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form asp-action="Leave" method="post">
+                                <input type="hidden" name="circleId" value="@circle.CircleID" />
+                                <button type="submit" class="dropdown-item text-danger">@SharedLocalizer["Circles.LeaveCircle"]</button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
-        <h4 class="mt-3">@SharedLocalizer["Circles.Members"]</h4>
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th>@SharedLocalizer["Circles.Members.User"]</th>
-                    <th>@SharedLocalizer["Circles.Members.Joined"]</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var m in Model.Members)
+<div class="collapse @(openInvite ? "show" : "")" id="invitePanel">
+    <div class="card list-card mb-3">
+        <div class="card-body">
+            <h2 class="h6 fw-semibold">@SharedLocalizer["Circles.Invite"]</h2>
+            <form asp-action="Invite" method="post" id="inviteForm" class="row g-2 align-items-end">
+                <input type="hidden" name="CircleID" value="@circle.CircleID" />
+                <div class="col-md-6">
+                    <label class="form-label" for="recipientEmail">@SharedLocalizer["Circles.RecipientEmail"]</label>
+                    <input id="recipientEmail" name="recipientEmail" class="form-control" type="email" placeholder="@SharedLocalizer["Circles.RecipientEmailPlaceholder"]" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="recipientId">@SharedLocalizer["Circles.RecipientUserIdOptional"]</label>
+                    <input id="recipientId" name="recipientId" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">@SharedLocalizer["Common.Send"]</button>
+                </div>
+                <div class="col-12"><div id="inviteError" class="small text-danger d-none">@SharedLocalizer["Circles.Invite.Validation"]</div></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <h2 class="section-heading">@SharedLocalizer["Nav.Lists"] <span class="count">(@lists.Count)</span></h2>
+        @if (!lists.Any())
+        {
+            <div class="empty-state text-center p-4">
+                <p class="text-body-secondary mb-3">@SharedLocalizer["Lists.Circle.Empty"]</p>
+                <a asp-controller="Lists" asp-action="Create" asp-route-circleId="@circle.CircleID" class="btn btn-primary btn-sm">@SharedLocalizer["Lists.Create.Title"]</a>
+            </div>
+        }
+        <div class="d-flex flex-column gap-2">
+            @foreach (var item in lists)
             {
-                <tr>
-                    <td>@m.UserID</td>
-                    <td>@m.JoinedDate.ToShortDateString()</td>
-                    <td>
-                        @if (Model.OwnerID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
-                        {
-                            <form asp-action="RemoveMember" method="post" class="d-inline">
-                                <input type="hidden" name="circleId" value="@Model.CircleID" />
-                                <input type="hidden" name="UserID" value="@m.UserID" />
-                                <button class="btn btn-sm btn-outline-danger">@SharedLocalizer["Common.Remove"]</button>
-                            </form>
-                        }
-                        @if (m.UserID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value && Model.OwnerID != m.UserID)
-                        {
-                            <form asp-action="Leave" method="post" class="d-inline">
-                                <input type="hidden" name="CircleID" value="@Model.CircleID" />
-                                <button class="btn btn-sm btn-outline-secondary">@SharedLocalizer["Common.Leave"]</button>
-                            </form>
-                        }
-                    </td>
-                </tr>
+                var list = item.ListModel!;
+                <a class="card item-row row-link" asp-controller="Lists" asp-action="Manage" asp-route-id="@list.ListID">
+                    <div class="card-body d-flex align-items-center gap-3 py-2">
+                        <span class="list-icon @IconClass(list.ListType)" aria-hidden="true"><partial name="_ListTypeIcon" model="list.ListType" /></span>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="fw-semibold text-truncate item-title">@list.ListName</div>
+                            <div class="small text-body-secondary">@list.ListType · <time datetime="@list.LastUpdatedDate.ToString("o")" data-relative-time>@list.LastUpdatedDate.ToString("MMM d, yyyy")</time></div>
+                        </div>
+                        <div class="d-none d-sm-block" style="width:5rem">
+                            <div class="progress list-progress mb-0" role="progressbar" aria-label="@SharedLocalizer["Lists.Progress", item.CompletedCount, item.ItemCount]" aria-valuenow="@item.Percent" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width:@item.Percent%"></div>
+                            </div>
+                        </div>
+                        <span class="small text-body-secondary text-nowrap">@item.CompletedCount/@item.ItemCount</span>
+                    </div>
+                </a>
             }
-            </tbody>
-        </table>
+        </div>
+    </div>
 
-        <h4 class="mt-4">@SharedLocalizer["Circles.Invitations"]</h4>
-        <table class="table table-sm">
-            <thead>
-                <tr><th>@SharedLocalizer["Circles.Invitations.Recipient"]</th><th>@SharedLocalizer["Circles.Invitations.Status"]</th><th></th></tr>
-            </thead>
-            <tbody>
-            @foreach (var i in Model.Invitations)
+    <div class="col-lg-5">
+        <h2 class="section-heading">
+            @SharedLocalizer["Circles.Members"] <span class="count">(@members.Count)</span>
+            <button type="button" class="btn btn-sm btn-link section-action p-0" data-bs-toggle="collapse" data-bs-target="#invitePanel">
+                <partial name="_Icon" model="@("person-plus")" /> @SharedLocalizer["Circles.Invite"]
+            </button>
+        </h2>
+        <div class="d-flex flex-column gap-2">
+            @foreach (var m in members)
             {
-                <tr>
-                    <td>@(i.RecipientEmail ?? i.RecipientID ?? SharedLocalizer["Circles.RecipientUnspecified"].Value)</td>
-                    <td>@(i.Accepted ? SharedLocalizer["Common.Accepted"].Value : SharedLocalizer["Common.Pending"].Value)</td>
-                    <td>
-                        @if (!i.Accepted)
-                        {
-                            <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Accept", "Circles", new { token = i.Token })">@SharedLocalizer["Circles.AcceptLink"]</a>
-                            @if (Model.OwnerID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value || i.InviterID == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                var isYou = m.UserID == currentUserId;
+                var isOwnerRow = m.UserID == circle.OwnerID;
+                <div class="card item-row">
+                    <div class="card-body d-flex align-items-center gap-3 py-2">
+                        <span class="avatar @(isYou ? "avatar-1" : "")" aria-hidden="true">
+                            @if (isYou)
                             {
-                                <form asp-action="RemoveInvitation" method="post" class="d-inline">
-                                    <input type="hidden" name="invitationId" value="@i.CircleInvitationID" />
-                                    <button class="btn btn-sm btn-outline-danger">@SharedLocalizer["Common.Cancel"]</button>
-                                </form>
+                                @SharedLocalizer["Circles.YouShort"]
                             }
-                        }
-                        else
+                            else
+                            {
+                                <partial name="_Icon" model="@("person")" />
+                            }
+                        </span>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="text-truncate" title="@m.UserID">@(isYou ? SharedLocalizer["Circles.You"].Value : m.UserID)</div>
+                            <div class="small text-body-secondary">@SharedLocalizer["Circles.Joined"] @m.JoinedDate.ToString("MMM d, yyyy")</div>
+                        </div>
+                        @if (isOwnerRow)
                         {
-                            <span>@SharedLocalizer["Circles.AcceptedBy"] @i.RecipientID</span>
+                            <span class="badge rounded-pill badge-tint-purple">@SharedLocalizer["Circles.Role.Owner"]</span>
                         }
-                    </td>
-                </tr>
+                        else if (Model.IsOwner)
+                        {
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-link text-body-secondary p-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@SharedLocalizer["Common.MoreActions"]">
+                                    <partial name="_Icon" model="@("dots")" />
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <form asp-action="RemoveMember" method="post">
+                                            <input type="hidden" name="circleId" value="@circle.CircleID" />
+                                            <input type="hidden" name="UserID" value="@m.UserID" />
+                                            <button type="submit" class="dropdown-item text-danger">@SharedLocalizer["Circles.RemoveMember"]</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
             }
-            </tbody>
-        </table>
+        </div>
 
-        <h4 class="mt-4">@SharedLocalizer["Circles.Invite"]</h4>
-        <form asp-action="Invite" method="post" id="inviteForm" class="row g-2 align-items-end">
-            <input type="hidden" name="CircleID" value="@Model.CircleID" />
-            <div class="col-md-6">
-                <label class="form-label">@SharedLocalizer["Circles.RecipientEmail"]</label>
-                <input name="recipientEmail" class="form-control" type="email" placeholder="@SharedLocalizer["Circles.RecipientEmailPlaceholder"]" />
+        @if (pendingInvites.Any())
+        {
+            <h2 class="section-heading">@SharedLocalizer["Circles.PendingInvitations"] <span class="count">(@pendingInvites.Count)</span></h2>
+            <div class="d-flex flex-column gap-2">
+                @foreach (var i in pendingInvites)
+                {
+                    var canCancel = Model.IsOwner || i.InviterID == currentUserId;
+                    var acceptUrl = Url.Action("Accept", "Circles", new { token = i.Token }, Context.Request.Scheme);
+                    <div class="card item-row">
+                        <div class="card-body d-flex align-items-center gap-3 py-2">
+                            <span class="avatar" aria-hidden="true"><partial name="_Icon" model="@("mail")" /></span>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="text-truncate">@(i.RecipientEmail ?? i.RecipientID ?? SharedLocalizer["Circles.RecipientUnspecified"].Value)</div>
+                                <div class="small text-body-secondary">@SharedLocalizer["Circles.Sent"] <time datetime="@i.CreatedDate.ToString("o")" data-relative-time>@i.CreatedDate.ToString("MMM d, yyyy")</time></div>
+                            </div>
+                            <span class="badge rounded-pill badge-tint-amber">@SharedLocalizer["Common.Pending"]</span>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-link text-body-secondary p-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@SharedLocalizer["Common.MoreActions"]">
+                                    <partial name="_Icon" model="@("dots")" />
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><button type="button" class="dropdown-item" data-copy-text="@acceptUrl" data-copied-label="@SharedLocalizer["Circles.LinkCopied"]">@SharedLocalizer["Circles.CopyInviteLink"]</button></li>
+                                    @if (canCancel)
+                                    {
+                                        <li>
+                                            <form asp-action="RemoveInvitation" method="post">
+                                                <input type="hidden" name="invitationId" value="@i.CircleInvitationID" />
+                                                <button type="submit" class="dropdown-item text-danger">@SharedLocalizer["Circles.CancelInvite"]</button>
+                                            </form>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
-            <div class="col-md-4">
-                <label class="form-label">@SharedLocalizer["Circles.RecipientUserIdOptional"]</label>
-                <input name="recipientId" class="form-control" />
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">@SharedLocalizer["Common.Send"]</button>
-            </div>
-        </form>
+        }
     </div>
 </div>
 
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
     <script>
-        // Simple client-side validation: require either email or UserID
+        // Require an email or a user ID before sending an invite.
         document.getElementById('inviteForm').addEventListener('submit', function (e) {
-            var email = document.querySelector('[name="recipientEmail"]').value.trim();
-            var uid = document.querySelector('[name="recipientId"]').value.trim();
-            if (!email && !uid) {
-                e.preventDefault();
-                alert('@SharedLocalizer["Circles.Invite.Validation"]');
-            }
+            var email = document.getElementById('recipientEmail').value.trim();
+            var uid = document.getElementById('recipientId').value.trim();
+            var error = document.getElementById('inviteError');
+            var missing = !email && !uid;
+            error.classList.toggle('d-none', !missing);
+            if (missing) e.preventDefault();
+        });
+
+        document.querySelectorAll('[data-copy-text]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                if (!navigator.clipboard) return;
+                navigator.clipboard.writeText(button.getAttribute('data-copy-text')).then(function () {
+                    button.textContent = button.getAttribute('data-copied-label');
+                });
+            });
         });
     </script>
 }

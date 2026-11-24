@@ -1,0 +1,30 @@
+@model ListManager.Models.Circle
+@* Small overlapping avatars for a circle's members. Only user IDs are stored, so the
+   avatar shows "You" for the signed-in user and a neutral person icon for everyone else. *@
+@{
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var members = Model.Members.OrderByDescending(m => m.UserID == currentUserId).ThenBy(m => m.JoinedDate).ToList();
+    const int shown = 3;
+}
+<span class="d-inline-flex align-items-center gap-2">
+    <span class="avatar-stack" aria-hidden="true">
+        @for (var i = 0; i < Math.Min(shown, members.Count); i++)
+        {
+            <span class="avatar avatar-@(i % 5)">
+                @if (members[i].UserID == currentUserId)
+                {
+                    @SharedLocalizer["Circles.YouShort"]
+                }
+                else
+                {
+                    <partial name="_Icon" model="@("person")" />
+                }
+            </span>
+        }
+        @if (members.Count > shown)
+        {
+            <span class="avatar">+@(members.Count - shown)</span>
+        }
+    </span>
+    <span class="small text-body-secondary">@SharedLocalizer[members.Count == 1 ? "Circles.MemberCountSingular" : "Circles.MemberCountPlural", members.Count]</span>
+</span>

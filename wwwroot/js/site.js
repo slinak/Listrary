@@ -61,49 +61,90 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// ── List search / type filter / delete modal ──
+// ── Index pages: search box and filter pills ──
+// Cards are .entity-col elements with data-filter-name (searched text) and
+// data-filter-tags ("|"-separated values the pills match against).
 document.addEventListener('DOMContentLoaded', function () {
-    var search = document.getElementById('listSearch');
-    var pills = document.querySelectorAll('[data-list-filter]');
+    var search = document.getElementById('entitySearch');
+    var pills = document.querySelectorAll('[data-entity-filter]');
     var groups = document.querySelectorAll('.list-group-section');
-    var noMatches = document.getElementById('listNoMatches');
-    var activeType = 'all';
+    var noMatches = document.getElementById('entityNoMatches');
+    var activeFilter = 'all';
 
     function applyFilters() {
         var term = search ? search.value.trim().toLowerCase() : '';
         var anyVisible = false;
-        document.querySelectorAll('.list-card-col').forEach(function (col) {
-            var matches = (activeType === 'all' || col.getAttribute('data-list-type') === activeType) &&
-                (!term || (col.getAttribute('data-list-name') || '').toLowerCase().indexOf(term) !== -1);
+        document.querySelectorAll('.entity-col').forEach(function (col) {
+            var tags = (col.getAttribute('data-filter-tags') || '').toLowerCase().split('|');
+            var matches = (activeFilter === 'all' || tags.indexOf(activeFilter) !== -1) &&
+                (!term || (col.getAttribute('data-filter-name') || '').toLowerCase().indexOf(term) !== -1);
             col.classList.toggle('d-none', !matches);
             anyVisible = anyVisible || matches;
         });
-        var filtering = term || activeType !== 'all';
+        var filtering = term || activeFilter !== 'all';
         groups.forEach(function (group) {
-            var hasVisible = group.querySelector('.list-card-col:not(.d-none)');
+            var hasVisible = group.querySelector('.entity-col:not(.d-none)');
             group.classList.toggle('d-none', !!filtering && !hasVisible);
         });
-        if (noMatches) noMatches.classList.toggle('d-none', anyVisible || !document.querySelector('.list-card-col'));
+        if (noMatches) noMatches.classList.toggle('d-none', anyVisible || !document.querySelector('.entity-col'));
     }
 
     if (search) search.addEventListener('input', applyFilters);
     pills.forEach(function (pill) {
         pill.addEventListener('click', function () {
-            activeType = pill.getAttribute('data-list-filter');
-            pills.forEach(function (p) { p.classList.toggle('active', p === pill); });
+            activeFilter = (pill.getAttribute('data-entity-filter') || 'all').toLowerCase();
+            pills.forEach(function (p) {
+                p.classList.toggle('active', p === pill);
+                p.setAttribute('aria-pressed', p === pill ? 'true' : 'false');
+            });
             applyFilters();
         });
     });
 
-    var modalEl = document.getElementById('deleteListModal');
-    if (modalEl) {
-        var modal = new bootstrap.Modal(modalEl);
-        document.querySelectorAll('.delete-list-btn').forEach(function (button) {
-            button.addEventListener('click', function () {
-                document.getElementById('deleteListName').textContent = button.getAttribute('data-list-name') || '';
-                document.getElementById('deleteListId').value = button.getAttribute('data-list-id');
-                modal.show();
+    // A pill can start selected, e.g. a recipe tag opened from a link.
+    var preselected = document.querySelector('[data-entity-filter].active');
+    if (preselected) {
+        activeFilter = (preselected.getAttribute('data-entity-filter') || 'all').toLowerCase();
+        applyFilters();
+    }
+});
+
+// ── Shared delete confirmation for lists, circles and recipes ──
+document.addEventListener('DOMContentLoaded', function () {
+    var modalEl = document.getElementById('confirmDeleteModal');
+    if (!modalEl) return;
+    var modal = new bootstrap.Modal(modalEl);
+    var form = document.getElementById('confirmDeleteForm');
+    document.querySelectorAll('.confirm-delete-btn').forEach(function (button) {
+        button.addEventListener('click', function () {
+            form.setAttribute('action', button.getAttribute('data-delete-url'));
+            document.getElementById('confirmDeletePrompt').textContent = button.getAttribute('data-delete-prompt') || '';
+            document.getElementById('confirmDeleteName').textContent = button.getAttribute('data-delete-name') || '';
+            modal.show();
+        });
+    });
+});
+
+// ── Recipe page: tick off ingredients while cooking, and the phone ingredients/steps switch ──
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-ingredient-toggle]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var row = button.closest('.item-row');
+            var checked = !button.classList.contains('checked');
+            button.classList.toggle('checked', checked);
+            button.setAttribute('aria-pressed', checked ? 'true' : 'false');
+            if (row) row.classList.toggle('item-row-completed', checked);
+        });
+    });
+
+    var recipe = document.querySelector('[data-recipe-view]');
+    document.querySelectorAll('[data-recipe-show]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            recipe.setAttribute('data-recipe-view', button.getAttribute('data-recipe-show'));
+            document.querySelectorAll('[data-recipe-show]').forEach(function (b) {
+                b.classList.toggle('active', b === button);
+                b.setAttribute('aria-pressed', b === button ? 'true' : 'false');
             });
         });
-    }
+    });
 });

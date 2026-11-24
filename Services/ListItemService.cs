@@ -16,7 +16,10 @@ public class ListItemService : IListItemService
         _localizer = localizer;
     }
 
-    public List<ListItem> GetManageViewOrderedItems(IEnumerable<ListItem> items)
+    public List<ListItem> GetManageViewOrderedItems(IEnumerable<ListItem> items) => OrderForManageView(items);
+
+    // Unchecked items first, grouped by store location, then the user's own order.
+    public static List<ListItem> OrderForManageView(IEnumerable<ListItem> items)
     {
         return items
             .OrderBy(item => item.IsCompleted)

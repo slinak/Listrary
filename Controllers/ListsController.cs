@@ -99,20 +99,13 @@ public class ListsController : Controller
             Circle = circle,
             Lists = _context.Lists
                 .Include(list => list.Items)
-                .Include(list => list.Shares)
                 .Include(list => list.Circle)
                 .Where(list => list.CircleID == circle.CircleID)
                 .OrderBy(list => list.CreatedDate)
-                .Select(list => new ListViewItemModel
-                {
-                    ListModel = list,
-                    ItemCount = list.Items.Count,
-                    CompletedCount = list.Items.Count(i => i.IsCompleted)
-                })
+                .AsEnumerable()
+                .Select(ListViewItemModel.FromList)
                 .ToList()
         }).ToList();
-
-        var circleListIds = circleGroups.SelectMany(group => group.Lists.Select(item => item.ListModel!.ListID)).ToHashSet();
 
         var otherLists = _context.Lists
             .Include(list => list.Items)
@@ -120,12 +113,8 @@ public class ListsController : Controller
             .Where(list => !list.CircleID.HasValue
                 && (list.OwnerID == userId || list.Shares.Any(share => share.RecipientID == userId)))
             .OrderBy(list => list.CreatedDate)
-            .Select(list => new ListViewItemModel
-            {
-                ListModel = list,
-                ItemCount = list.Items.Count,
-                    CompletedCount = list.Items.Count(i => i.IsCompleted)
-            })
+            .AsEnumerable()
+            .Select(ListViewItemModel.FromList)
             .ToList();
 
         var viewModel = new ListsIndexViewModel
@@ -137,47 +126,15 @@ public class ListsController : Controller
         return View(viewModel);
     }
 
-    // Show all lists that belong to a specific circle (only available to circle owner or members)
+    // Old circle page; a circle's lists now live on the circle detail page.
     [HttpGet]
-    public IActionResult Circle(int id)
-    {
-        var circle = _context.Circles
-            .Include(c => c.Members)
-            .FirstOrDefault(c => c.CircleID == id);
-
-        if (circle == null)
-            return NotFound();
-
-        var userId = CurrentUserId;
-        var isMemberOrOwner = circle.OwnerID == userId || circle.Members.Any(m => m.UserID == userId);
-        if (!isMemberOrOwner)
-            return NotFound();
-
-        var listViewModels = _context.Lists
-            .Include(l => l.Items)
-            .Include(l => l.Shares)
-            .Include(l => l.Circle)
-            .Where(l => l.CircleID == id)
-            .OrderBy(l => l.CreatedDate)
-            .Select(l => new ListViewItemModel
-            {
-                ListModel = l,
-                ItemCount = l.Items.Count,
-                CompletedCount = l.Items.Count(i => i.IsCompleted)
-            })
-            .ToList();
-
-        ViewData["CircleName"] = circle.Name;
-        ViewData["CircleId"] = id;
-
-        return View("Circle", listViewModels);
-    }
+    public IActionResult Circle(int id) => RedirectToAction("Manage", "Circles", new { id });
 
     [HttpGet]
-    public IActionResult Create()
+    public IActionResult Create(int? circleId)
     {
         ViewBag.CircleOptions = GetCircleSelectList();
-        return View(new List { ListType = ListType.Shopping });
+        return View(new List { ListType = ListType.Shopping, CircleID = circleId });
     }
 
     [HttpPost]
@@ -257,6 +214,7 @@ public class ListsController : Controller
         var list = _context.Lists
             .Include(l => l.Items)
             .Include(l => l.Shares)
+            .Include(l => l.Circle)
             .FirstOrDefault(l => l.ListID == id);
 
         if (list == null)
@@ -323,6 +281,7 @@ public class ListsController : Controller
         var list = _context.Lists
             .Include(l => l.Items)
             .Include(l => l.Shares)
+            .Include(l => l.Circle)
             .FirstOrDefault(l => l.ListID == id && l.OwnerID == CurrentUserId);
 
         if (list == null)

@@ -1,51 +1,67 @@
 @model ListManager.Models.CirclesIndexViewModel
+@using ListManager.Models
 
 @{
     ViewData["Title"] = SharedLocalizer["Circles.YourCircles"].Value;
+    string IconClass(ListType? type) => type switch
+    {
+        ListType.Shopping => "list-icon-shopping",
+        ListType.ToDo => "list-icon-todo",
+        ListType.WishList => "list-icon-wishlist",
+        _ => "list-icon-default"
+    };
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="display-4 mb-0">@SharedLocalizer["Nav.Circles"]</h1>
-    <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg me-2" viewBox="0 0 16 16" aria-hidden="true">
-            <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5V7.5H14a.5.5 0 0 1 0 1H8.5V14a.5.5 0 0 1-1 0V8.5H2a.5.5 0 0 1 0-1h5.5V1.5A.5.5 0 0 1 8 1z"/>
-        </svg>
-        @SharedLocalizer["Circles.Create.Title"]
+<div class="page-header">
+    <h1 class="page-title">@SharedLocalizer["Nav.Circles"]<span class="page-count">@Model.Circles.Count()</span></h1>
+    <a asp-action="Create" class="btn btn-primary page-primary-action" aria-label="@SharedLocalizer["Circles.Create.Title"]">
+        <partial name="_Icon" model="@("plus")" />
+        <span class="page-primary-label">@SharedLocalizer["Circles.Create.Title"]</span>
     </a>
 </div>
 
 @if (TempData["StatusMessage"] != null)
 {
-    <div class="alert alert-success" role="alert">
-        @TempData["StatusMessage"]
+    <div class="alert alert-success" role="alert">@TempData["StatusMessage"]</div>
+}
+
+@if (Model.Circles.Any())
+{
+    <div class="page-toolbar">
+        <input type="search" id="entitySearch" class="form-control list-search" placeholder="@SharedLocalizer["Circles.Search.Placeholder"]" aria-label="@SharedLocalizer["Circles.Search.Placeholder"]" />
+        <div class="d-flex flex-wrap gap-2 filter-pills" role="group">
+            <button type="button" class="btn btn-sm rounded-pill filter-pill active" aria-pressed="true" data-entity-filter="all">@SharedLocalizer["Common.All"]</button>
+            <button type="button" class="btn btn-sm rounded-pill filter-pill" aria-pressed="false" data-entity-filter="owned">@SharedLocalizer["Circles.Filter.Owned"]</button>
+            <button type="button" class="btn btn-sm rounded-pill filter-pill" aria-pressed="false" data-entity-filter="joined">@SharedLocalizer["Circles.Filter.Joined"]</button>
+        </div>
     </div>
 }
 
 @if (Model.PendingInvitations.Any())
 {
     <section class="mb-4">
-        <h5 class="fw-semibold mb-3">@SharedLocalizer["Circles.PendingInvitations"]</h5>
-        <div class="row row-cols-1 row-cols-md-2 g-3">
+        <h2 class="section-heading mt-0">@SharedLocalizer["Circles.PendingInvitations"] <span class="count">(@Model.PendingInvitations.Count())</span></h2>
+        <div class="d-flex flex-column gap-2">
             @foreach (var invite in Model.PendingInvitations)
             {
-                <div class="col">
-                    <div class="card list-card h-100">
-                        <div class="card-body d-flex justify-content-between align-items-start gap-3">
-                            <div class="min-w-0">
-                                <h5 class="mb-1">@invite.Circle?.Name</h5>
-                                <p class="mb-1 small text-body-secondary">@SharedLocalizer["Circles.InvitedBy"] @invite.InviterID</p>
-                                <small class="text-body-secondary">@SharedLocalizer["Circles.InvitedOn"] @invite.CreatedDate.ToString("g")</small>
+                <div class="card item-row">
+                    <div class="card-body d-flex flex-wrap align-items-center gap-3 py-2">
+                        <span class="list-icon list-icon-circle" aria-hidden="true"><partial name="_Icon" model="@("mail")" /></span>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="fw-semibold text-truncate">@invite.Circle?.Name</div>
+                            <div class="small text-body-secondary">
+                                @SharedLocalizer["Circles.Invited"] <time datetime="@invite.CreatedDate.ToString("o")" data-relative-time>@invite.CreatedDate.ToString("g")</time>
                             </div>
-                            <div class="d-flex gap-2">
-                                <form asp-action="AcceptInvite" method="post">
-                                    <input type="hidden" name="invitationId" value="@invite.CircleInvitationID" />
-                                    <button type="submit" class="btn btn-sm btn-success">@SharedLocalizer["Common.Accept"]</button>
-                                </form>
-                                <form asp-action="RejectInvite" method="post">
-                                    <input type="hidden" name="invitationId" value="@invite.CircleInvitationID" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">@SharedLocalizer["Common.Reject"]</button>
-                                </form>
-                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <form asp-action="RejectInvite" method="post">
+                                <input type="hidden" name="invitationId" value="@invite.CircleInvitationID" />
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">@SharedLocalizer["Common.Reject"]</button>
+                            </form>
+                            <form asp-action="AcceptInvite" method="post">
+                                <input type="hidden" name="invitationId" value="@invite.CircleInvitationID" />
+                                <button type="submit" class="btn btn-sm btn-primary">@SharedLocalizer["Common.Accept"]</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -64,31 +80,56 @@
 }
 else
 {
-    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
-        @foreach (var c in Model.Circles)
-        {
-            <div class="col">
-                <div class="card list-card h-100 position-relative">
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <span class="list-icon list-icon-circle" aria-hidden="true">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/></svg>
-                            </span>
-                            <div class="flex-grow-1 min-w-0">
-                                <h5 class="card-title mb-1 text-truncate">
-                                    <a asp-controller="Lists" asp-action="Circle" asp-route-id="@c.CircleID" class="stretched-link text-decoration-none list-card-link">@c.Name</a>
-                                </h5>
-                                <span class="badge rounded-pill badge-theme-neutral">@(c.Members?.Count ?? 0) @SharedLocalizer["Circles.Members"]</span>
+    <section class="list-group-section">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+            @foreach (var summary in Model.Circles)
+            {
+                var c = summary.Circle;
+                var lists = summary.Lists.ToList();
+                <div class="col entity-col" data-filter-name="@c.Name" data-filter-tags="@(summary.IsOwner ? "owned" : "joined")">
+                    <div class="card list-card h-100 position-relative">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="list-icon list-icon-circle" aria-hidden="true"><partial name="_Icon" model="@("circles")" /></span>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h5 class="card-title mb-1 text-truncate">
+                                        <a asp-action="Manage" asp-route-id="@c.CircleID" class="stretched-link text-decoration-none list-card-link">@c.Name</a>
+                                    </h5>
+                                    <span class="badge rounded-pill @(summary.IsOwner ? "badge-tint-purple" : "badge-theme-neutral")">@SharedLocalizer[summary.IsOwner ? "Circles.Role.Owner" : "Circles.Role.Member"]</span>
+                                </div>
                             </div>
-                        </div>
-                        <p class="small text-body-secondary mb-3 text-truncate"><strong>@SharedLocalizer["Circles.Owner"]</strong> @c.OwnerID</p>
-                        <div class="mt-auto d-flex gap-2 position-relative" style="z-index:2">
-                            <a class="btn btn-sm btn-outline-primary" asp-controller="Lists" asp-action="Circle" asp-route-id="@c.CircleID">@SharedLocalizer["Circles.ViewLists"]</a>
-                            <a class="btn btn-sm btn-outline-secondary" asp-action="Manage" asp-route-id="@c.CircleID">@SharedLocalizer["Common.Manage"]</a>
+
+                            @if (lists.Any())
+                            {
+                                <ul class="card-preview">
+                                    @foreach (var list in lists.Take(ListViewItemModel.PreviewSize))
+                                    {
+                                        <li>
+                                            <span class="list-icon @IconClass(list.ListModel!.ListType)" aria-hidden="true"><partial name="_ListTypeIcon" model="list.ListModel.ListType" /></span>
+                                            <span>@list.ListModel.ListName</span>
+                                            <span class="preview-count">@list.CompletedCount/@list.ItemCount</span>
+                                        </li>
+                                    }
+                                    @if (lists.Count > ListViewItemModel.PreviewSize)
+                                    {
+                                        <li class="more">@SharedLocalizer["Circles.MoreLists", lists.Count - ListViewItemModel.PreviewSize]</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="small text-body-secondary mb-0">@SharedLocalizer["Lists.Circle.Empty"]</p>
+                            }
+
+                            <div class="mt-auto d-flex justify-content-between align-items-center gap-2 small text-body-secondary">
+                                <partial name="_CircleAvatars" model="c" />
+                                <time class="text-nowrap" datetime="@summary.LastActivity.ToString("o")" data-relative-time>@summary.LastActivity.ToString("MMM d, yyyy")</time>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    </section>
+    <p id="entityNoMatches" class="text-center text-body-secondary d-none mt-3">@SharedLocalizer["Circles.NoMatches"]</p>
 }
