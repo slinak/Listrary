@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "listmanager",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "ListManager.csproj", "--launch-profile", "https", "--no-build"],
+      "port": 7269,
+      "url": "https://localhost:7269"
+    }
+  ]
+}
