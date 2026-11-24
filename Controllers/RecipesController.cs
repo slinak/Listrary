@@ -86,19 +86,16 @@ public class RecipesController : Controller
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateList(int id, string? listName, ListType listType, int[]? selectedIngredientIds)
+    public async Task<IActionResult> CreateList(int id, string? listName, ListType listType)
     {
         var recipe = await FindOwnedRecipeAsync(id);
         if (recipe == null)
             return NotFound();
 
-        var selected = recipe.Ingredients
-            .Where(i => selectedIngredientIds != null && selectedIngredientIds.Contains(i.RecipeIngredientID))
-            .OrderBy(i => i.SortOrder)
-            .ToList();
+        var selected = recipe.Ingredients.OrderBy(i => i.SortOrder).ToList();
         if (selected.Count == 0)
         {
-            TempData["RecipeError"] = "Select at least one ingredient.";
+            TempData["RecipeError"] = "This recipe has no ingredients.";
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -142,11 +139,35 @@ public class RecipesController : Controller
 
         var lines = (model.IngredientsText ?? string.Empty)
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Trim().TrimStart('-', '*', '\u2022', '\u00B7', '\u2610', '\u25A1', '[', ']', ' ').Trim())
+            .Select(line => line.Trim())
             .Where(line => line.Length > 0)
-            .Select(line => line.Length > 500 ? line[..500] : line)
-            .Take(200)
             .ToList();
+
+        // A line ending in a colon (e.g. "Kebabs:") starts a new ingredient section.
+        var ingredients = new List<RecipeIngredient>();
+        string? currentSection = null;
+        foreach (var line in lines)
+        {
+            if (line.EndsWith(':'))
+            {
+                var heading = line.TrimEnd(':').Trim();
+                currentSection = string.IsNullOrEmpty(heading) ? null : heading[..Math.Min(heading.Length, 100)];
+                continue;
+            }
+
+            var text = line.TrimStart('-', '*', '\u2022', '\u00B7', '\u2610', '\u25A1', '[', ']', ' ').Trim();
+            if (text.Length == 0)
+                continue;
+            if (ingredients.Count >= 200)
+                break;
+
+            ingredients.Add(new RecipeIngredient
+            {
+                Text = text.Length > 500 ? text[..500] : text,
+                Section = currentSection,
+                SortOrder = ingredients.Count
+            });
+        }
         var instructions = model.Instructions?.Trim();
 
         var recipe = new Recipe
@@ -154,7 +175,7 @@ public class RecipesController : Controller
             OwnerID = CurrentUserId,
             Title = name!,
             Instructions = string.IsNullOrEmpty(instructions) ? null : instructions,
-            Ingredients = lines.Select((text, index) => new RecipeIngredient { Text = text, SortOrder = index }).ToList()
+            Ingredients = ingredients
         };
         _context.Recipes.Add(recipe);
         await _context.SaveChangesAsync();

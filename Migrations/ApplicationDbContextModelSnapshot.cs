@@ -330,6 +330,10 @@ namespace ListManager.Migrations
                     b.Property<int>("RecipeID")
                         .HasColumnType("int");
 
+                    b.Property<string>("Section")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
 

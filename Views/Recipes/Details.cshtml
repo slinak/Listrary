@@ -1,10 +1,20 @@
+@using ListManager.Services
 @model ListManager.Models.Recipe
 
 @{
     ViewData["Title"] = Model.Title;
 }
 
-<h1 class="display-6">@Model.Title</h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="display-6 mb-0">@Model.Title</h1>
+    <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createListModal">@SharedLocalizer["Recipes.CreateList"]</button>
+        <form asp-action="Delete" asp-route-id="@Model.RecipeID" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger">@SharedLocalizer["Recipes.Delete"]</button>
+        </form>
+    </div>
+</div>
 
 @if (!string.IsNullOrEmpty(Model.SourceUrl) && Uri.TryCreate(Model.SourceUrl, UriKind.Absolute, out var source)
     && (source.Scheme == Uri.UriSchemeHttp || source.Scheme == Uri.UriSchemeHttps))
@@ -17,46 +27,61 @@
     <div class="alert alert-danger">@error</div>
 }
 
-<form asp-action="CreateList" asp-route-id="@Model.RecipeID" method="post">
-    @Html.AntiForgeryToken()
-    <h2 class="h5">@SharedLocalizer["Recipes.Ingredients"]</h2>
+<h2 class="h5">@SharedLocalizer["Recipes.Ingredients"]</h2>
+@foreach (var group in Model.Ingredients.GroupBy(i => i.Section))
+{
+    if (!string.IsNullOrEmpty(group.Key))
+    {
+        <h3 class="h6 mt-3">@group.Key</h3>
+    }
     <ul class="list-unstyled">
-        @foreach (var ingredient in Model.Ingredients)
+        @foreach (var ingredient in group)
         {
-            <li class="form-check">
-                <input class="form-check-input" type="checkbox" name="selectedIngredientIds" value="@ingredient.RecipeIngredientID" id="ing-@ingredient.RecipeIngredientID" checked />
-                <label class="form-check-label" for="ing-@ingredient.RecipeIngredientID">@ingredient.Text</label>
-            </li>
+            <li>@ingredient.Text</li>
         }
     </ul>
-
-    <div class="row g-2 align-items-end mb-3">
-        <div class="col-md-6">
-            <label class="form-label" for="listName">@SharedLocalizer["Lists.Fields.ListName"]</label>
-            <input type="text" id="listName" name="listName" class="form-control" maxlength="100" value="@Model.Title" />
-        </div>
-        <div class="col-md-3">
-            <label class="form-label" for="listType">@SharedLocalizer["Lists.Fields.ListType"]</label>
-            <select id="listType" name="listType" class="form-select">
-                @foreach (var type in Enum.GetValues<ListManager.Models.ListType>())
-                {
-                    <option value="@type" selected="@(type == ListManager.Models.ListType.Shopping)">@type</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-primary">@SharedLocalizer["Recipes.CreateList"]</button>
-        </div>
-    </div>
-</form>
+}
 
 @if (!string.IsNullOrWhiteSpace(Model.Instructions))
 {
     <h2 class="h5">@SharedLocalizer["Recipes.Instructions"]</h2>
-    <p style="white-space: pre-wrap">@Model.Instructions</p>
+    <ol class="ps-3">
+        @foreach (var step in RecipeInstructionParser.Parse(Model.Instructions))
+        {
+            <li class="mb-2">@step</li>
+        }
+    </ol>
 }
 
-<form asp-action="Delete" asp-route-id="@Model.RecipeID" method="post">
-    @Html.AntiForgeryToken()
-    <button type="submit" class="btn btn-outline-danger btn-sm">@SharedLocalizer["Recipes.Delete"]</button>
-</form>
+<div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="CreateList" asp-route-id="@Model.RecipeID" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createListModalLabel">@SharedLocalizer["Lists.Create.Title"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="listName">@SharedLocalizer["Lists.Fields.ListName"]</label>
+                        <input type="text" id="listName" name="listName" class="form-control" maxlength="100" value="@Model.Title" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="listType">@SharedLocalizer["Lists.Fields.ListType"]</label>
+                        <select id="listType" name="listType" class="form-select">
+                            @foreach (var type in Enum.GetValues<ListManager.Models.ListType>())
+                            {
+                                <option value="@type" selected="@(type == ListManager.Models.ListType.Shopping)">@type</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SharedLocalizer["Common.Cancel"]</button>
+                    <button type="submit" class="btn btn-primary">@SharedLocalizer["Recipes.CreateList"]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
